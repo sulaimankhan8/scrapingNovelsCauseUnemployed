@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 432: Trap (Part 1)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .novel-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            min-height: 100vh;
+        }
+        
+        .chapter-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .chapter-title {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        
+        .chapter-number {
+            color: #7f8c8d;
+            font-size: 16px;
+            font-weight: normal;
+        }
+        
+        .chapter-content {
+            font-size: 18px;
+            text-align: justify;
+        }
+        
+        .chapter-content p {
+            margin-bottom: 1.5em;
+            text-indent: 2em;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .chapter-content p:first-child {
+            text-indent: 0;
+        }
+        
+        .chapter-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .nav-button.prev {
+            background-color: #2c3e50;
+        }
+        
+        .nav-button.prev:hover {
+            background-color: #1a252f;
+        }
+        
+        .nav-button.disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .nav-button.disabled:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: #95a5a6;
+        }
+        
+        .home-button {
+            display: block;
+            text-align: center;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            width: fit-content;
+        }
+        
+        .chapter-info {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .novel-container {
+                padding: 20px;
+            }
+            
+            .chapter-title {
+                font-size: 22px;
+            }
+            
+            .chapter-content {
+                font-size: 16px;
+            }
+            
+            .chapter-content p {
+                text-indent: 1.5em;
+            }
+            
+            .nav-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .chapter-navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="novel-container">
+        <div class="chapter-header">
+            <h1 class="chapter-title">Trap (Part 1)</h1>
+            <div class="chapter-number">Chapter 432</div>
+        </div>
+        
+        <div class="chapter-info">
+            Downloaded from NovelBin • 1/28/2026
+        </div>
+        
+        <div class="chapter-content">
+            <br><p>Leona sat next to Adam who was holding a tablet, on the screen was a list of various houses for sale in the Second Ring.</p><br><p>'Wow... To think my son is going to buy a house. It's one thing to pay rent steadily, but... to buy a house without a decade's worth of savings, you need a lot of money.' Leona internally muttered, baffled and amazed at the situation she was in.</p><br><p>She didn't even know how she was supposed to feel, as she was unprepared to sit on the couch after dinner and pick out a suitable house.</p><br><p>Sure, deep down inside she was glad, but the confusion was still a little stronger.</p><br><p>"Damn... after you said you have over two million, those prices don't look so intimidating. But... it's actually an unbelievable amount..." Leona said in a trembling voice looking at the prices listed under each offer.</p><br><p>Each offer came with dozens of photos of the house and every room from different angles, all the detailed information, map locations, 3D tours, and more.</p><br><p>But, the most key detail was always the price.</p><br><p>It didn't matter how conveniently located the house was or how well it suited the preferences of a particular individual or family if they couldn't pay the asking price.</p><br><p>In the Second Ring, prices were much higher than in the Third Ring. This applied to everything from the price of groceries or meals in a restaurant, to dental or hairdressing services.</p><br><p>However, the biggest difference in the cost of living was seen in housing prices.</p><br><p>On average, an ordinary house where a family of four could live comfortably in the Third Ring costs about 100,000 credits. Sure, there were more affordable offers, such houses cost in the range of 70-80 thousand credits.</p><br><p>Those who earned more, but for some reason could not or did not want to leave the Third Ring, could choose something from more expensive options. More expensive houses cost in the range of 120-150 thousand credits, which considering the average salary in the Third Ring could be regarded as almost a luxury.</p><br><p>Naturally, those who had big problems with finances could try to find cheaper options, or on the contrary, those who had a lot of money in the Third Ring could find some houses that cost more than 150 thousand credits, but this was the exception to the rule.</p><br><br><p>Leona muttered looking at the prices that seemed to be drawn without any objective reason.</p><br><p>She didn't understand how one needed to work to buy a house for half a million credits.</p><br><p>'Damn... Apparently, people working in the Second Ring earn more than in the Third Ring, but... it's still too much. I'm not sure if any houses in the Third Ring are worth 500,000 credits, maybe one and that's unlikely...'</p><br><p>Adam was surprised too, but his reaction was not as evident and strong as Leona's. After all, he realized that he could buy a house even for a million credits and still have enough money left over.</p><br><p>However, Adam was not going to throw money around. He wanted to choose an optimal option that first of all would have a good location, enough rooms and space, and made of quality materials.</p><br><p>'Silvana explained to me several times how prices worked when I asked her about our current house... Then I was quite shocked that rent could cost 1.100 credits...' Adam pondered internally, scrolling down.</p><br><p>'A house with a smaller area and cheaper materials might cost more simply because it's near some important buildings or workplaces. In our case, it would just be overpaying and a stupid decision, since these neighborhoods are usually noisy.'</p><br><p>Adam pondered, hoping that something could catch his eye soon.</p><br><p>After about half an hour, Leona and Adam selected several options, of varying cost and location. However, they didn't have a final decision.</p><br><p>"Hey, Adam, maybe you should discuss this with Silvana. She's a smart girl and is well-versed in these things. I'm sure she can find the perfect match for us." Leona suggested, placing a hand on Adam's shoulder.</p><br><p>Adam's eyes went wide as he slowly turned around, looking outside the window.</p><br><p>It was already evening, but the sun had not yet faded below the horizon, the sunset illuminating the city streets.</p><br><p>"Right, I was going to go over to her place. When I went out for gifts I bought something for her too." Adam muttered, remembering that he completely forgot about it.</p><br><br><p>"Then this is a great opportunity to do two things at once, isn't it?" Leona suggested, smiling slightly.</p><br><p>Adam looked over at Trici, who was sleeping on the couch, not suspecting that soon, they might live in a different house.</p><br><p>"Good, in that case, I'll go right now. She lives pretty far from here." Adam stood up and headed for the exit.</p><br><br><p>Leona called out to him, keeping her hands on her waist.</p><br><p>"Don't forget, you're always welcome. If you have the desire or free time then come in, the more often you're home, the happier your mom is."</p><br><p>Adam nodded deeply with a happy glint in his eyes.</p><br><p>"Sure, it's been a long time since I've felt as good as I did today, as well as yesterday..." Adam muttered remembering the night with Jena, "I definitely needed a break, which I'm not going to finish yet."</p><br><br><p>Adam opened the door stepping outside under Leona's gaze.</p><br><p>"Agh... We've lived in the slums all our lives and now my son wants us to move to the Second Ring? Well, I guess I shouldn't complain. It's a blessing that Adam can afford to take such good care of us."</p><br><p>Leona looked away as she whispered:</p><br><p>"The Phantoms are the embodiment of hope after all. Both for the entire Citadel and for their families..."</p><br><br><p>The hope helped to keep fighting even in the most desperate of situations and to strive for the dreams, no matter how unattainable they might seem.</p><br><p>But, hope was not only for humans, but for monsters as well.</p><br><p>The Redcore Wolf wasn't going to die here, he wanted to get out of Morton Observatory. Even if there were working rules here, this place was still hell for all but those who stood at the very top.</p><br><p>After a few clashes with Glara, Redcore Wolf realized that he couldn't defeat her, at least he would have to pay too high a price to do it, which was something that the Redcore Wolf wasn't ready for.</p><br><p>In that case, the Redcore Wolf had no other choice but to use his backup plan.</p><br><br><p>The Redcore Wolf rushed forward, it seemed he had once again decided to attack Glara. She got into a defensive stance, going to block his assault with her shield.</p><br><br><p>Gladius, watching the battle realized that this was not the Redcore Wolf's goal. A sly smirk appeared on his face.</p><br><p>'Hah, you're pretty smart after all. Glara, it was your choice and your mistake. Even if you survive, you can't become a Phantom of higher quality than your brother.' Gladius inwardly chuckled evilly.</p><br><p>Tremble. Tremble. Tremble.</p><br><p>The Redcore Wolf stopped abruptly in the center of the room as the crystal in his chest shone brightly.</p><br><p>Glara's green eyes reflected a bright red flash as an array of energy burst from the crystal, triggering a massive explosion.</p><br><p>A massive hole formed in the floor, a second later several streams of dark smoke came out, as if some other monster roughly equal in power to Redcore Wolf was trying to get in here... and Redcore Wolf had just given it that opportunity.</p>
+
+                        <br>
+        </div>
+        
+        <div class="chapter-navigation">
+            <a href="chapter_431.html" class="nav-button prev">← Chapter 431</a>
+            
+            <a href="index.html" class="nav-button">🏠 Chapters List</a>
+            
+            <a href="chapter_433.html" class="nav-button">Chapter 433 →</a>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add reading progress bar
+            const progressBar = document.createElement('div');
+            progressBar.style.position = 'fixed';
+            progressBar.style.top = '0';
+            progressBar.style.left = '0';
+            progressBar.style.width = '100%';
+            progressBar.style.height = '3px';
+            progressBar.style.backgroundColor = '#3498db';
+            progressBar.style.transform = 'scaleX(0)';
+            progressBar.style.transformOrigin = '0 0';
+            progressBar.style.transition = 'transform 0.1s';
+            progressBar.style.zIndex = '10000';
+            document.body.appendChild(progressBar);
+            
+            // Update progress
+            function updateProgress() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) : 0;
+                progressBar.style.transform = 'scaleX(' + progress + ')';
+            }
+            
+            window.addEventListener('scroll', updateProgress);
+            updateProgress();
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft' && true) {
+                    window.location.href = 'chapter_431.html';
+                } else if (e.key === 'ArrowRight' && true) {
+                    window.location.href = 'chapter_433.html';
+                } else if (e.key === 'Home' || e.key === 'h') {
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // Remove any leftover script tags from original content
+            document.querySelectorAll('script').forEach(script => script.remove());
+            
+            // Smooth scroll to top on load
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

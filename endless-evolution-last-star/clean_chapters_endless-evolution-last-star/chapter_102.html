@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 102: The Elevator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .novel-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            min-height: 100vh;
+        }
+        
+        .chapter-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .chapter-title {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        
+        .chapter-number {
+            color: #7f8c8d;
+            font-size: 16px;
+            font-weight: normal;
+        }
+        
+        .chapter-content {
+            font-size: 18px;
+            text-align: justify;
+        }
+        
+        .chapter-content p {
+            margin-bottom: 1.5em;
+            text-indent: 2em;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .chapter-content p:first-child {
+            text-indent: 0;
+        }
+        
+        .chapter-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .nav-button.prev {
+            background-color: #2c3e50;
+        }
+        
+        .nav-button.prev:hover {
+            background-color: #1a252f;
+        }
+        
+        .nav-button.disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .nav-button.disabled:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: #95a5a6;
+        }
+        
+        .home-button {
+            display: block;
+            text-align: center;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            width: fit-content;
+        }
+        
+        .chapter-info {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .novel-container {
+                padding: 20px;
+            }
+            
+            .chapter-title {
+                font-size: 22px;
+            }
+            
+            .chapter-content {
+                font-size: 16px;
+            }
+            
+            .chapter-content p {
+                text-indent: 1.5em;
+            }
+            
+            .nav-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .chapter-navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="novel-container">
+        <div class="chapter-header">
+            <h1 class="chapter-title">The Elevator</h1>
+            <div class="chapter-number">Chapter 102</div>
+        </div>
+        
+        <div class="chapter-info">
+            Downloaded from NovelBin • 1/28/2026
+        </div>
+        
+        <div class="chapter-content">
+            <br><p>The wind currents swept over Adam's shoulders, lightly ruffling his black hair, which rose slightly longer. His blue eyes grew, not only deeper but filled with the wisdom of painful experiences and accomplishments infused with delight.</p><br><p>His gaze was fixed on the bright sun, which would disappear over the horizon in a few hours and leave its place for the moon.</p><br><p>The moon brought peace and tranquility, just like the countless stars in the night sky.</p><br><p>However, no one would see the moon today, for it was the day of the Eclipse.</p><br><p>Eclipses occurred at night, hiding the moon and causing almost all light to disappear, even in the dark.</p><br><p>Adam had spent the past two days preparing for the Eclipse, more on the informational side. In those two days, however, he'd had time to do some training and eaten enough to fill himself up for a month.</p><br><p>Eclipses were nothing new to Adam, as they were to everyone in the Citadel. However, all he knew was that the Eclipses were dangerous, and the Phantoms put a lot of effort into defending their home.</p><br><p>"There won't be any night monsters among the invading monsters, right?" Adam muttered, wanting to be sure of his knowledge.</p><br><p>'Most likely. Although the time is appropriate, night monsters rarely gather in large groups, especially in massive waves of monsters that will strike the Bastion. However, the most important factor is the light.' Silvana said calmly.</p><br><p>At the same moment, several massive spotlights shone brightly, illuminating everything in front of the northern gate of the Bastion Radon. The lights would become an arena for the Phantoms, giving them an advantage and a shield from the night monsters.</p><br><p>These spotlights weren't the only ones, but most were still inactive as their turn would come at night.</p><br><p>Sure, the monsters were not afraid of light, they were creatures tearing their enemies apart without fear and with true violence.</p><br><p>Still, the spotlights had their uses, especially during the Eclipse, not just on a normal night.</p><br><p>As Silvana had said, the night monsters did not bunch up in groups, much less in waves. Moreover, the light annoyed them since they weren't used to it. It didn't affect their fighting ability, but these two factors greatly reduced the chances of them appearing on this night.</p><br><p>However, this only really worked during the Eclipse. If the Phantoms went on a normal night mission, they didn't have any bright spotlights or monster waves.</p><br><br><p>'Adam, you need to move to your squad. You'll be defending the left area in front of the north gate.' Silvana said calmly, occasionally receiving data and relaying information to him.</p><br><p>"Sure. It's almost time." Adam muttered, walking along the wall - towards the elevator.</p><br><p>He passed next to the military men, who were especially numerous today. Their rifles were useless, but grenades could distract monsters, and laser turrets could hurt White and Green Threat Level Monsters.</p><br><p>The military men nodded respectfully with serious faces. They knew that against monsters above Green Threat Level, only Phantoms could help them.</p><br><p>"Alright, twenty minutes left, right?" Adam muttered, glanced at his watch, and reached for the elevator panel, about to head downstairs - to the gate.</p><br><br><p>Suddenly, a worried voice sounded as a girl in blue winter clothes headed towards the elevator. Her eyes were filled with anxiety and seemed... shame?</p><br><p>At the last moment, Adam reached his hands forward, preventing the elevator from closing. With a little effort, he pushed aside the iron plates, weighing several hundred kilos each.</p><br><p>Then, the girl rocketed forward, finding herself right next to Adam.</p><br><p>"Whew! I made it, thanks for holding up the elevator!" The girl said with an excited smile, fixing her blue hair. The unruly ends were constantly coming out of her neatly folded ponytail, bobbing in front of her light freckles and green eyes.</p><br><p>"Wait... You're..." Adam muttered, slightly surprised, for he knew who the girl was.</p><br><p>The girl's eyes went wide as she held out her hand.</p><br><p>"Hey, you're Adam, aren't you? My name is Alexia, nice to meet you!" She said vigorously.</p><br><p>Adam nodded, shaking her hand. </p><br><br><p>Alexia was no random Phantom, for she was the leader of the K1-Left North Squad. This Squad was not official, since it was created for this night to defend the left area of the north gate.</p><br><p>There were two squads at each gate, as well as four more at diagonal points, creating a protective circle of Phantoms around the Bastion. Their primary goal was to hold off the monsters until morning, killing monsters was a secondary goal.</p><br><p>There were also K0, K2, K3, and K4-Squads, all located at different points and distances from the Bastion. All of this had been thought out and calculated beforehand for maximum effect.</p><br><p>Alexia had become their leader. That could only mean one thing - she was worthy of it as well as her skills.</p><br><p>'Hmm... Just like in the picture, she doesn't look like someone strong or formidable at all. However...' Adam pondered, looking at Alexia as his gaze headed towards her Nexus.</p><br><p>Like Adam, Alexia's Nexus was not a weapon, but combat gloves, made of cold metal with several tubes coming out of the far side of the gloves, near her elbows.</p><br><p>'Her Nexus doesn't look at all as harmless as she does. Moreover, even though we're about to fight waves of monsters, she looks as carefree as a child.'</p><br><p>"Adam... You're looking at me so intently." Alexia muttered, with flushed cheeks biting her fingertip, "Do you really like me?"</p><br><p>Adam raised an eyebrow puzzled, crossed his arms over his chest, and turned away with a calm look.</p><br><p>"This isn't the first time you've defended Bastion Radon, is it?"</p><br><p>Alexia's corners of her mouth lifted upward slightly.</p><br><br><p>Adam glanced at her.</p><br><p>"Do you have any advice? It's my first time."</p><br><br><p>"Beat your enemies, help your allies. However, if you decide to go it alone, take control of your area and stay out of my way."</p><br><p>A slight chill went down Adam's back, for Alexia's appearance and soft tone didn't match her words, at all.</p><br><p>'Interesting...' Adam internally muttered, 'Looks like my squad has a really strong leader this time.'</p><br><br><p>The elevator opened.</p><br><p>Adam and Alexia walked through the grand north gate, heading for the left area, where several dozen Phantoms were already waiting for them. Some didn't look particularly strong, but there were enough people here with powerful auras - they could compete with Adam.</p><br><p>"Agh..." Alexia took a deep breath, looking at the sun going behind the horizon line, "It's going to be a long night tonight. I advise you not to die because that's not cool!"</p><br><p>"Tsk. Thanks for the tip." Some Phantom smiled bitterly, shaking his head.</p><br><p>It seemed Adam wasn't the only one who was surprised that someone like Alexia was their leader, but no one was going to figure it out. They had one goal - to defeat the monsters. There were no enemies here, only allies.</p><br><p>Soon, after thirty minutes, the sun was gone, allowing the moon to gradually rise. However, instead of the moon, everyone saw only a thin disk of light - the only thing left of the moon in the eclipse.</p><br><p>Then, all the floodlights turned on simultaneously, illuminating the area around Bastion.</p><br><p>"ROOOOOOOOOOAAAAAARRRRRR!!!"</p><br><p>The terrifying roars echoed in the distance, resonating amongst themselves like the belligerent howls of an entire army.</p>
+
+                        <br>
+        </div>
+        
+        <div class="chapter-navigation">
+            <a href="chapter_101.html" class="nav-button prev">← Chapter 101</a>
+            
+            <a href="index.html" class="nav-button">🏠 Chapters List</a>
+            
+            <a href="chapter_103.html" class="nav-button">Chapter 103 →</a>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add reading progress bar
+            const progressBar = document.createElement('div');
+            progressBar.style.position = 'fixed';
+            progressBar.style.top = '0';
+            progressBar.style.left = '0';
+            progressBar.style.width = '100%';
+            progressBar.style.height = '3px';
+            progressBar.style.backgroundColor = '#3498db';
+            progressBar.style.transform = 'scaleX(0)';
+            progressBar.style.transformOrigin = '0 0';
+            progressBar.style.transition = 'transform 0.1s';
+            progressBar.style.zIndex = '10000';
+            document.body.appendChild(progressBar);
+            
+            // Update progress
+            function updateProgress() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) : 0;
+                progressBar.style.transform = 'scaleX(' + progress + ')';
+            }
+            
+            window.addEventListener('scroll', updateProgress);
+            updateProgress();
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft' && true) {
+                    window.location.href = 'chapter_101.html';
+                } else if (e.key === 'ArrowRight' && true) {
+                    window.location.href = 'chapter_103.html';
+                } else if (e.key === 'Home' || e.key === 'h') {
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // Remove any leftover script tags from original content
+            document.querySelectorAll('script').forEach(script => script.remove());
+            
+            // Smooth scroll to top on load
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 9: Virtual Zone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .novel-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            min-height: 100vh;
+        }
+        
+        .chapter-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .chapter-title {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        
+        .chapter-number {
+            color: #7f8c8d;
+            font-size: 16px;
+            font-weight: normal;
+        }
+        
+        .chapter-content {
+            font-size: 18px;
+            text-align: justify;
+        }
+        
+        .chapter-content p {
+            margin-bottom: 1.5em;
+            text-indent: 2em;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .chapter-content p:first-child {
+            text-indent: 0;
+        }
+        
+        .chapter-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .nav-button.prev {
+            background-color: #2c3e50;
+        }
+        
+        .nav-button.prev:hover {
+            background-color: #1a252f;
+        }
+        
+        .nav-button.disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .nav-button.disabled:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: #95a5a6;
+        }
+        
+        .home-button {
+            display: block;
+            text-align: center;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            width: fit-content;
+        }
+        
+        .chapter-info {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .novel-container {
+                padding: 20px;
+            }
+            
+            .chapter-title {
+                font-size: 22px;
+            }
+            
+            .chapter-content {
+                font-size: 16px;
+            }
+            
+            .chapter-content p {
+                text-indent: 1.5em;
+            }
+            
+            .nav-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .chapter-navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="novel-container">
+        <div class="chapter-header">
+            <h1 class="chapter-title">Virtual Zone</h1>
+            <div class="chapter-number">Chapter 9</div>
+        </div>
+        
+        <div class="chapter-info">
+            Downloaded from NovelBin • 1/28/2026
+        </div>
+        
+        <div class="chapter-content">
+            <h4>Chapter 9: Virtual Zone</h4><br><p>Adam sat at the table while Silvana brought four glasses filled with different liquids - water, juice, coffee, and tea. The glasses were equally spaced apart like a self-respecting perfectionist. </p><br><p>"Mr. Adam, I didn't know what you preferred, so I prepared everything I had at once." Silvana said seriously, bowing slightly. </p><br><p>She stood in front of the table though he sat and just waited for him to make his choice. </p><br><p>'Damn... Douglas was right when he said that Silvana is tough on the chain of command. Well, I don't mind, let her do what she wants, but... something needs to be fixed.' </p><br><p>Adam nodded, "Thanks, but I'm not thirsty, I prefer soda." </p><br><p>"Understood. Mr. Adam, next time I won't make the same mistake." Silvana instantly replied. </p><br><p>"Agh... Silvana, sticking to the subordination is your choice, but since this is about me after all, I want you to just call me by my first name. The rest is fine with me." Adam waved his hand, taking a glass of water. </p><br><p>Silvana bowed, "I can comply with that request." </p><br><p>"Fine, I want to go home, but before I do... Do you have any options on how I could get stronger? Maybe training or some kind of mission. As an Operator, can you help me with that?" Adam asked, leaving the half-empty glass on the table. </p><br><br><p>"I thought of it as soon as Mr. Douglas informed me of you. I was hoping you'd ask, and it turned out to be for good reason." Silvana uttered before pulling out the tablet and clicking a few times. </p><br><p>"I've already selected five suitable missions for the first time. All of them are available for completion within this week. All have Level One difficulty." Silvana placed the tablet on the table, and five holographic images appeared with all the information about the missions - time, task, number of monsters, approximate location, reward, and more. </p><br><p>"Hmm?" Adam tilted his head, "Silvana, what does this mean?" </p><br><p>[Get Fangs of Fire Wolves - White Threat Level, V1.] </p><br><p>"It's a classification of the difficulty level of the quest. It's pretty simple, let me explain it to you. V1 means that you will only encounter monsters of the specified threat level on the mission. That is, if there are 10 Fire Wolves, they will all be of White Threat Level." Silvana calmly said while raising a finger. </p><br><p>V2 means that on a mission, you can encounter monsters of a higher threat level by a maximum of one step, and such monsters are up to 10%. That is to say, among 10 Fire Wolves, there will most likely be 1 Green Threat Level monster, but no more than that. V3 means up to 25%, and V4 up to 50%. </p><br><p>Naturally, the higher the V-Level, the greater the reward." Silvana finished her explanation, leaving Adam some time to think. </p><br><p>"I see... Is it possible that a monster of a higher threat level will appear through green? If we're talking about missions with a white threat level." Adam asked, with a slight wave of his hand. </p><br><p>Silvana nodded, "Yes, but there is no difficulty level for such a situation because it is considered a mistake by the mission department. It could easily get you fired because it could get Phantom killed." </p><br><p>Adam's gaze deepened as he remembered the incident with the Thick-headed Desert Lizards. This was exactly what had happened to the Fire Fox Squad because a Blue Threat Level Monster had appeared that was impossible for them to deal with. </p><br><p>"I apologize for being rude, but if you're thinking about today's case, I can tell you more about it." Silvana offered. </p><br><p>"Sure. I'd like to hear how it came to be that a Blue Threat Level Monster appeared. It was a Prime Type, what is it?" Adam uttered, with obvious curiosity in his eyes. </p><br><p>Silvana picked up the tablet, entered the mission ID of the Fire Fox Squad, and all the information appeared in hologram form, with pictures and reports. Silvana removed everything not needed, including a list of Lisa's injuries, and left only two photos - Lizard, regular, and Prime one. </p><br><p>"Prime Type is the strongest individual among the entire species of a particular monster. The difference varies from species to species, but most often, Prime Type is rated one threat level higher than regular individuals. Missions where a Prime Type is expected to appear are labeled as V-P, for example, V4-P would be the hardest mission at a given threat level." Silvana said, clearly and measuredly. </p><br><p>Adam understood everything, Silvana was explaining well enough that he didn't need to ask questions twice. </p><br><p>"Are you interested in any particular mission? I know you absorbed the artifact, but may I know what level of rarity it is?" Silvana asked respectfully. </p><br><p>"Sure. False Orb, First Rarity Level." Adam nonchalantly replied. </p><br><p>He was just getting used to living as a Phantom, as well as working with the Operator, but he realized that Silvana was his main ally. She would guide him during missions and keep in constant contact with him, so there was no room for mistrust in their alliance. </p><br><p>"Amazing. Find your first Artifact and it immediately turns out to be First Rarity Level. For your information, the chances of finding them are ten times less than the Zero Rarity Level." </p><br><p>"Hah, you're probably right, though I'm still not sure if it was luck or just payment for failing too hard." Adam smiled bitterly. </p><br><p>Silvana's gaze changed. Like Adam, she knew a lot about him, not everything, but Douglas had detailed all that had happened to Adam after the experiment. </p><br><p>"I see... In that case, you need green threat level genes, don't you?" Silvana asked protractedly. </p><br><p>Adam didn't answer, as he needed to check it out. His eyes flashed brightly and his mind drifted to the Evolution Tree. </p><br><p>The artifact was floating, surrounded by thunderclouds just like before. </p><br><p>[False Orb (First Rarity Level.) </p><br><p>First Trait - Lightning Reflexes. </p><br><p>Second Trait - ??? (Requires 10 of any green threat level genes.)] </p><br><p>"10 genes of green threat level." Adam replied. </p><br><p>Silvana nodded, "In that case, I think we should start with a few V1 missions, then move on to V2 to build up the required number of genes over time. I can reserve a mission for tomorrow. Morning or evening?" </p><br><p>"Hold on." Adam raised his hand, "First I want to rest and meet my family, but I don't mind at all spending tomorrow training. Any suggestions?" </p><br><p>"Oh, forgive my haste. I didn't think of you at all." Silvana quickly apologized, bowing slightly. </p><br><p>Then, she picked up the tablet and said, "There are two options. You can always fight in the arena with a suitable opponent, but in my opinion, that's quite inefficient. We're fighting against monsters, not humans, so a virtual zone would be the best option!" </p><br><p>"A virtual zone...?" Adam muttered. It was the first time he had heard of something like that. </p><br><br><p>"I can create any zone for you, as well as any monsters that are in the database. It's especially useful before a mission where you'll have to fight the same monsters." </p><br><p>"Hah, consider me ready! Let's do it tomorrow morning!" Adam exclaimed excitedly. </p><br><p>"Sure, as you wish." Silvana calmly replied, but even she couldn't hold back her slight smile that appeared for a moment.</p>
+
+                        <br>
+        </div>
+        
+        <div class="chapter-navigation">
+            <a href="chapter_008.html" class="nav-button prev">← Chapter 8</a>
+            
+            <a href="index.html" class="nav-button">🏠 Chapters List</a>
+            
+            <a href="chapter_010.html" class="nav-button">Chapter 10 →</a>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add reading progress bar
+            const progressBar = document.createElement('div');
+            progressBar.style.position = 'fixed';
+            progressBar.style.top = '0';
+            progressBar.style.left = '0';
+            progressBar.style.width = '100%';
+            progressBar.style.height = '3px';
+            progressBar.style.backgroundColor = '#3498db';
+            progressBar.style.transform = 'scaleX(0)';
+            progressBar.style.transformOrigin = '0 0';
+            progressBar.style.transition = 'transform 0.1s';
+            progressBar.style.zIndex = '10000';
+            document.body.appendChild(progressBar);
+            
+            // Update progress
+            function updateProgress() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) : 0;
+                progressBar.style.transform = 'scaleX(' + progress + ')';
+            }
+            
+            window.addEventListener('scroll', updateProgress);
+            updateProgress();
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft' && true) {
+                    window.location.href = 'chapter_008.html';
+                } else if (e.key === 'ArrowRight' && true) {
+                    window.location.href = 'chapter_010.html';
+                } else if (e.key === 'Home' || e.key === 'h') {
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // Remove any leftover script tags from original content
+            document.querySelectorAll('script').forEach(script => script.remove());
+            
+            // Smooth scroll to top on load
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

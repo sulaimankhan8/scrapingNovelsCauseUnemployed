@@ -1,0 +1,1520 @@
+  Chapter 1: Failed Experiment
+  Chapter 2: Eclipse
+  Chapter 3: Anomaly
+  Chapter 4: Reflexes
+  Chapter 5: Red Book
+  Chapter 6: Prime
+  Chapter 7: Natural and Artificial
+  Chapter 8: Operator
+  Chapter 9: Virtual Zone
+  Chapter 10: Family and the Virtual Zone
+  Chapter 11: The First Test
+  Chapter 12: Victory
+  Chapter 13: The Hunt
+  Chapter 14: Rust Squad
+  Chapter 15: Destroyer
+  Chapter 16: Fallen Giant
+  Chapter 17: Second Trait
+  Chapter 18: Dark World
+  Chapter 19: Choosing the Nexus
+  Chapter 20: The Lock and Key of Evolution
+  Chapter 21: Thousand
+  Chapter 22: Incubator and the Golden Egg
+  Chapter 23: Nexus and Soul Cry
+  Chapter 24: Exoskeleton
+  Chapter 25: Bright Future
+  Chapter 26: Golden Searchers
+  Chapter 27: Wings
+  Chapter 28: Queen and King
+  Chapter 29: Massacre and the Fallen Queen
+  Chapter 30: Warped Space
+  Chapter 31: Mother Nature
+  Chapter 32: The New Team
+  Chapter 33: Ten Minutes of Hell
+  Chapter 34: The Power of One Man
+  Chapter 35: Man vs. Monster and Seeds of Hope
+  Chapter 36: Recovery and Lollipop
+  Chapter 37: The Cunning Love Plan and the First Monster
+  Chapter 38: The Silver Weaver and the Hundreds of Rats
+  Chapter 39: All are equal, but some are more equal
+  Chapter 40 Beginning Monster
+  Chapter 41 Crown Type
+  Chapter 42 Crystal Weapon and Special Mission
+  Chapter 43 The Tragedy of the Rusty Gears
+  Chapter 44 Key and the Door
+  Chapter 45 Death by Rusty Plague
+  Chapter 46 Respect
+  Chapter 47 Recognition and Growth
+  Chapter 48 Development and New Opportunities
+  Chapter 49 New Opportunities
+  Chapter 50 First Ring (Part 1)
+  Chapter 51 First Ring (Part 2)
+  Chapter 52 First Ring (Part 3)
+  Chapter 53 Three Forces
+  Chapter 54 Change of Plans
+  Chapter 55 Dark Experiments
+  Chapter 56 Ice Creatures
+  Chapter 57 The Trap
+  Chapter 58 The Anomaly Center
+  Chapter 59: Mirage and the Ice Jail
+  Chapter 60: 2 vs 2
+  Chapter 61: Zera's True Essence
+  Chapter 62: Despair in the Sight
+  Chapter 63: Pure Brutality and Chaotic Thunder
+  Chapter 64: Earthquake
+  Chapter 65: Melting Ice
+  Chapter 66: Three Conditions
+  Chapter 67: The Invitation and the Walls
+  Chapter 68: Essence
+  Chapter 69: The Phantom Storage and the Black Shell
+  Chapter 70: Proud Wing
+  Chapter 71: The Shooting Range
+  Chapter 72: Consolation Prize and Invitation to the Academy
+  Chapter 73: The Fateful Encounter
+  Chapter 74: Pawn and the Unknown Phantom
+  Chapter 75: Reflections and the imminent meeting with an old adversary
+  Chapter 76: Unexpected Allies
+  Chapter 77: Prime King and the Magic Book
+  Chapter 78: King vs. Phantom.
+  Chapter 79: Enemies Among Our Own
+  Chapter 80: Words Don't Matter (Part 1)
+  Chapter 81: Words Don't Matter (Part 2)
+  Chapter 82: Words Don't Matter (Part 3)
+  Chapter 83: Words Don't Matter (Part 4)
+  Chapter 84: Words Don't Matter (Part 5)
+  Chapter 85: K2
+  Chapter 86: Silence
+  Chapter 87: Home of the Strongest
+  Chapter 88: The Influence of Genes
+  Chapter 89: Elemental Training
+  Chapter 90: Bastion (Part 1)
+  Chapter 91: Bastion (Part 2)
+  Chapter 92: Bastion (Part 3)
+  Chapter 93: Seven Days (Part 1)
+  Chapter 94: Seven Days (Part 2)
+  Chapter 95: Seven Days (Part 3)
+  Chapter 96: Seven Days (Part 4)
+  Chapter 97: Fire and Lightning
+  Chapter 98: The Last Zone
+  Chapter 99: Seven Sprouts
+  Chapter 100: Elemental Root
+  Chapter 101: Recovery in Bastion and prepare for Eclipse
+  Chapter 102: The Elevator
+  Chapter 103: Monster Type
+  Chapter 104: Conqueror Type
+  Chapter 105: Worms
+  Chapter 106: Giants (Part 1)
+  Chapter 107: Giants (Part 2)
+  Chapter 108: Giants (Part 3)
+  Chapter 109: Four Nightmares and One Terror
+  Chapter 110: Azure Wolf and the 6th Rank
+  Chapter 111: The Second Stage
+  Chapter 112: Frost Beast
+  Chapter 113: Replacement
+  Chapter 114: Absolute Zero
+  Chapter 115: I Want More!
+  Chapter 116: The Power of Desire
+  Chapter 117: The Fall of the North
+  Chapter 118: Dawn
+  Chapter 119: Coming Home
+  Chapter 120: Coming Home (Part 2)
+  Chapter 121: Coming Home (Part 3)
+  Chapter 122: The Fair
+  Chapter 123: The winner of the second round
+  Chapter 124: Who's the real winner?
+  Chapter 125: An Unexpected Place
+  Chapter 126: Military Rodeo
+  Chapter 127: The Power of Technology
+  Chapter 128: I'm Scared
+  Chapter 129: Fight Like a Phantom
+  Chapter 130: Arm wrestling
+  Chapter 131: Crimson Tree
+  Chapter 132: Right Mistake (Part 1)
+  Chapter 133: Right Mistake (Part 2)
+  Chapter 134: Punishment
+  Chapter 135: The difference in the value of lives
+  Chapter 136: The First Days
+  Chapter 137: First Days (Part 2)
+  Chapter 138: Aura
+  Chapter 139: F-Zone
+  Chapter 140: Test of Strength
+  Chapter 141: The Guardian
+  Chapter 142: The Next Zone
+  Chapter 143: D-Zone (Part 1)
+  Chapter 144: D-Zone
+  Chapter 145: D-Zone (Part 3)
+  Chapter 146: Two Fires
+  Chapter 147: The Will (Part 1)
+  Chapter 148: The Will (Part 2)
+  Chapter 149: The Will (Part 3)
+  Chapter 150: The Will (Part 4)
+  Chapter 151: A-Zone (Part 1)
+  Chapter 152: A-Zone (Part 2)
+  Chapter 153: Where better to go?
+  Chapter 154: Choice of Clothing and the First Guardian's Weakness
+  Chapter 155: The Curse in Blessing (Part 1)
+  Chapter 156: The Curse in Blessing (Part 2)
+  Chapter 157: The Curse in Blessing (Part 3)
+  Chapter 158: The Curse in Blessing (Part 4)
+  Chapter 159: The Curse in Blessing (Part 5)
+  Chapter 160: The True Dream
+  Chapter 161: A Real Opportunity
+  Chapter 162: Strange Relationships
+  Chapter 163: S-Zone
+  Chapter 164: Ally
+  Chapter 165: Warden
+  Chapter 166: K2 vs. K1
+  Chapter 167: Eager for Strength
+  Chapter 168: Fury and Calm
+  Chapter 169: The Trump Leftovers
+  Chapter 170: Third Order and Purpose of the Spirits
+  Chapter 171: Second Stage Spirit
+  Chapter 172: Without a Face
+  Chapter 173: Freedom
+  Chapter 174: Taste of Freedom
+  Chapter 175: Who Wants to be a Phantom?
+  Chapter 176: Three Days
+  Chapter 177: Last Days for Phantom Narata
+  Chapter 178: The Way of the Operator
+  Chapter 179: Controlling the Power
+  Chapter 180: Sudden Darkness
+  Chapter 181: The Party (Part 1)
+  Chapter 182: The Party (Part 2)
+  Chapter 183: Relationship and Connection with Phantom
+  Chapter 184: What is above love?
+  Chapter 185: Never?
+  Chapter 186: The Prince and the Queen (Part 1)
+  Chapter 187: The Prince and the Queen (Part 2)
+  Chapter 188: The Reason Rules Exist
+  Chapter 189: Essence Monster (Part 1)
+  Chapter 190: Essence Monster (Part 2)
+  Chapter 191: Essence Monster (Part 3)
+  Chapter 192: Essence Monster (Part 4)
+  Chapter 193: Essence Monster (Part 5)
+  Chapter 194: Essence Monster (Part 6)
+  Chapter 195: Essence Monster (Part 7)
+  Chapter 196: Essence Monster (Part 8)
+  Chapter 197: Essence Monster (Part 9)
+  Chapter 198: Essence Monster (Part 10)
+  Chapter 199: Essence Monster (Part 11)
+  Chapter 200: Essence Monster (Part 12)
+  Chapter 201: Essence Monster (Part 13)
+  Chapter 202: Essence Monster (Part 14)
+  Chapter 203: Essence Monster (Part 15)
+  Chapter 204: Essence Monster (Part 16)
+  Chapter 205: Essence Monster (Part 17)
+  Chapter 206: Essence Monster (Part 18)
+  Chapter 207: Essence Monster (Part 19)
+  Chapter 208: Essence Monster (Part 20)
+  Chapter 209: Essence Monster (Part 21)
+  Chapter 210: Essence Monster (Part 22)
+  Chapter 211: Essence Monster (Part 23)
+  Chapter 212: Essence Monster (Part 24)
+  Chapter 213: Essence Monster (Part 25)
+  Chapter 214: Essence Monster (Part 26)
+  Chapter 215: Essence Monster (Part 27)
+  Chapter 216: Essence Monster (Part 28)
+  Chapter 217: Essence Monster (Part 29)
+  Chapter 218: Essence Monster (Part 30)
+  Chapter 219: Essence Monster (Part 31)
+  Chapter 220: Essence Monster (Part 32)
+  Chapter 221: Essence Monster (Part 33)
+  Chapter 222: Essence Monster (Part 34)
+  Chapter 223: Essence Monster (Part 35)
+  Chapter 224: Sacrifices and Lightning Bolt
+  Chapter 225: Another Sacrifice
+  Chapter 226: The Last Sacrifice
+  Chapter 227: The Silence and the Rumble.
+  Chapter 228: Abilities Deprivation
+  Chapter 229: One Move and One Breath
+  Chapter 230: First Breath and the Scientist
+  Chapter 231: What am I supposed to do?
+  Chapter 232: Toughness
+  Chapter 233: The Operator's Place
+  Chapter 234: Miracle Observatory
+  Chapter 235: Regeneration Through Food
+  Chapter 236: Gourmets
+  Chapter 237: Appetite
+  Chapter 238: What are the chances of success?
+  Chapter 239: Costumes, Masks and Alias?
+  Chapter 240: Red Feast
+  Chapter 241: Red Feast (Part 2)
+  Chapter 242: Red Feast (Part 3)
+  Chapter 243: Red Feast (Part 4)
+  Chapter 244: Red Feast (Part 5)
+  Chapter 245: Red Feast (Part 6)
+  Chapter 246: The Pendant
+  Chapter 247: Give Me a Chance!
+  Chapter 248: Bright Future?
+  Chapter 249: The Simplicity of Life
+  Chapter 250: Memories
+  Chapter 251: Instead of Breakfast, Lunch and Dinner (Part 1)
+  Chapter 252: Instead of Breakfast, Lunch and Dinner (Part 2)
+  Chapter 253: Instead of Breakfast, Lunch and Dinner (Part 3)
+  Chapter 254: Instead of Breakfast, Lunch and Dinner (Part 4)
+  Chapter 255: Instead of Breakfast, Lunch and Dinner (Part 5)
+  Chapter 256: The Only One Perfect Human
+  Chapter 257: Hybrid
+  Chapter 258: Perfection (Part 1)
+  Chapter 259: Perfection (Part 2)
+  Chapter 260: What can a hybrid do? (Part 1)
+  Chapter 261 : What can a hybrid do? (Part 2)
+  Chapter 262 : The Power of the Hybrid (Part 1)
+  Chapter 263: The Power of the Hybrid (Part 2)
+  Chapter 264: Is that the best you can do? (Part 1)
+  Chapter 265: Is that the best you can do? (Part 2)
+  Chapter 266: Is that the best you can do? (Part 3)
+  Chapter 267 : Is that the best you can do? (Part 4)
+  Chapter 268 : Is that the best you can do? (Part 5)
+  Chapter 269: Is this the best you can do? (Part 6)
+  Chapter 270: This is Resonance?
+  Chapter 271: Phantom vs Hybrid
+  Chapter 272: The Beating
+  Chapter 273: Necessary Defeat?
+  Chapter 274: Why Am I Alive? (Part 1)
+  Chapter 275: Why Am I Alive? (Part 2)
+  Chapter 276: Midnight Crystal (Part 1)
+  Chapter 277: Midnight Crystal (Part 2)
+  Chapter 278: Midnight Crystal (Part 3)
+  Chapter 279: Midnight Crystal (Part 4)
+  Chapter 280: Midnight Crystal (Part 5)
+  Chapter 281: Midnight Crystal (Part 6)
+  Chapter 282: Midnight Crystal (Part 7)
+  Chapter 283: Midnight Crystal (Part 8)
+  Chapter 284: Midnight Crystal (Part 9)
+  Chapter 285: Midnight Crystal (Part 10)
+  Chapter 286: Midnight Crystal (Part 11)
+  Chapter 287: Midnight Crystal (Part 12)
+  Chapter 288: Midnight Crystal (Part 13)
+  Chapter 289: Midnight Crystal (Part 14)
+  Chapter 290: Midnight Crystal (Part 15)
+  Chapter 291: Midnight Crystal (Part 16)
+  Chapter 292: Midnight Crystal (Part 17)
+  Chapter 293: Midnight Crystal (Part 18)
+  Chapter 294: Midnight Crystal (Part 19)
+  Chapter 295: Midnight Crystal (Part 20)
+  Chapter 296: Midnight Crystal (Part 21)
+  Chapter 297: Midnight Crystal (Part 22)
+  Chapter 298: Midnight Crystal (Part 23)
+  Chapter 299: Midnight Crystal (Part 24)
+  Chapter 300: Midnight Crystal (Part 25)
+  Chapter 301: Midnight Crystal (Part 26)
+  Chapter 302: Midnight Crystal (Part 27)
+  Chapter 303: Midnight Crystal (Part 28)
+  Chapter 304: Midnight Crystal (Part 29)
+  Chapter 305: Midnight Crystal (Part 30)
+  Chapter 306: Midnight Crystal (Part 31)
+  Chapter 307: Midnight Crystal (Part 32)
+  Chapter 308: Midnight Crystal (Part 33)
+  Chapter 309: Midnight Crystal (Part 34)
+  Chapter 310: Midnight Crystal (Part 35)
+  Chapter 311: Midnight Crystal (Part 36)
+  Chapter 312: Midnight Crystal (Part 37)
+  Chapter 313: Midnight Crystal (Part 38)
+  Chapter 314: Midnight Crystal (Part 39)
+  Chapter 315: Midnight Crystal (Part 40)
+  Chapter 316: Midnight Crystal (Part 41)
+  Chapter 317: Midnight Crystal (Part 42)
+  Chapter 318: Midnight Crystal (Part 43)
+  Chapter 319: Midnight Crystal (Part 44)
+  Chapter 320: Midnight Crystal (Part 45)
+  Chapter 321: Midnight Crystal (Part 46)
+  Chapter 322: Midnight Crystal (Part 47)
+  Chapter 323: Midnight Crystal (Part 48)
+  Chapter 324: Midnight Crystal (Part 49)
+  Chapter 325: Midnight Crystal (Part 50)
+  Chapter 326: Midnight Crystal (Part 51)
+  Chapter 327: Midnight Crystal (Part 52)
+  Chapter 328: Midnight Crystal (Part 53)
+  Chapter 329: Midnight Crystal (Part 54)
+  Chapter 330: Midnight Crystal (Part 55)
+  Chapter 331: Midnight Crystal (Part 56)
+  Chapter 332: Midnight Crystal (Part 57)
+  Chapter 333: Midnight Crystal (Part 58)
+  Chapter 334: Midnight Crystal (Part 59)
+  Chapter 335: Midnight Crystal (Part 60)
+  Chapter 336: Midnight Crystal (Part 61)
+  Chapter 337: Midnight Crystal (Part 62)
+  Chapter 338: Midnight Crystal (Part 63)
+  Chapter 339: Midnight Crystal (Part 64)
+  Chapter 340: Midnight Crystal (Part 65)
+  Chapter 341: Midnight Crystal (Part 66)
+  Chapter 342: Midnight Crystal (Part 67)
+  Chapter 343: Midnight Crystal (Part 68)
+  Chapter 344: Midnight Crystal (Part 69)
+  Chapter 345: Midnight Crystal (Part 70)
+  Chapter 346: Midnight Crystal (Part 71)
+  Chapter 347: Midnight Crystal (Part 72)
+  Chapter 348: Midnight Crystal (Part 73)
+  Chapter 349: Midnight Crystal (Part 74)
+  Chapter 350: Midnight Crystal (Part 75)
+  Chapter 351: Midnight Crystal (Part 76)
+  Chapter 352: Midnight Crystal (Part 77)
+  Chapter 353: Midnight Crystal (Part 78)
+  Chapter 354: Midnight Crystal (Part 79)
+  Chapter 355: Midnight Crystal (Part 80)
+  Chapter 356 Midnight Crystal (Part 81)
+  Chapter 357 Midnight Crystal (Part 82)
+  Chapter 358 Midnight Crystal (Part 83)
+  Chapter 359 Midnight Crystal (Part 84)
+  Chapter 360 Midnight Crystal (Part 85)
+  Chapter 361 Midnight Crystal (Part 86)
+  Chapter 362 Midnight Crystal (Part 87)
+  Chapter 363 Midnight Crystal (Part 88)
+  Chapter 364 Midnight Crystal (Part 89)
+  Chapter 365 Midnight Crystal (Part 90)
+  Chapter 366 Midnight Crystal (Part 91)
+  Chapter 367 Midnight Crystal (Part 92)
+  Chapter 368 Midnight Crystal (Part 93)
+  Chapter 369 Midnight Crystal (Part 94)
+  Chapter 370 Midnight Crystal (Part 95)
+  Chapter 371 Midnight Crystal (Part 96)
+  Chapter 372 Midnight Crystal (Part 97)
+  Chapter 373 Black Initial Gene
+  Chapter 374 Don't worry, I don't need to be anxious about it anymore
+  Chapter 375 Amber Eyes
+  Chapter 376 Who Died?
+  Chapter 377 Purple Cross
+  Chapter 378 She Knew Everything
+  Chapter 379 Scattered Clouds (Part 1)
+  Chapter 380 Scattered Clouds (Part 2)
+  Chapter 381 Scattered Clouds (Part 3)
+  Chapter 382 Scattered Clouds (Part 4)
+  Chapter 383 Scattered Clouds (Part 5)
+  Chapter 384 Forty-seven defeats
+  Chapter 385 Morning Citadel
+  Chapter 386 First Key (Part 1)
+  Chapter 387 First Key (Part 2)
+  Chapter 388 First Key (Part 3)
+  Chapter 389 First Key (Part 4)
+  Chapter 390 First Key (Part 5)
+  Chapter 391 First Key (Part 6)
+  Chapter 392 Strawberry Milkshake
+  Chapter 393 The Needle
+  Chapter 394 It is time to lose
+  Chapter 395 The Gaze
+  Chapter 396 Eye and Teeth
+  Chapter 397 Silver Threads
+  Chapter 398 Control Difficulties
+  Chapter 399 Electricity
+  Chapter 400 Gravity
+  Chapter 401 Mass and Shiver
+  Chapter 402 Destruction and Defense Threads
+  Chapter 403 Two Sounds
+  Chapter 404 Broken Needle
+  Chapter 405 Blood and Wind
+  Chapter 406 Not a defeat
+  Chapter 407 Gene Field
+  Chapter 408 Left or Right?
+  Chapter 409 The Benefit of Genes
+  Chapter 410 Hard Encounter (Part 1)
+  Chapter 411 Hard Encounter (Part 2)
+  Chapter 412 Hard Encounter (Part 3)
+  Chapter 413 Hard Encounter (Part 4)
+  Chapter 414 Pleasure and Fear
+  Chapter 415 More Work Every Day
+  Chapter 416 First Monster
+  Chapter 417 Training or Doping? (Part 1)
+  Chapter 418 Training or Doping? (Part 2)
+  Chapter 419 Training or Doping (Part 3)
+  Chapter 420 Choosing a dish and...
+  Chapter 421 Shopping
+  Chapter 422 Cheese or Weapon?
+  Chapter 423 Weapon or Gun?
+  Chapter 424 Choosing the First Monster
+  Chapter 425 Time to Cook (Part 1)
+  Chapter 426 Time to Cook (Part 2)
+  Chapter 427 Time to Cook (Part 3)
+  Chapter 428 Time to Cook (Part 4)
+  Chapter 429 Time to Cook (Part 5)
+  Chapter 430 Time to Cook (Part 6)
+  Chapter 431 A new stage in life?
+  Chapter 432 Trap (Part 1)
+  Chapter 433 Trap (Part 2)
+  Chapter 434 Trap (Part 3)
+  Chapter 435 Trap (Part 4)
+  Chapter 436 A missed opportunity?
+  Chapter 437 Why do I work here?
+  Chapter 438 Serenity and Chaos
+  Chapter 439 Dense Darkness
+  Chapter 440 The Hidden Situation
+  Chapter 441 Barrier of Darkness
+  Chapter 442 Two New Ways
+  Chapter 443 Dream and Wishes (Part 1)
+  Chapter 444 Dream and Wishes (Part 2)
+  Chapter 445 Dream and Wishes (Part 3)
+  Chapter 446 Dream and Wishes (Part 4)
+  Chapter 447 Dream and Wishes (Part 5)
+  Chapter 448 Wings in Chains (Part 1)
+  Chapter 449 Wings in Chains (Part 2)
+  Chapter 450 Wings in Chains (Part 3)
+  Chapter 451 Wings in Chains (Part 4)
+  Chapter 452 Wings in Chains (Part 5)
+  Chapter 453 Wings in Chains (Part 6)
+  Chapter 454 Wings in Chains (Part 7)
+  Chapter 455 Wings in Chains (Part 8)
+  Chapter 456 Wings in Chains (Part 9)
+  Chapter 457 Wings in Chains (Part 10)
+  Chapter 458 Wings in Chains (Part 11)
+  Chapter 459 Strong Who Thinks He's Weak (Part 1)
+  Chapter 460 Strong Who Thinks He's Weak (Part 2)
+  Chapter 461 Strong Who Thinks He's Weak (Part 3)
+  Chapter 462 Strong Who Thinks He's Weak (Part 4)
+  Chapter 463 Strong Who Thinks He's Weak (Part 5)
+  Chapter 464 Strong Who Thinks He's Weak (Part 6)
+  Chapter 465 Training After Fights (Part 1)
+  Chapter 466 Training After Fights (Part 2)
+  Chapter 467 Training After Fights (Part 3)
+  Chapter 468 Training After Fights (Part 4)
+  Chapter 469 Training After Fights (Part 5)
+  Chapter 470 Who's Stronger: Human or Phantom? (Part 1)
+  Chapter 471 Who's Stronger: Human or Phantom? (Part 2)
+  Chapter 472 Who's Stronger: Human or Phantom? (Part 3)
+  Chapter 473 Who's Stronger: Human or Phantom? (Part 4)
+  Chapter 474 Who's Stronger: Human of Phantom? (Part 5)
+  Chapter 475 Who's Stronger: Human of Phantom? (Part 6)
+  Chapter 476 The Man Who Is Stronger Than the Monster
+  Chapter 477 Successful Training
+  Chapter 478 Violations of recommendations
+  Chapter 479 Two Walls (Part 1)
+  Chapter 480 Two Walls (Part 2)
+  Chapter 481 Two Walls (Part 3)
+  Chapter 482 Two Walls (Part 4)
+  Chapter 483 Two Walls (Part 5)
+  Chapter 484 Two Walls (Part 6)
+  Chapter 485 Two Walls (Part 7)
+  Chapter 486 Two Walls (Part 8)
+  Chapter 487 First Wall (Part 1)
+  Chapter 488 First Wall (Part 2)
+  Chapter 489 Strength didn't matter
+  Chapter 490 Halfway through
+  Chapter 491 Sincerity is the best reward
+  Chapter 492 : Unique Gift (Part 1)
+  Chapter 493 Unique Gift (Part 2)
+  Chapter 494 Unique Gift (Part 3)
+  Chapter 495 Glass (Part 1)
+  Chapter 496 Glass (Part 2)
+  Chapter 497 Glass (Part 3)
+  Chapter 498 Glass (Part 4)
+  Chapter 499 Glass (Part 5)
+  Chapter 500 Glass (Part 6)
+  Chapter 501 Incoming (Part 1)
+  Chapter 502 Incoming (Part 2)
+  Chapter 503 Incoming (Part 3)
+  Chapter 504 Incoming (Part 4)
+  Chapter 505 Incoming (Part 5)
+  Chapter 506 Incoming (Part 6)
+  Chapter 507 Smoke and Fire
+  Chapter 508 The Last Three Days
+  Chapter 509 The Suit
+  Chapter 510 Theater
+  Chapter 511 The Banquet
+  Chapter 512 Purple Hair
+  Chapter 513 One of the Peaks
+  Chapter 514: Franz Balo
+  Chapter 515: Raising the Stakes
+  Chapter 516: Eight Blades (Part 1)
+  Chapter 517 Eight Blades (Part 2)
+  Chapter 518 Eight Blades (Part 3)
+  Chapter 519 Eight Blades (Part 4)
+  Chapter 520 Eight Blades (Part 5)
+  Chapter 521 Eight Blades (Part 6)
+  Chapter 522 Uninvited Guest
+  Chapter 523 Uninvited Guest (Part 2)
+  Chapter 524 Uninvited Guest (Part 3)
+  Chapter 525 The Last Day
+  Chapter 526 Broken Wall
+  Chapter 527 Cracks and Patience
+  Chapter 528 The Worst Wedding (Part 1)
+  Chapter 529 The Worst Wedding (Part 2)
+  Chapter 530 The Worst Wedding (Part 3)
+  Chapter 531 The Worst Wedding (Part 4)
+  Chapter 532 The Worst Wedding (Part 5)
+  Chapter 533 The Worst Wedding (Part 6)
+  Chapter 534 The Worst Wedding (Part 7)
+  Chapter 535 The Worst Wedding (Part 8)
+  Chapter 536 The Worst Wedding (Part 9)
+  Chapter 537 The Worst Wedding (Part 10)
+  Chapter 538 The Worst Wedding (Part 11)
+  Chapter 539 The Worst Wedding (Part 12)
+  Chapter 540 The Worst Wedding (Part 13)
+  Chapter 541 The Worst Wedding (Part 14)
+  Chapter 542 The Rule of Power (Part 1)
+  Chapter 543 The Rule of Power (Part 2)
+  Chapter 544 The Rule of Power (Part 3)
+  Chapter 545 The Rule of Power (Part 4)
+  Chapter 546 The Rule of Power (Part 5)
+  Chapter 547: The Rule of Power (Part 6)
+  Chapter 548: The Rule of Power (Part 7)
+  Chapter 549: The Rule of Power (Part 8)
+  Chapter 550 The Rule of Power (Part 9)
+  Chapter 551 The Rule of Power (Part 10)
+  Chapter 552 Raising the Stakes (Part 1)
+  Chapter 553 Raising the Stakes (Part 2)
+  Chapter 554 Raising the Stakes (Part 3)
+  Chapter 555 Raising the Stakes (Part 4)
+  Chapter 556 Raising the Stakes (Part 5)
+  Chapter 557 The Moon Colosseum (Part 1)
+  Chapter 558 The Moon Colosseum (Part 2)
+  Chapter 559 The Moon Colosseum (Part 3)
+  Chapter 560 The Moon Colosseum (Part 4)
+  Chapter 561 The Moon Colosseum (Part 5)
+  Chapter 562 The Moon Colosseum (Part 6)
+  Chapter 563 Second Fighter (Part 1)
+  Chapter 564 Second Fighter (Part 2)
+  Chapter 565 Hot Pizza
+  Chapter 566 Honesty in a gaze
+  Chapter 567 The Beginning of Negotiations
+  Chapter 568 Worst Father and Mother
+  Chapter 569 The Greed that brought disaster
+  Chapter 570 A Choice Without a Choice
+  Chapter 571 Last Chance
+  Chapter 572 Black Raven
+  Chapter 573 The Second Fighter Announced
+  Chapter 574 Stone Case
+  Chapter 575 The Road to the Arena
+  Chapter 576 The Disappearance of the Moon
+  Chapter 577 Last Bets
+  Chapter 578 No More Places
+  Chapter 579 Entering the arena
+  Chapter 580: The Handshake
+  Chapter 581: Flame Warrior
+  Chapter 582: Attention must be paid
+  Chapter 583: Fire Blast
+  Chapter 584: Heart of Fire
+  Chapter 585: Wrong wound
+  Chapter 586: Dark Hands
+  Chapter 587: Hot Weapon
+  Chapter 588: Nexus vs Nexus
+  Chapter 589: The Broken Hammer
+  Chapter 590: Heavenly Retribution
+  Chapter 591: The snow-white way
+  Chapter 592: The Price of Power
+  Chapter 593: Black Sword
+  Chapter 594: The Flaming Blade
+  Chapter 595 Important Decision
+  Chapter 596 Flame Breath
+  Chapter 597 No Other Choice
+  Chapter 598 Trembling Earth
+  Chapter 599 The Nearness of Defeat
+  Chapter 600 The Last Needle
+  Chapter 601 Fortitude
+  Chapter 602 White Bridge
+  Chapter 603 The Last Victory
+  Chapter 604 Crimson Blood
+  Chapter 605 End for fighter
+  Chapter 606 Wrong Fall
+  Chapter 607 Warrior, Knight and Monster
+  Chapter 608 Broken Spear
+  Chapter 609 A Quiet Dream
+  Chapter 610 Arena's move
+  Chapter 611 Either outcome is acceptable
+  Chapter 612 Shattered Hope
+  Chapter 613 Failure
+  Chapter 614 The Winner - Adam Vinter
+  Chapter 615 Freedom
+  Chapter 616 Another important choice
+  Chapter 617 Healthy Food?
+  Chapter 618 The Coward
+  Chapter 619 The Good Guest
+  Chapter 620 60% too low?
+  Chapter 621 An Offer You Can't Refuse
+  Chapter 622 The Only Condition
+  Chapter 623 Demon's Operator
+  Chapter 624 He's already dead
+  Chapter 625 Evil That Loves Good
+  Chapter 626 Old style
+  Chapter 627 White Coat
+  Chapter 628 Gene Diffusion (Part 1)
+  Chapter 629 Gene Diffusion (Part 2)
+  Chapter 630 White Cube
+  Chapter 631 Human and the Tree (Part 1)
+  Chapter 632 Human and the Tree (Part 2)
+  Chapter 633 Silvana Desio (Part 1)
+  Chapter 634 Silvana Desio (Part 2)
+  Chapter 635 Silvana Desio? (Part 1)
+  Chapter 636 Silvana Desio? (Part 2)
+  Chapter 637 Her Future
+  Chapter 638 The First Job
+  Chapter 639 Regular Visitors
+  Chapter 640 The Real Side
+  Chapter 641 The Debt (Part 1)
+  Chapter 642 The Debt (Part 2)
+  Chapter 643 One military man
+  Chapter 644 Offer and Determination
+  Chapter 645 Secret Information
+  Chapter 646 It's a Dream
+  Chapter 647 Best Operator
+  Chapter 648 Ordinary Mission
+  Chapter 649 Caves
+  Chapter 650 Her Nexus
+  Chapter 651 Only Three
+  Chapter 652 Fighting by the book
+  Chapter 653 More enemies
+  Chapter 654 Broken Eggs
+  Chapter 655 The Lower Level
+  Chapter 656 One Adversary
+  Chapter 657 Obsidian Hydra
+  Chapter 658 Spatial Explosion (Part 1)
+  Chapter 659 Spatial Explosion (Part 2)
+  Chapter 660 Answer to the question
+  Chapter 661 A Modest Gift
+  Chapter 662 The First Step to Power
+  Chapter 663 Strong But Still Weak
+  Chapter 664: So weak
+  Chapter 665: Black But Not Blue
+  Chapter 666: Irritated Demon
+  Chapter 667 Strong is weaker than weak
+  Chapter 668 Lonely Mission
+  Chapter 669 Rivers of blood
+  Chapter 670 One Phantom One Fighter
+  Chapter 671 The Wild Lands
+  Chapter 672 The Stronghold
+  Chapter 673 Muddy Water
+  Chapter 674 Not a Light Yellow
+  Chapter 675 The First Monster in a Long Time
+  Chapter 676 The Rune on the Gates
+  Chapter 677 The Four Specters
+  Chapter 678 The Purple Rune
+  Chapter 679 The Forgotten Sense
+  Chapter 680 New Rune
+  Chapter 681 Shield is a useful weapon
+  Chapter 682: Live Sphere
+  Chapter 683: Unfair Fight
+  Chapter 684: Crimson Spear
+  Chapter 685: Bloody Fists
+  Chapter 686: Purple Heart
+  Chapter 687: Flame Thread
+  Chapter 688 Screams from the Maze
+  Chapter 689 Great Workers
+  Chapter 690 The First Statue
+  Chapter 691 Two Beasts
+  Chapter 692 Stone Leap
+  Chapter 693 Earth
+  Chapter 694 Joyful Victory
+  Chapter 695 The way to the top is through the bottom
+  Chapter 696 Spire
+  Chapter 697 Step up and sit down
+  Chapter 698 Three Strikes
+  Chapter 699 Useless, Useless, Useless!
+  Chapter 700 Two Hands
+  Chapter 701 Hands
+  Chapter 702 Two out of three
+  Chapter 703 The White Line
+  Chapter 704 Deep Desires
+  Chapter 705 Bright Light?
+  Chapter 706 The Light is Bright
+  Chapter 707 Beginning of the Fall
+  Chapter 708 Center of Attention
+  Chapter 709 That's not an order
+  Chapter 710 My Name
+  Chapter 711 The Pact
+  Chapter 712 The First Archer
+  Chapter 713 That Phantom is a Coward!
+  Chapter 714 The Real Coward
+  Chapter 715 Cruel Light
+  Chapter 716 He's Not Here
+  Chapter 717 The First Wave
+  Chapter 718 Trace of the Sun
+  Chapter 719 The Flaming Contract
+  Chapter 720 Big Risk
+  Chapter 721 Starfall (Part 1)
+  Chapter 722 Starfall (Part 2)
+  Chapter 723 Figure Behind the Gates
+  Chapter 724 He's too strong
+  Chapter 725 Flesh Clots
+  Chapter 726 Symbiosis
+  Chapter 727: Temporary Changes
+  Chapter 728: Trouble at the top
+  Chapter 729: Grim Warro
+  Chapter 730: Four Directions
+  Chapter 731: Flame Raider
+  Chapter 732: From Heaven to Earth
+  Chapter 733: You are not worthy to fly
+  Chapter 734: Torn Wings
+  Chapter 735: Eagle’s End
+  Chapter 736: Endless Cycle
+  Chapter 737: Shadow
+  Chapter 738: Blood River
+  Chapter 739: Late Fight
+  Chapter 740: Thirst Redeemer
+  Chapter 741: Like an Insect
+  Chapter 742: Devouring Demon
+  Chapter 743: Strong Current
+  Chapter 744: Flaming Steps
+  Chapter 745: They are not equal
+  Chapter 746: Combat mode
+  Chapter 747: White Disk
+  Chapter 748: Blue Flame
+  Chapter 749: The Lazy Monster
+  Chapter 750: The New Look
+  Chapter 751: Blind Sinner
+  Chapter 752: The Four Towers
+  Chapter 753: Conflict of Interest
+  Chapter 754: He was stronger
+  Chapter 755: I’m scared
+  Chapter 756: The New Enemy
+  Chapter 757: Three Options
+  Chapter 758: Stop whining
+  Chapter 759: I am very strong
+  Chapter 760: The New Shape
+  Chapter 761: Cold Tears
+  Chapter 762: A Simple Plan
+  Chapter 763: Overlord without honor
+  Chapter 764: Your ability
+  Chapter 765: The Aggressive Guardian
+  Chapter 766: The Wrong Plan
+  Chapter 767: Lone Blaze's birth
+  Chapter 768: The seal, the harbinger of the constellation (Part 1)
+  Chapter 769: The seal, the harbinger of the constellation (Part 2)
+  Chapter 770: Almost K3
+  Chapter 771: Lone Wing (Part 1)
+  Chapter 772: Lone Wing (Part 2)
+  Chapter 773: The Title
+  Chapter 774: Overlord Type (Part 1)
+  Chapter 775: Overlord Type (Part 2)
+  Chapter 776: The Last Question
+  Chapter 777: Sea of Blood (Part 1)
+  Chapter 778: Sea of Blood (Part 2)
+  Chapter 779: Unknown Phantom (Part 1)
+  Chapter 780: Unknown Phantom (Part 2)
+  Chapter 781: Crimson Thunder (Part 1)
+  Chapter 782: Crimson Thunder (Part 2)
+  Chapter 783 783: Difference in Power
+  Chapter 784 784: Knight's Stand
+  Chapter 785 785: Crimson Ray
+  Chapter 786 786: One more wing
+  Chapter 787 787: Choosing Sides (Part 1)
+  Chapter 788 788: Choosing Sides (Part 2)
+  Chapter 789 789: Fledgling and the Eagle
+  Chapter 790 790: Desired Encounter
+  Chapter 791 791: The Weak and the Strong
+  Chapter 792 792: Crimson Ray
+  Chapter 793 793: The Second Blade
+  Chapter 794 794: Better Partner
+  Chapter 795 795: Her Sacrifice
+  Chapter 796: Dark Silhouettes (Part 1)
+  Chapter 797: Dark Silhouettes (Part 2)
+  Chapter 798: The Fall of the Monarch (Part 1)
+  Chapter 799: The Fall of the Monarch (Part 2)
+  Chapter 800: Ten Seconds
+  Chapter 801: Strong and weak are not equal
+  Chapter 802: Katrin's Desire (Part 1)
+  Chapter 803: Katrin's Desire (Part 2)
+  Chapter 804: The Trident (Part 1)
+  Chapter 805: The Trident (Part 2)
+  Chapter 806: The Last Resort (Part 1)
+  Chapter 807: The Last Resort (Part 2)
+  Chapter 808 808: Fortitude Until Dawn
+  Chapter 809 809: The longest path
+  Chapter 810 810: The Last Wish (Part 1)
+  Chapter 811 811: The Last Wish (Part 2)
+  Chapter 815: The Fourth Star
+  Chapter 812: Dawn (Part 1)
+  Chapter 813: Dawn (Part 2)
+  Chapter 814: A Flame for Two
+  Chapter 816 816: The Best Gift
+  Chapter 817 817: Three in One
+  Chapter 818: Time to go home
+  Chapter 819: First Impression
+  Chapter 820: Moira's Occurrence
+  Chapter 821: Are you a fan?
+  Chapter 822: Red Apple
+  Chapter 823: Fire (Part 1)
+  Chapter 824: Fire (Part 2)
+  Chapter 825: Threat of Burning
+  Chapter 826: Energy Excess
+  Chapter 827: Star Frame (Part 1)
+  Chapter 828: Star Frame (Part 2)
+  Chapter 829: A Thousand Years? (Part 1)
+  Chapter 830: A Thousand Years? (Part 2)
+  Chapter 831: Citadel Center
+  Chapter 832: The Infinite Tunnel
+  Chapter 833: Zero Ring (Part 1)
+  Chapter 834: Zero Ring (Part 2)
+  Chapter 835: The Great Tree
+  Chapter 836: The Queen (Part 1)
+  Chapter 837: The Queen (Part 2)
+  Chapter 838: Second Key (Part 1)
+  Chapter 839: Second Key (Part 2)
+  Chapter 840: Power of Beyond
+  Chapter 841: Crystal Gates (Part 1)
+  Chapter 842: Crystal Gates (Part 2)
+  Chapter 843: Zero Orb
+  Chapter 844: The New Gene
+  Chapter 845: Global Gene
+  Chapter 846: K3-Phantom
+  Chapter 847: The Butler
+  Chapter 848: Twilight Palace
+  Chapter 849: Five and Zero Coins
+  Chapter 850: All fights later
+  Chapter 851: Not a Nobleman
+  Chapter 852: Observer
+  Chapter 853: One Coin
+  Chapter 854: Old Style
+  Chapter 855: Amber Cloud
+  Chapter 856: Two out of Four
+  Chapter 857: Hurxo and Valthorn families
+  Chapter 858: The Speed of Battle
+  Chapter 859: Food!
+  Chapter 860: Trouble Over Defeat
+  Chapter 861: It's Not Worth the Risk
+  Chapter 862: Fight for the Last Coin (Part 1)
+  Chapter 863: Fight for the Last Coin (Part 2)
+  Chapter 864: Constant Ability
+  Chapter 865: First Defeat and First Victory (Part 1)
+  Chapter 866: First Defeat and First Victory (Part 2)
+  Chapter 867: Mirrors
+  Chapter 868: A Miserable Defeat
+  Chapter 869: Cold Wrath
+  Chapter 870: Beating
+  Chapter 871: Rules are rules
+  Chapter 872: Thank you
+  Chapter 873: There's no turning back
+  Chapter 874: First Lesser Gates (Part 1)
+  Chapter 875: First Lesser Gates (Part 2)
+  Chapter 876: Stellar Resonance
+  Chapter 877: The First of Twelve
+  Chapter 878: You're Not Worthy (Part 1)
+  Chapter 879: You're Not Worthy (Part 2)
+  Chapter 880: An Important Number (Part 1)
+  Chapter 881: An Important Number (Part 2)
+  Chapter 882: Real Bets (Part 1)
+  Chapter 883: Real Bets (Part 2)
+  Chapter 884: Territories (Part 1)
+  Chapter 885: Territories (Part 2)
+  Chapter 886: One Minute Better Than a Year (Part 1)
+  Chapter 887: One Minute Better Than a Year (Part 2)
+  Chapter 888: The Garden of the First Family (Part 1)
+  Chapter 889: The Garden of the First Family (Part 2)
+  Chapter 890: Good Work
+  Chapter 891: Another Operator
+  Chapter 892: Two Bitches
+  Chapter 893: Two Tails
+  Chapter 894: Full Energy Control
+  Chapter 895: Full Energy Control (Part 2)
+  Chapter 896: The Bun
+  Chapter 897: I'll Help You
+  Chapter 898: Operators' Energy
+  Chapter 899: Last Measure
+  Chapter 900: Lovely Evening
+  Chapter 901: Is the Queen Alive?
+  Chapter 902: The end of the second type
+  Chapter 903: Head of the First Family or the Strongest in the Citadel?
+  Chapter 904: Two men with one goal
+  Chapter 905: Infusive Energy Control
+  Chapter 906: Five Days
+  Chapter 907: Three Points
+  Chapter 908: Exam
+  Chapter 909: I want to fight
+  Chapter 910: Two Goals
+  Chapter 911: Dividing Paths (Part 1)
+  Chapter 912: Dividing Paths (Part 2)
+  Chapter 913: Hollow Spot
+  Chapter 914: Tunnel
+  Chapter 915: Black NEP
+  Chapter 916: The Two Below (Part 1)
+  Chapter 917: The Two Below (Part 2)
+  Chapter 918: The Red Axe
+  Chapter 919: Red Bear
+  Chapter 920: The Price of Defeat
+  Chapter 921: Red Tower (Part 1)
+  Chapter 922: Red Tower (Part 2)
+  Chapter 923: Bracelet and the Collar (Part 1)
+  Chapter 924: Bracelet and the Collar (Part 2)
+  Chapter 925: Hunter and Prey (Part 1)
+  Chapter 926: Hunter and Prey (Part 2)
+  Chapter 927: Simple Puzzles (Part 1)
+  Chapter 928: Simple Puzzles (Part 2)
+  Chapter 929: The worst thing that could happen to Phantom (Part 1)
+  Chapter 930: The worst thing that could happen to Phantom (Part 2)
+  Chapter 931: The Bottom (Part 1)
+  Chapter 932: The Bottom (Part 2)
+  Chapter 933: Foundation of the Lower Ring (Part 1)
+  Chapter 934: Foundation of the Lower Ring (Part 2)
+  Chapter 935: Cave Grid (Part 1)
+  Chapter 936: Cave Grid (Part 2)
+  Chapter 937: Defeat by S3
+  Chapter 938: Communication
+  Chapter 939: Descent to the Red Zone (Part 1)
+  Chapter 940: Main Elevator
+  Chapter 941: Pocket Nexus
+  Chapter 942: Pocket Nexus (Part 2)
+  Chapter 943: Speed of Battle
+  Chapter 944: The Invitation
+  Chapter 945: Revelation Ring
+  Chapter 946: S4 Monster (Part 1)
+  Chapter 947: S4 Monster (Part 2)
+  Chapter 948: Time for Changes
+  Chapter 949: Foundation Artifact (Part 1)
+  Chapter 950: Foundation Artifact (Part 2)
+  Chapter 951: Wreath of Hope (Part 1)
+  Chapter 952: Wreath of Hope (Part 2)
+  Chapter 953: Essence of the Invitation
+  Chapter 954: The Special List
+  Chapter 955: Unwanted Authority (Part 1)
+  Chapter 956: Unwanted Authority (Part 2)
+  Chapter 957: Those who soar above the mountain
+  Chapter 958: Crusader of the Lost Light
+  Chapter 959: Crooked Throne
+  Chapter 960: Light Legion
+  Chapter 961: Rock Worms (Part 1)
+  Chapter 962: Rock Worms (Part 2)
+  Chapter 963: The Fallen Ring Castle (Part 1)
+  Chapter 964: The Fallen Ring Castle (Part 2)
+  Chapter 965: Rebels (Part 1)
+  Chapter 966: Rebels (Part 2)
+  Chapter 967: Mirrors (Part 1)
+  Chapter 968: Mirrors (Part 2)
+  Chapter 969: Magma Plateau (Part 1)
+  Chapter 970: Magma Plateau (Part 2)
+  Chapter 971: Energy Absorption
+  Chapter 972: A Few More Steps
+  Chapter 973: Full Power
+  Chapter 974: Return to the Beginning (Part 1)
+  Chapter 975: Return to the Beginning (Part 2)
+  Chapter 976: Two-Faced Weaver (Part 1)
+  Chapter 977: Two-Faced Weaver (Part 2)
+  Chapter 978: The Fourth Gates
+  Chapter 979: Two Needles
+  Chapter 980: Artifact or Death? (Part 1)
+  Chapter 981: Artifact or Death? (Part 2)
+  Chapter 982: Risha's Will (Part 1)
+  Chapter 983: Risha's Will (Part 2)
+  Chapter 984: Mirage Step (Part 1)
+  Chapter 985: Mirage Step (Part 2)
+  Chapter 986: Another Failure
+  Chapter 987: Jaws instead of claws (Part 1)
+  Chapter 988: Jaws instead of claws (Part 2)
+  Chapter 989: Last Days
+  Chapter 990: Light Legion Squad
+  Chapter 991: Road to the Main Square
+  Chapter 992: Kreyna
+  Chapter 993: Guardian
+  Chapter 994: The First Floor (Part 1)
+  Chapter 995: The First Floor (Part 2)
+  Chapter 996: Dark Blade (Part 1)
+  Chapter 997: Dark Blade (Part 2)
+  Chapter 998: Dark Circle
+  Chapter 999: Goliaths
+  Chapter 1000: Crusader
+  Chapter 1001: Lost Light
+  Chapter 1002: Revenge or Strength?
+  Chapter 1003: Flaming Hugg
+  Chapter 1004: Sphere of Darkness
+  Chapter 1005: Jaw of the Beast (Part 1)
+  Chapter 1006: Jaw of the Beast (Part 2)
+  Chapter 1007: Unbreakable Shield (Part 1)
+  Chapter 1008: Unbreakable Shield (Part 2)
+  Chapter 1009: Cruel Sun (Part 1)
+  Chapter 1010: Cruel Sun (Part 2)
+  Chapter 1011: Two Cores
+  Chapter 1012: Crucible (Part 1)
+  Chapter 1013: Crucible (Part 2)
+  Chapter 1014: Crucible Type
+  Chapter 1015: Crimson Monarch's true mastery
+  Chapter 1016: Fifth Gate (Part 1)
+  Chapter 1017: Fifth Gate (Part 2)
+  Chapter 1018: First Crack
+  Chapter 1019: Imaginary Cut (Part 1)
+  Chapter 1020: Imaginary Cut (Part 2)
+  Chapter 1021: Imaginary Cut (Part 3)
+  Chapter 1022: Imaginary Cut (Part 4)
+  Chapter 1023: Salvation for a dark soul (Part 1)
+  Chapter 1024: Salvation for a dark soul (Part 2)
+  Chapter 1025: Ruined Castle
+  Chapter 1026: Power of Fire
+  Chapter 1027: Two Watchers
+  Chapter 1028: A Fortunate Incident
+  Chapter 1029: Same Wound Again
+  Chapter 1030: Feast and Hunt (Part 1)
+  Chapter 1031: Feast and Hunt (Part 2)
+  Chapter 1032: Prepare for hunt
+  Chapter 1033: Is There a King?
+  Chapter 1034: Trembling Lock
+  Chapter 1035: Wrong Heart
+  Chapter 1036: Third Key’s conditions
+  Chapter 1037: Voracious Beasts
+  Chapter 1038: No arm for you (Part 1)
+  Chapter 1039: No arm for you (Part 2)
+  Chapter 1040: Invitation on fight (Part 1)
+  Chapter 1041: Invitation on fight (Part 2)
+  Chapter 1042: Rosana (Part 1)
+  Chapter 1043: Rosana (Part 2)
+  Chapter 1044: Key Spark (Part 1)
+  Chapter 1045: Key Spark (Part 2)
+  Chapter 1046: Dark Sky (Part 1)
+  Chapter 1047: Dark Sky (Part 2)
+  Chapter 1048: Dark Helper
+  Chapter 1049: Black Impulse (Part 1)
+  Chapter 1050: Black Impulse (Part 2)
+  Chapter 1051: Shining Dew (Part 1)
+  Chapter 1052: Shining Dew (Part 2)
+  Chapter 1053: Rider (Part 1)
+  Chapter 1054: Rider (Part 2)
+  Chapter 1055: Kenward, Rider of Darkness (Part 1)
+  Chapter 1056: Kenward, Rider of Darkness (Part 2)
+  Chapter 1057: Falling Chains (Part 1)
+  Chapter 1058: Falling Chains (Part 2)
+  Chapter 1059: Lord
+  Chapter 1060: Saegar, the Proud Wing (Part 1)
+  Chapter 1061: Saegar, the Proud Wing (Part 2)
+  Chapter 1062: Good Offer?
+  Chapter 1063: Eye from afar
+  Chapter 1064: Dark Frontier (Part 1)
+  Chapter 1065: Dark Frontier (Part 2)
+  Chapter 1066: Two Barons and the Main Course (Part 1)
+  Chapter 1067: Two Barons and the Main Course (Part 2)
+  Chapter 1068: Attentive One (Part 1)
+  Chapter 1069: Attentive One (Part 2)
+  Chapter 1070: Three Earls
+  Chapter 1071: Mushroom Eel
+  Chapter 1072: First Encounter (Part 1)
+  Chapter 1073: First Encounter (Part 2)
+  Chapter 1074: True Lord
+  Chapter 1075: The First Ones of Many? (Part 1)
+  Chapter 1076: The First Ones of Many? (Part 2)
+  Chapter 1077: I Only Have One Wish (Part 1)
+  Chapter 1078: I Only Have One Wish (Part 2)
+  Chapter 1079: Shadow Hail (Part 1)
+  Chapter 1080: Shadow Hail (Part 2)
+  Chapter 1081: Twilight Crystal (Part 1)
+  Chapter 1082: Twilight Crystal (Part 2)
+  Chapter 1083: Great Snake (Part 1)
+  Chapter 1084: Great Snake (Part 2)
+  Chapter 1085: Nature of the Lords (Part 1)
+  Chapter 1086: Nature of the Lords (Part 2)
+  Chapter 1087: Late One (Part 1)
+  Chapter 1088: Late One (Part 2)
+  Chapter 1089: How about a date? (Part 1)
+  Chapter 1090: How about a date? (Part 2)
+  Chapter 1091: Third Key
+  Chapter 1092: Epos of Exhausted Descent (Part 1)
+  Chapter 1093: Epos of Exhausted Descent (Part 2)
+  Chapter 1094: K4-Level
+  Chapter 1095: Core Nexus
+  Chapter 1096: Tailor's Assistant (Part 1)
+  Chapter 1097: Tailor's Assistant (Part 2)
+  Chapter 1098: Black Tower (Part 1)
+  Chapter 1099: Black Tower (Part 2)
+  Chapter 1100: World Wipe (Part 1)
+  Chapter 1101: World Wipe (Part 2)
+  Chapter 1102: Protective Barrier (Part 1)
+  Chapter 1103: Protective Barrier (Part 2)
+  Chapter 1104: Lifespan
+  Chapter 1105: More Phantoms!
+  Chapter 1106: There’s nothing more for you to do here (Part 1)
+  Chapter 1107: There’s nothing more for you to do here (Part 2)
+  Chapter 1108: View from Above (Part 1)
+  Chapter 1109: View from Above (Part 2)
+  Chapter 1110: Touched Ones (Part 1)
+  Chapter 1111: Touched Ones (Part 2)
+  Chapter 1112: Hard Times
+  Chapter 1113: Worst and Best Races (Part 1)
+  Chapter 1114: Worst and Best Races (Part 2)
+  Chapter 1115: Tarnished Lands
+  Chapter 1116: Time to Rest
+  Chapter 1117: Darkness Gathers
+  Chapter 1118: Dark Dream
+  Chapter 1119: Teleport (Part 1)
+  Chapter 1120: Teleport (Part 2)
+  Chapter 1121: Corrosive Lakes (Part 1)
+  Chapter 1122: Corrosive Lakes (Part 2)
+  Chapter 1123: Acid Trap (Part 1)
+  Chapter 1124: Acid Trap (Part 2)
+  Chapter 1125: Flaming Countdown (Part 1)
+  Chapter 1126: Flaming Countdown (Part 2)
+  Chapter 1127: Spare Me!
+  Chapter 1128: Crypt of the Ancient Soul
+  Chapter 1129: Crypt of the Ancient Soul (Part 2)
+  Chapter 1130: Great Lake (Part 1)
+  Chapter 1131: Great Lake (Part 2)
+  Chapter 1132: Two Seals
+  Chapter 1133: Big Guy
+  Chapter 1134: Crypt's Guard
+  Chapter 1135: First Floor and Mirrors
+  Chapter 1136: Catch It (Part 1)
+  Chapter 1137: Catch It (Part 2)
+  Chapter 1138: The Altar
+  Chapter 1139: Shining Water
+  Chapter 1140: Lyrod, the Shining Claw (Part 1)
+  Chapter 1141: Lyrod, the Shining Claw (Part 2)
+  Chapter 1142: No Compromises (Part 1)
+  Chapter 1143: No Compromises (Part 2)
+  Chapter 1144: Dark Crown
+  Chapter 1145: White Heart
+  Chapter 1146: Darkness on My Side
+  Chapter 1147: Stellar Phantom
+  Chapter 1148: Two Chosen Ones (Part 1)
+  Chapter 1149: Two Chosen Ones (Part 2)
+  Chapter 1150: Path Construct (Part 1)
+  Chapter 1151: Path Construct (Part 2)
+  Chapter 1152: First Constellation
+  Chapter 1153: Storm and She
+  Chapter 1154: Sniper
+  Chapter 1155: Spear and Shockwave
+  Chapter 1156: Who leads the Crimson Path?
+  Chapter 1157: Strawberries in chocolate
+  Chapter 1158: Youngest Second Rank Phantom
+  Chapter 1159: Choice of Hearts (Part 1)
+  Chapter 1160: Choice of Hearts (Part 2)
+  Chapter 1161: Hybrids (Part 1)
+  Chapter 1162: Hybrids (Part 2)
+  Chapter 1163: Connected String
+  Chapter 1164: Zero Vault
+  Chapter 1165: Clash of Two Crystals
+  Chapter 1166: Just Like Him
+  Chapter 1167: An Unexpected Offer
+  Chapter 1168: The Beginning of the Bloodline
+  Chapter 1169: Pure Bloodline
+  Chapter 1170: Everyone wants a family
+  Chapter 1171: To be alive or not? (Part 1)
+  Chapter 1172: To be alive or not? (Part 2)
+  Chapter 1173: Old Adversary (Part 1)
+  Chapter 1174: Old Adversary (Part 2)
+  Chapter 1175: Do it or die trying (Part 1)
+  Chapter 1176: Do it or die trying (Part 2)
+  Chapter 1177: Corrupted Volcano (Part 1)
+  Chapter 1178: Corrupted Volcano (Part 2)
+  Chapter 1179: Obsidian Guard (Part 1)
+  Chapter 1180: Obsidian Guard (Part 2)
+  Chapter 1181: Bait (Part 1)
+  Chapter 1182: Bait (Part 2)
+  Chapter 1183: A Storm is Coming (Part 1)
+  Chapter 1184: A Storm is Coming (Part 2)
+  Chapter 1185: Flight Attempt
+  Chapter 1186: What lies behind the thunder?
+  Chapter 1187: Is that him? (Part 1)
+  Chapter 1188: Is that him? (Part 2)
+  Chapter 1189: No Chase (Part 1)
+  Chapter 1190: No Chase (Part 2)
+  Chapter 1191: Colony (Part 1)
+  Chapter 1192: Colony (Part 2)
+  Chapter 1193: Vertical Slash and Hidden Treasure
+  Chapter 1194: Burning Gap
+  Chapter 1195: Knights and Ashes (Part 1)
+  Chapter 1196: Knights and Ashes (Part 2)
+  Chapter 1197: Last Minutes Before the Thunder
+  Chapter 1198: Bathild, One Without a Title (Part 1)
+  Chapter 1199: Bathild, One Without a Title (Part 2)
+  Chapter 1200: This is Shame (Part 1)
+  Chapter 1201: This is Shame (Part 2)
+  Chapter 1202: Hand and Tail (Part 1)
+  Chapter 1203: Hand and Tail (Part 2)
+  Chapter 1204: Power of the storm (Part 1)
+  Chapter 1205: Power of the storm (Part 2)
+  Chapter 1206: Wrong Ability (Part 1)
+  Chapter 1207: Wrong Ability (Part 2)
+  Chapter 1208: White Blast (Part 1)
+  Chapter 1209: White Blast (Part 2)
+  Chapter 1210: Blaze Ring (Part 1)
+  Chapter 1211: Blaze Ring (Part 2)
+  Chapter 1212: Amber Pond (Part 1)
+  Chapter 1213: Amber Pond (Part 2)
+  Chapter 1214: Two Princes
+  Chapter 1215: External Force
+  Chapter 1216: Lightning Threat (Part 1)
+  Chapter 1217: Lightning Threat (Part 2)
+  Chapter 1218: Cruel Sun (Part 1)
+  Chapter 1219: Cruel Sun (Part 2)
+  Chapter 1220: Unbearable Heat
+  Chapter 1221: A Pragmatic Solution
+  Chapter 1222: Red Threads (Part 1)
+  Chapter 1223: Red Threats (Part 2)
+  Chapter 1224: Flash Swap (Part 1)
+  Chapter 1225: Flash Swap (Part 2)
+  Chapter 1226: First Grand Star (Part 1)
+  Chapter 1227: First Grand Star (Part 2)
+  Chapter 1228: Dual Demon Sword
+  Chapter 1229: Desire of Beyond
+  Chapter 1230: Walk (Part 1)
+  Chapter 1231: Walk (Part 2)
+  Chapter 1232: Broken Fortress (Part 1)
+  Chapter 1233: Broken Fortress (Part 2)
+  Chapter 1234: View from the Other Side (Part 1)
+  Chapter 1235: View from the Other Side (Part 2)
+  Chapter 1236: Advice
+  Chapter 1237: Medic
+  Chapter 1238: Development of Territories (Part 1)
+  Chapter 1239: Development of Territories (Part 2)
+  Chapter 1240: Until Next Time
+  Chapter 1241: Chart with ?
+  Chapter 1242: Forgotten Mills (Part 1)
+  Chapter 1243: Forgotten Mills (Part 2)
+  Chapter 1244: Calm Fog (Part 1)
+  Chapter 1245: Calm Fog (Part 2)
+  Chapter 1246: Mirror Wall
+  Chapter 1247: Red Barrier
+  Chapter 1248: Forest Team (Part 1)
+  Chapter 1249: Forest Team (Part 2)
+  Chapter 1250: Four Fighters and Four Crystals (Part 1)
+  Chapter 1251: Four Fighters and Four Crystals (Part 2)
+  Chapter 1252: Sword and the Eyes (Part 1)
+  Chapter 1253: Sword and the Eyes (Part 2)
+  Chapter 1254: Red Bloom (Part 1)
+  Chapter 1255: Red Bloom (Part 2)
+  Chapter 1256: A Skein of Threads
+  Chapter 1257: Ash for the forest
+  Chapter 1258: Black Root (Part 1)
+  Chapter 1259: Black Root (Part 2)
+  Chapter 1260: Glass Bridge (Part 1)
+  Chapter 1261: Glass Bridge (Part 1)
+  Chapter 1262: The Beast
+  Chapter 1263: Targon, the Crystal Beast (Part 1)
+  Chapter 1264: Targon, the Crystal Beast (Part 2)
+  Chapter 1265: Battle on the Bridge
+  Chapter 1266: Beetle Chase
+  Chapter 1267: Warning About Threads
+  Chapter 1268: White, Gray, and Black
+  Chapter 1269: Desire for War and the White Mill
+  Chapter 1270: Flowers and Tea (Part 1)
+  Chapter 1271: Flowers and Tea (Part 2)
+  Chapter 1272:  Three Threads (Part 1)
+  Chapter 1273: Three Threads (Part 2)
+  Chapter 1274: White Threads and Goal
+  Chapter 1275: Death or Duel?
+  Chapter 1276: Damien
+  Chapter 1277: Blighted Scar Lands
+  Chapter 1278: Broken Hopes (Part 1)
+  Chapter 1279: Broken Hopes (Part 2)
+  Chapter 1280: Ugly Spider? (Part 1)
+  Chapter 1281: Ugly Spider? (Part 2)
+  Chapter 1282: Arachne Nollura
+  Chapter 1283: Cut Seal
+  Chapter 1284: His ex?!
+  Chapter 1285: White Lie
+  Chapter 1286: Observer from the Darkness
+  Chapter 1287: Fury Flower (Part 1)
+  Chapter 1288: Fury Flower (Part 2)
+  Chapter 1289: Seven Years - Eternity (Part 1)
+  Chapter 1290: Seven Years - Eternity (Part 2)
+  Chapter 1291: Ureyn, the Grim Wind (Part 1)
+  Chapter 1292: Ureyn, the Grim Wind (Part 2)
+  Chapter 1293: String Duel (Part 1)
+  Chapter 1294: String Duel (Part 2)
+  Chapter 1295: His Path Is Wrong (Part 1)
+  Chapter 1296: His Path is Wrong (Part 2)
+  Chapter 1297: Needles Falling From the Sky (Part 1)
+  Chapter 1298: Needles Falling From the Sky (Part 2)
+  Chapter 1299: Ureyn's Fall (Part 1)
+  Chapter 1300: Ureyn's Fall (Part 2)
+  Chapter 1301: True power of the wind and a change of team (Part 1)
+  Chapter 1302: True power of the wind and a change of team (Part 2)
+  Chapter 1303: Reversal of Positions (Part 1)
+  Chapter 1304: Reversal of Positions (Part 2)
+  Chapter 1305: Element Against Element (Part 1)
+  Chapter 1306: Element Against Element (Part 2)
+  Chapter 1307: Last Thunder
+  Chapter 1308: A Wound in the Heart
+  Chapter 1309: Golden Flash
+  Chapter 1310: Eight Blades and One Heart
+  Chapter 1311: Draug and old belief (Part 1)
+  Chapter 1312: Draug and old belief (Part 2)
+  Chapter 1313: Spatula and Line (Part 1)
+  Chapter 1314: Spatula and Line (Part 2)
+  Chapter 1315: Energy Axis (Part 1)
+  Chapter 1316: Energy Axis (Part 2)
+  Chapter 1317: From Weak to Strong (Part 1)
+  Chapter 1318: From Weak to Strong (Part 2)
+  Chapter 1319: Crimson scar on the sky
+  Chapter 1320: Unbeatable Game
+  Chapter 1321: Half Death?
+  Chapter 1322: A Difficult Start
+  Chapter 1323: First Stage and Risks
+  Chapter 1324: Lack of Patience
+  Chapter 1325: Silver Beacon
+  Chapter 1326: Loss of Effectiveness
+  Chapter 1327: Anger of Two Women
+  Chapter 1328: Dark Bear
+  Chapter 1329: Fall of Limits
+  Chapter 1330: My energy hasn't run out yet
+  Chapter 1331: Arrival of Flame and Dead Cold
+  Chapter 1332: One Explosion After Another
+  Chapter 1333: Fiery Throw into the Clouds
+  Chapter 1334: Lightning Clouds
+  Chapter 1335: Path to Light (Part 1)
+  Chapter 1336: Path to Light (Part 2)
+  Chapter 1337: Gloves of Silver Touch
+  Chapter 1338: Ancient Artifact
+  Chapter 1339: New Resonance
+  Chapter 1340: Dark Coat
+  Chapter 1341: Crystal Threads and Barrier
+  Chapter 1342: Guard of the White Gates
+  Chapter 1343: Aura and the Silver Wing Sign
+  Chapter 1344: It's Not That Simple (Part 1)
+  Chapter 1345: It's Not That Simple (Part 2)
+  Chapter 1346: Amber Crystal
+  Chapter 1347: Silver Gargoyle
+  Chapter 1348: Knife in the stone
+  Chapter 1349: Hunter’s Dagger (Part 1)
+  Chapter 1350: Hunter’s Dagger (Part 2)
+  Chapter 1351: Part of the Seal
+  Chapter 1352: Whose servant are you?
+  Chapter 1353: Soaring Fragments
+  Chapter 1354: Dark Wings of the Sky
+  Chapter 1355: Breaking the Rules
+  Chapter 1356: Fake Lord
+  Chapter 1357: Amber Orb
+  Chapter 1358: Red Chamber in the Sky
+  Chapter 1359: Wait for the gray area
+  Chapter 1360: Cold Clouds
+  Chapter 1361: Wyvern Hunt
+  Chapter 1362: Future of the Past
+  Chapter 1363: Another Rule
+  Chapter 1364: The Only Spear
+  Chapter 1365: Seal of the First Tragedy
+  Chapter 1366: Where Am I?
+  Chapter 1367: Enemy from the Past
+  Chapter 1368: Darkness and Threads
+  Chapter 1369: How to Defeat the Past?
+  Chapter 1370: Fall in the tar
+  Chapter 1371: Five Rings and the green eyes
+  Chapter 1372: You are a disgrace
+  Chapter 1373: Price of desire
+  Chapter 1374: Two Warriors and Two Needles
+  Chapter 1375: Path of Desire
+  Chapter 1376: His Desire
+  Chapter 1377: New Place
+  Chapter 1378: Order of Desire
+  Chapter 1379: Path of Tragedy
+  Chapter 1380: Black Dress
+  Chapter 1381: Long Stair
+  Chapter 1382: Fears of the Past
+  Chapter 1383: Mysterious Figure
+  Chapter 1384: New path for the host
+  Chapter 1385: Reward for the Lands
+  Chapter 1386: Victory Tea Party
+  Chapter 1387: Cold Cider
+  Chapter 1388: Hollow Artifacts and Dessert
+  Chapter 1389: Choice and Cake
+  Chapter 1390: City...?
+  Chapter 1391: Fighting the maps
+  Chapter 1392: Road to Izardo
+  Chapter 1393: Chief Guard
+  Chapter 1394: Hot Bun
+  Chapter 1395: Pink Bartender
+  Chapter 1396: Helasa
+  Chapter 1397: Fight Club
+  Chapter 1398: Tarnished Coins
+  Chapter 1399: Red Eye Arena (Part 1)
+  Chapter 1400: Red Eye Arena (Part 2)
+  Chapter 1401: A. V. (Part 1)
+  Chapter 1402: A. V. (Part 2)
+  Chapter 1403: That Very Phantom
+  Chapter 1404: The Judge's Turn
+  Chapter 1405: Xander
+  Chapter 1406: Black Fang Troupe
+  Chapter 1407: Rule of Blood
+  Chapter 1408: Choosing an Opponent
+  Chapter 1409: The best memories remain in the past
+  Chapter 1410: Ancient Voice
+  Chapter 1411: Calm Flame
+  Chapter 1412: Speed Beyond Limits
+  Chapter 1413: Hybrid's Power
+  Chapter 1414: Solar Form
+  Chapter 1415: End for One Fighter
+  Chapter 1416: New Hybrid
+  Chapter 1417: Black Threads
+  Chapter 1418: Fear of Death
+  Chapter 1419: Beast Instinct
+  Chapter 1420: Only One Beast
+  Chapter 1421: Green Eye and Snow-White Needle
+  Chapter 1422: Dark Light
+  Chapter 1423: Dark Heart (Part 1)
+  Chapter 1424: Dark Heart (Part 2)
+  Chapter 1425: Wish and Time
+  Chapter 1426 - Capítulo 1426: Wish
+  Chapter 1427 - Capítulo 1427: Looming Power
+  Chapter 1428 - Capítulo 1428: Another Bun
+  Chapter 1429 - Capítulo 1429: Library
+  Chapter 1430 - Capítulo 1430: Road of Escape
+  Chapter 1431 - Capítulo 1431: The Hunt (Part 1)
+  Chapter 1432 - Capítulo 1432: The Hunt (Part 2)
+  Chapter 1433 - Capítulo 1433: Golden Light (Part 1)
+  Chapter 1434 - Capítulo 1434: Golden Light (Part 2)
+  Chapter 1435 - Capítulo 1435: Golden Ray (Part 1)
+  Chapter 1436 - Capítulo 1436: Golden Ray (Part 2)
+  Chapter 1437 - Capítulo 1437: Dark Evolution (Part 1)
+  Chapter 1438 - Capítulo 1438: Dark Evolution (Part 2)
+  Chapter 1439 - Capítulo 1439: Staff of Defeat
+  Chapter 1440 - Capítulo 1440: Pure Power
+  Chapter 1441 - Capítulo 1441: Golden Armor (Part 1)
+  Chapter 1442 - Capítulo 1442: Golden Armor (Part 2)
+  Chapter 1443 - Capítulo 1443: Several Sighs
+  Chapter 1444 - Capítulo 1444: The Last View
+  Chapter 1445 - Capítulo 1445: Bonfire and Flames
+  Chapter 1446 - Capítulo 1446: Distant Spire
+  Chapter 1447: Permission
+  Chapter 1448: Work Together
+  Chapter 1449: Hot Chocolate
+  Chapter 1450: Problems from the fame
+  Chapter 1451 - Capítulo 1451: Decrease in power
+  Chapter 1452 - Capítulo 1452: Teleportation and a Satisfying Victory
+  Chapter 1453: Bitter Coffee (Part 1)
+  Chapter 1454: Bitter Coffee (Part 2)
+  Chapter 1455 1455: Love Is Not Forever
+  Chapter 1456 1456: Rose & Sugar
+  Chapter 1457: Cream
+  Chapter 1458: Stolen Light
+  Chapter 1459 - Capítulo 1459: Trinket (Part 1)
+  Chapter 1460 - Capítulo 1460: Trinket (Part 2)
+  Chapter 1461 - Capítulo 1461: Long Breakfast
+  Chapter 1462 - Capítulo 1462: Serious Plans
+  Chapter 1463: Rest and Reward
+  Chapter 1464: Casino
+  Chapter 1465 - Capítulo 1465: Wins and Losses
+  Chapter 1466 - Capítulo 1466: She Only Loses
+  Chapter 1467 - Capítulo 1467: Two rings and risks
+  Chapter 1468 - Capítulo 1468: Roulette
+  Chapter 1469: Investments and Money
+  Chapter 1470: Poker (Part 2)
+  Chapter 1471: Luck and Combinations
+  Chapter 1472: Silvana’s Luck
+  Chapter 1473 - Capítulo 1473: Arcade
+  Chapter 1474 - Capítulo 1474: Bowling
+  Chapter 1475 - Capítulo 1475: Next Plans
+  Chapter 1476 - Capítulo 1476: House in the Center (Part 1)
+  Chapter 1477 - Capítulo 1477: House in the Center (Part 2)
+  Chapter 1478 - Capítulo 1478: Lost Birthdays
+  Chapter 1479: Little Sister
+  Chapter 1480: House on Top (Part 1)
+  Chapter 1481: House on Top (Part 2)
+  Chapter 1482: Purchasing a Home and the Way Forward
+  Chapter 1483: Third Star
+  Chapter 1484: Impossible Condition
+  Chapter 1485: Theories
+  Chapter 1486: Party
+  Chapter 1487: Ancient Ice
+  Chapter 1488: Two Guests (Part 1)
+  Chapter 1489: Two Guests (Part 2)
+  Chapter 1490: The Strongest and Dinner
+  Chapter 1491: Flight and Knowledges
+  Chapter 1492: Search
+  Chapter 1493: Red Ear
+  Chapter 1494: Azure Island (Part 1)
+  Chapter 1495: Azure Island (Part 2)
+  Chapter 1496: Winding Fragments (Part 1)
+  Chapter 1497: Winding Fragments (Part 2)
+  Chapter 1498: Frost Lands and Portals
+  Chapter 1499: New Lands (Part 1)
+  Chapter 1500: New Lands (Part 2)
+  Chapter 1501: Detached Mountains (Part 1)
+  Chapter 1502:  Detached Mountains (Part 2)
+  Chapter 1503: Thousand Anomalies (Part 1)
+  Chapter 1504: Thousand Anomalies (Part 2)
+  Chapter 1505: Iron Gate and Test
+  Chapter 1506: Snow Town
+  Chapter 1507 1507: Anomaly Grid
+  Chapter 1508 1508: Frost Ridge (Part 1)
+  Chapter 1509: Frost Ridge (Part 2)
+  Chapter 1510: Frozen Spine (Part 1)
+  Chapter 1511: Frozen Spine (Part 2)
+  Chapter 1512: The Ice Worm (Part 1)
+  Chapter 1513: The Ice Worm (Part 2)
+  Chapter 1514: Abyss Guards (Part 1)
+  Chapter 1515: Abyss Guards (Part 2)
+  Chapter 1516: Is this the way? (Part 1)
+  Chapter 1517 1517: Is this the way? (Part 2)
+  Chapter 1518 1518: Flux
+  Chapter 1519: Now you see
+  Chapter 1520: Blood Bite

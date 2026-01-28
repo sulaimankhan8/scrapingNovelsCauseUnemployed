@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 14: Rust Squad</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .novel-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            min-height: 100vh;
+        }
+        
+        .chapter-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .chapter-title {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        
+        .chapter-number {
+            color: #7f8c8d;
+            font-size: 16px;
+            font-weight: normal;
+        }
+        
+        .chapter-content {
+            font-size: 18px;
+            text-align: justify;
+        }
+        
+        .chapter-content p {
+            margin-bottom: 1.5em;
+            text-indent: 2em;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .chapter-content p:first-child {
+            text-indent: 0;
+        }
+        
+        .chapter-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .nav-button.prev {
+            background-color: #2c3e50;
+        }
+        
+        .nav-button.prev:hover {
+            background-color: #1a252f;
+        }
+        
+        .nav-button.disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .nav-button.disabled:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: #95a5a6;
+        }
+        
+        .home-button {
+            display: block;
+            text-align: center;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            width: fit-content;
+        }
+        
+        .chapter-info {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .novel-container {
+                padding: 20px;
+            }
+            
+            .chapter-title {
+                font-size: 22px;
+            }
+            
+            .chapter-content {
+                font-size: 16px;
+            }
+            
+            .chapter-content p {
+                text-indent: 1.5em;
+            }
+            
+            .nav-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .chapter-navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="novel-container">
+        <div class="chapter-header">
+            <h1 class="chapter-title">Rust Squad</h1>
+            <div class="chapter-number">Chapter 14</div>
+        </div>
+        
+        <div class="chapter-info">
+            Downloaded from NovelBin • 1/28/2026
+        </div>
+        
+        <div class="chapter-content">
+            <h4>Chapter 14: Rust Squad</h4><br><p>Felix was driving at full speed, cutting through the wasteland and looking serious. Squads often ran into trouble, but more often than not, the Phantoms simply canceled the mission and returned to the Citadel. It was much better than getting into a suicidal fight and losing valuable people. </p><br><p>However, sometimes there were situations when it was impossible to escape, you just had to fight and wait for help. </p><br><p>A warplane could not fly out to help each Squad as was the case with Fire Fox Squad. There were only a few of them on each Fort, and they would only fly in for particularly difficult cases and those that were close to the walls. </p><br><p>Unfortunately for the Rust Squad, this was not a situation for which the Fort's forces would be activated, however, the defense department was doing their best to save them. </p><br><p>Adam, Felix, and Verna, thanks to their location, were the first to arrive on the spot in a few minutes. </p><br><p>Tremble. Tremble. Tremble. </p><br><p>Several massive silhouettes about five to six meters tall were approaching the Rust Squad huddled in a ring. </p><br><p>There were about ten monsters in total, each of them was a huge figure covered in stone armor that as part of their body protected them. Along the cracks in the armor was protruding flesh, showing that they were living beings. </p><br><p>The monsters had bulky legs that left a massive footprint in the sand and shook the ground with every step. The torso of the monsters was wide and grew even closer, rising to their massive shoulders, it seemed that not even a cannon shot with an explosive shell could hurt them. </p><br><p>The most notable detail was their hands or rather, their dual appearance. To their massive fists were attached cannons with glowing magma at their bases, ready to attack at any moment. </p><br><p>"What are those big guys?" Adam muttered in a daze. </p><br><p>'Stone Goliaths. White Threat Level, White Book.' Silvana hastily replied, 'However, they are much stronger than the Living Strings. They're not as fast, but it'll be harder to break through their defenses, and one attack will be enough to turn you into a pancake. Also, beware of the cannons on their arms. </p><br><p>Adam nodded before stepping out of the truck and calling upon his needle again. </p><br><p>"Do not engage, against such monsters, I will not be able to protect you. However, you will be able to help with grenades, right?" </p><br><p>"Sure. It's unlikely that even a direct hit will hurt the Stone Goliaths much, but part of their armor will definitely be broken." Felix said confidently. </p><br><p>Adam nodded silently before running forward. </p><br><p>This region of the Scorching Desert had much less sand and more stones. The sand was only a small layer, so with each step, Adam got faster and faster. </p><br><p>On the hard surface, during the battle, he could finally feel how strong and swift his body became. He could feel every step he took as the power flowed through his muscles, rebounding with a slight pulse in his legs. </p><br><p>'Alright, this is the way it's supposed to be. I'm Phantom now, I'm strong and fast, but not invincible...' Adam muttered inwardly as he moved towards the nearest Stone Goliath. </p><br><p>At the same moment, two grenades flew over his head. </p><br><p>BOOOOOOOOOOOOOOOOOM! </p><br><p>The crushing blast, designed specifically to break through armor, shattered the sturdy stone frame, revealing the gruesome flesh on the Stone Goliath's shoulder. </p><br><p>Adam's pupils narrowed as he jumped up, plunging the needle into the monster's shoulder and through to the neck, leaving a long cut. Streams of blood rushed outward flooding all around while the huge monster slowly died. </p><br><p>"Agh... Agh... Agh... Fuck, that was hard." Adam breathed heavily, looking at his right hand. His fingertips trembled slightly, and his wrist whimpered. Cutting through the stone layer closer to the neck, though badly damaged was a difficult task. </p><br><br><p>The Stone Goliath's body fell to the ground with a clatter, raising a cloud of dust. </p><br><p>Then, all the Phantoms and Harvesters turned their attention to it, they finally got a short respite after a long defense. </p><br><p>"Great! The backup has arrived! No giving up! We just need to hold out a little longer!" A man with thick black hair and a mustache exclaimed before tearing forward, holding the massive lance with both hands. </p><br><p>His eyes sparkled as torrents of wind enveloped his legs like whirlwinds. He became several times faster, in a heartbeat, crossing several meters and thrusting the lance into the Stone Goliath's leg. </p><br><p>The stone armor tried to withstand the pressure, but it was useless. Thus, the man smashed the Stone Goliath's leg into splinters, causing the monster to fall. </p><br><br><p>Several grenades were right in front of the monster's face, tearing the armor apart. </p><br><p>'No! That's not enough!' Adam inwardly exclaimed, realizing that the grenades wouldn't be able to kill Stone Goliath. </p><br><br><p>His gaze was caught by a bright red flash coming from the second Phantom of the Rust Squad. It was a tall girl with red hair who was holding a bow created from flames. She quickly drew the bowstring, releasing a fiery arrow. </p><br><p>With a whistle, cutting through the air currents in its path, the arrow slammed into the monster's head, blowing it up. Bloody shards were scattered around, as well as red-hot rocks. </p><br><p>'Adam, the man with Lance is named Aron, he is the leader of the Rust Squad. The girl with the red hair is Layla, and the third one is Cody.' Silvana said quickly, handing Adam the necessary information. </p><br><p>Even though she was dozens of kilometers away from Adam, she could see everything through the cameras in his NEP. The cameras were in different locations, so whatever position Adam's arm was in, Silvana had a full view. </p><br><p>"Third one...?" Adam was puzzled. </p><br><p>At the same moment, the three Stone Goliaths stopped and pointed their cannons at the Rust Squad. They heated up quickly, ready to fire at any moment. </p><br><p>"Everyone, get behind me! Hurry up!" Cody exclaimed, running out in front of Aron and Layla. He had a massive black shield with many protective plates and grooves to fill with energy. </p><br><p>Cody's eyes flashed as his shield shone brightly, coating itself in ice that became several times larger than the shield, covering them like an impregnable wall. </p><br><p>Then, red-hot rocks began to fly out of the Stone Goliaths' cannons, at a tremendous speed as if they were machine guns. </p><br><p>"NO! I'm not making it!" One of the Harvesters exclaimed, trying to run to the ice shield. </p><br><p>However, no sooner had he taken the next step than a red-hot rock exploded his head, plunging him into darkness forever. </p><br><p>The same fate befell two more Harvesters. The red-hot stones made wide holes in them, they only missed by a few steps, and it doomed them. </p><br><p>"FUCK!!! This wasn't supposed to happen!" Cody exclaimed furiously, holding his shield tightly with both hands. </p><br><p>The ice barrier absorbed all the damage into itself, but everything else was a death zone. </p><br><p>'Adam, run!' Silvana shouted as one of the Stone Goliaths pointed its cannons at him. </p><br><p>Before Adam could realize anything, several of the rocks were already right in front of him. </p><br><p>Electric shocks passed through his eyes as his body began to move automatically. With a sharp sweep of his arm, the needle split the rocks in front of him, then Adam's body twisted several times in different directions, passing the rocks right next to him. </p><br><p>Aron, Layla, Cody, and the Harvesters watching got shocked looks on their faces, for they knew that it was almost impossible to dodge the direct fire of the Stone Goliath.</p>
+
+                        <br>
+        </div>
+        
+        <div class="chapter-navigation">
+            <a href="chapter_013.html" class="nav-button prev">← Chapter 13</a>
+            
+            <a href="index.html" class="nav-button">🏠 Chapters List</a>
+            
+            <a href="chapter_015.html" class="nav-button">Chapter 15 →</a>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add reading progress bar
+            const progressBar = document.createElement('div');
+            progressBar.style.position = 'fixed';
+            progressBar.style.top = '0';
+            progressBar.style.left = '0';
+            progressBar.style.width = '100%';
+            progressBar.style.height = '3px';
+            progressBar.style.backgroundColor = '#3498db';
+            progressBar.style.transform = 'scaleX(0)';
+            progressBar.style.transformOrigin = '0 0';
+            progressBar.style.transition = 'transform 0.1s';
+            progressBar.style.zIndex = '10000';
+            document.body.appendChild(progressBar);
+            
+            // Update progress
+            function updateProgress() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) : 0;
+                progressBar.style.transform = 'scaleX(' + progress + ')';
+            }
+            
+            window.addEventListener('scroll', updateProgress);
+            updateProgress();
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft' && true) {
+                    window.location.href = 'chapter_013.html';
+                } else if (e.key === 'ArrowRight' && true) {
+                    window.location.href = 'chapter_015.html';
+                } else if (e.key === 'Home' || e.key === 'h') {
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // Remove any leftover script tags from original content
+            document.querySelectorAll('script').forEach(script => script.remove());
+            
+            // Smooth scroll to top on load
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

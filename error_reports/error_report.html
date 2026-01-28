@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Report - Super Gene Chapters</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; text-align: center; }
+        h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0; }
+        .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; }
+        .stat-number { font-size: 2em; font-weight: bold; color: #3498db; }
+        .error-list { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #3498db; color: white; padding: 15px; text-align: left; }
+        td { padding: 12px 15px; border-bottom: 1px solid #ddd; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        tr:hover { background: #f1f7fd; }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8em; font-weight: bold; }
+        .badge-error { background: #ff6b6b; color: white; }
+        .badge-warning { background: #ffd93d; color: #333; }
+        .chapter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin: 20px 0; }
+        .chapter-badge { background: #ff6b6b; color: white; padding: 8px; text-align: center; border-radius: 5px; font-weight: bold; }
+        .controls { margin: 20px 0; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .btn:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Error Report</h1>
+            <p>Super Gene Chapter Cleaning - 1/28/2026</p>
+        </header>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">18</div>
+                <div>Error Chapters</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">420</div>
+                <div>Success Chapters</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">462</div>
+                <div>Total Chapters</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4%</div>
+                <div>Error Rate</div>
+            </div>
+        </div>
+        
+        <div class="error-list">
+            <h2>Error Chapters List</h2>
+            
+            <div class="controls">
+                <button class="btn" onclick="filterErrors('all')">Show All</button>
+                <button class="btn" onclick="filterErrors('Scraping Error')">Scraping Errors</button>
+                <button class="btn" onclick="filterErrors('Processing Error')">Processing Errors</button>
+                <button class="btn" onclick="sortTable('chapter')">Sort by Chapter</button>
+                <button class="btn" onclick="sortTable('error')">Sort by Error Type</button>
+            </div>
+            
+            <table id="errorTable">
+                <thead>
+                    <tr>
+                        <th>Chapter</th>
+                        <th>File</th>
+                        <th>Error Type</th>
+                        <th>Error Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>564</strong></td>
+                        <td>scraped_chapter_564.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>565</strong></td>
+                        <td>scraped_chapter_565.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>566</strong></td>
+                        <td>scraped_chapter_566.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>567</strong></td>
+                        <td>scraped_chapter_567.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>568</strong></td>
+                        <td>scraped_chapter_568.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>569</strong></td>
+                        <td>scraped_chapter_569.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>570</strong></td>
+                        <td>scraped_chapter_570.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>571</strong></td>
+                        <td>scraped_chapter_571.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>572</strong></td>
+                        <td>scraped_chapter_572.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>573</strong></td>
+                        <td>scraped_chapter_573.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>574</strong></td>
+                        <td>scraped_chapter_574.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>575</strong></td>
+                        <td>scraped_chapter_575.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>576</strong></td>
+                        <td>scraped_chapter_576.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>577</strong></td>
+                        <td>scraped_chapter_577.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>578</strong></td>
+                        <td>scraped_chapter_578.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>579</strong></td>
+                        <td>scraped_chapter_579.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>580</strong></td>
+                        <td>scraped_chapter_580.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                    <tr data-type="Scraping Error">
+                        <td><strong>581</strong></td>
+                        <td>scraped_chapter_581.html</td>
+                        <td><span class="badge badge-error">Scraping Error</span></td>
+                        <td>Unknown error</td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+            
+            <h3 style="margin-top: 40px;">Error Chapters Summary</h3>
+            <div class="chapter-grid">
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        564
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        565
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        566
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        567
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        568
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        569
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        570
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        571
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        572
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        573
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        574
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        575
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        576
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        577
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        578
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        579
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        580
+                    </div>
+                
+                    <div class="chapter-badge" title="Unknown error">
+                        581
+                    </div>
+                
+            </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
+                <h4>Recommended Actions:</h4>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Re-scrape the error chapters (total: 18)</li>
+                    <li>Check if chapters 564, 565, 566, 567, 568... are available on the source site</li>
+                    <li>Verify network connectivity for scraping</li>
+                    <li>Check if the website structure has changed</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function filterErrors(type) {
+            const rows = document.querySelectorAll('#errorTable tbody tr');
+            rows.forEach(row => {
+                if (type === 'all' || row.getAttribute('data-type') === type) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        function sortTable(by) {
+            const tbody = document.querySelector('#errorTable tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            rows.sort((a, b) => {
+                if (by === 'chapter') {
+                    const aChap = parseInt(a.cells[0].textContent.trim());
+                    const bChap = parseInt(b.cells[0].textContent.trim());
+                    return aChap - bChap;
+                } else if (by === 'error') {
+                    const aError = a.cells[2].textContent.trim();
+                    const bError = b.cells[2].textContent.trim();
+                    return aError.localeCompare(bError);
+                }
+                return 0;
+            });
+            
+            // Clear and re-append sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Error report loaded. Total errors:', 18);
+        });
+    </script>
+</body>
+</html>

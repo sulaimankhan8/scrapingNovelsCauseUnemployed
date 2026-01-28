@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 8: Operator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .novel-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            min-height: 100vh;
+        }
+        
+        .chapter-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .chapter-title {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        
+        .chapter-number {
+            color: #7f8c8d;
+            font-size: 16px;
+            font-weight: normal;
+        }
+        
+        .chapter-content {
+            font-size: 18px;
+            text-align: justify;
+        }
+        
+        .chapter-content p {
+            margin-bottom: 1.5em;
+            text-indent: 2em;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .chapter-content p:first-child {
+            text-indent: 0;
+        }
+        
+        .chapter-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .nav-button.prev {
+            background-color: #2c3e50;
+        }
+        
+        .nav-button.prev:hover {
+            background-color: #1a252f;
+        }
+        
+        .nav-button.disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .nav-button.disabled:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: #95a5a6;
+        }
+        
+        .home-button {
+            display: block;
+            text-align: center;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            width: fit-content;
+        }
+        
+        .chapter-info {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .novel-container {
+                padding: 20px;
+            }
+            
+            .chapter-title {
+                font-size: 22px;
+            }
+            
+            .chapter-content {
+                font-size: 16px;
+            }
+            
+            .chapter-content p {
+                text-indent: 1.5em;
+            }
+            
+            .nav-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .chapter-navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="novel-container">
+        <div class="chapter-header">
+            <h1 class="chapter-title">Operator</h1>
+            <div class="chapter-number">Chapter 8</div>
+        </div>
+        
+        <div class="chapter-info">
+            Downloaded from NovelBin • 1/28/2026
+        </div>
+        
+        <div class="chapter-content">
+            <h4>Chapter 8: Operator</h4><br><p>Fire Fox Squad had returned to the Citadel hours ago, and all this time, the two men in Fort Norton had a long conversation. However, everything comes to an end at some point just like this talk. </p><br><p>"I'm Naturalborn Phantom...?" Adam muttered, pointing to himself. </p><br><p>Douglas nodded with a serious look, "Yes, but you don't have to tell anyone that. To everyone, you're just an ordinary Phantom who awakened his talent just like everyone else. I'll handle the paperwork, so no one will be suspicious of your recent appearance." </p><br><p>Adam sighed, he stared at the ceiling for a while. </p><br><p>In the last few minutes, Douglas had made him recount everything that had happened to him, from the beginning of the experiment and defeating the Silver Weaver, to his encounter with the Fire Fox Squad. </p><br><p>"What about Aiden Henk? Will he be punished for what he did?" Adam asked as his gaze grew darker. It was the same scientist from the Morton Observatory. </p><br><p>"Agh, Adam I understand how you feel, but given the circumstances, the best solution would be to keep the situation quiet. Even if I wanted to help you, no one would let me. A conflict between the chief scientist of one of the Observatories and Naturalborn Phantom is the last thing our Citadel needs." Douglas tried to explain. </p><br><p>Adam answered nothing, his gaze only gradually growing darker like the depths of the abyss, then he abruptly returned to normal and nodded. </p><br><p>"So... What next?" Adam tilted his head. </p><br><p>"I'm going to ask you to stay here for a few hours. I'll try to get things done as quickly as possible. You'll be home by tonight. Should I notify your family?" Douglas said seriously. </p><br><p>Adam shook his head, "Nah, I want to surprise them." </p><br><p>Douglas smirked, pulled a small book out of his inside pocket, and handed it to Adam. </p><br><p>"Here. It's the only entertainment I can give you, hopefully, you won't be too bored." </p><br><p>Then, Douglas walked away. </p><br><p>"What...? The print edition of the White Book...?" Adam yawned, "Well, it's better than just staring at the ceiling." </p><br><p>Time passed, and soon enough Douglas returned with a large black case. </p><br><br><p>Douglas opened the case, spreading out the documents, a bracelet, a metal card as well as a flash drive across the table. </p><br><p>"Here, this is your NEP - Navigational Explorer Processor, your ID is 14113." Douglas said, moving the bracelet towards Adam. </p><br><p>"14113? My name? Not too original." Adam raised an eyebrow, equipping the NEP. </p><br><p>"Hahaha, well, it is what it is." Douglas slid a metal card forward, "There are 10,000 credits here. Usually, Phantoms get 3,000 to 5,000 as a starting bonus, but you... you're a special case." </p><br><p>Adam's eyes went wide as if he had seen something impossible. His whole family lived on 100-200 credits a month, sometimes they couldn't even get that small amount. So now he had enough money for several years to come! </p><br><p>"However, I don't advise you to relax. It's bad to live in slums, but it's cheap, so in the third ring you won't be able to live on a few hundred credits." Douglas pronounced before handing him a stack of papers. </p><br><p>"This is your house. It's rented for 1 month, after that you'll have to pay for it yourself. The monthly fee is 1,100 credits." </p><br><p>"Damn! This is unbelievable!" Adam exclaimed happily, looking at the photo of his new home. </p><br><p>The Third Ring was the area above the slums, where either the wealthy, the civil servants and military, or the Phantoms usually lived. Crime was less there, conditions were better, and even the air was cleaner. </p><br><p>"Fine, now on to the most important part." Douglas smirked, taking Adam by the wrist and inserting the flash drive into his NEP. </p><br><p>"Agh? What are you doing?" </p><br><p>At the same moment, his NEP activated, and three holograms flashed up - pictures of girls with various, and extremely detailed information about them, from eye color to breast size. </p><br><p>The first thing Adam thought of made his face turn red, and he looked at Douglas puzzled. </p><br><p>"I understand your surprise, but it's not what you thought, your personal life will be decided without my help. Adam, even though you're new, you must have realized that someone was in constant contact with the Fire Fox Squad, especially Lisa, didn't you?" </p><br><p>Adam nodded, remembering how several messages came through on Lisa's NEP. </p><br><p>"Usually, only squad leaders and experienced Phantoms have their personal assistants, while the rest are handled by the general department. But, you're like I said - special case. These girls are ordinary people, but each of them is very valuable since they are Operators." </p><br><p>"Operator...?" Adam muttered, looking at the girls. </p><br><p>Douglas nodded, "Yeah, the Operators' job is extensive, they tell their Phantom all the important news, discuss proposed missions, create strategy, and think through possible outcomes. Information about monsters, their numbers, loot, strengths and weaknesses, and much more. All of this is handled by Operators. Obviously, personal Operators have more efficiency and skill." </p><br><p>Adam nodded, "I see... Something like brain and muscle, right?" </p><br><p>Douglas shrugged, " Sort of." </p><br><p>Then, he pointed to the girls' profiles, "I realize this seems cynical to some degree, but this has all the information on them, all of it, and they're aware of it. "It's all about you choosing the best Operator for you. I advise you to think twice." </p><br><p>"All girls are different, both in appearance and personality." </p><br><p>Adam nodded, "Yeah, I can see that..." </p><br><p>For the next few minutes, Adam carefully read each girl's profile, and each time, he was as surprised as the first. Now he knew all their history, skills, fears and achievements as well as even what they preferred to wear or eat for breakfast. </p><br><p>"How about Odile Cerfbeer?" Douglas pointed to the first girl with a bright smile, pink hair, and below-average height, "She's smart and kind, did well on her exam and did well on her tests." </p><br><p>However, Adam didn't answer anything, obviously, he didn't need someone soft and caring like Odile. </p><br><p>"In that case maybe her?" Douglas pointed to the second girl. She had short blue hair, medium height, and a calm look with round glasses - Nancy Rouanet. </p><br><p>Adam shook his head, "I've made up my mind. Logic tells me it could be a mistake, but I need someone like her to get better." </p><br><p>"I want her." Adam tapped the photo of the last girl - Silvana Desio. </p><br><p>"Ouch... This is going to be a rattling mix." Douglas muttered, surprised by this choice. </p><br><p>Silvana had medium-length black hair, green eyes, and a stern, cold stare, with no hint of a smile or friendliness. </p><br><p>"Can I see her?" Adam asked. </p><br><p>"Sure... As her Phantom, you have the right to contact her at any time. Likewise, I must warn you. Silvana adheres to the strictest chain of command, but she is not an obedient subordinate and will demand that you give your best, just as she does herself." </p><br><p>"A warning? That's usually what people say before something bad happens, but... I haven't heard any downsides." Adam said detachedly. </p><br><p>Douglas's eyes went wide, then he smiled broadly. </p><br><p>"Alright. Follow me. I'll take you to the door, further on your own." </p><br><br><br><p>Mechanical door opened into one of the buildings on the grounds nearest Fort Norton. </p><br><p>Perfect cleanliness, dozens of blue screens, and a few holograms of monsters was the first thing Adam saw. </p><br><p>Then, a tall girl in a tight black suit stood up from her chair and with her hands at the hips bowed low. </p><br><p>"Adam Vinter, my name is Silvana Desio, and I will be your Operator. It is an honor to work with you, Naturalborn Phantom." </p><br><p>Silvana paused for a moment before raising her head. Her cold gaze met with Adam's smile, but as soon as he opened his eyes Silvana sensed the seriousness in his stare - just what she needed.</p>
+
+                        <br>
+        </div>
+        
+        <div class="chapter-navigation">
+            <a href="chapter_007.html" class="nav-button prev">← Chapter 7</a>
+            
+            <a href="index.html" class="nav-button">🏠 Chapters List</a>
+            
+            <a href="chapter_009.html" class="nav-button">Chapter 9 →</a>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add reading progress bar
+            const progressBar = document.createElement('div');
+            progressBar.style.position = 'fixed';
+            progressBar.style.top = '0';
+            progressBar.style.left = '0';
+            progressBar.style.width = '100%';
+            progressBar.style.height = '3px';
+            progressBar.style.backgroundColor = '#3498db';
+            progressBar.style.transform = 'scaleX(0)';
+            progressBar.style.transformOrigin = '0 0';
+            progressBar.style.transition = 'transform 0.1s';
+            progressBar.style.zIndex = '10000';
+            document.body.appendChild(progressBar);
+            
+            // Update progress
+            function updateProgress() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) : 0;
+                progressBar.style.transform = 'scaleX(' + progress + ')';
+            }
+            
+            window.addEventListener('scroll', updateProgress);
+            updateProgress();
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft' && true) {
+                    window.location.href = 'chapter_007.html';
+                } else if (e.key === 'ArrowRight' && true) {
+                    window.location.href = 'chapter_009.html';
+                } else if (e.key === 'Home' || e.key === 'h') {
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // Remove any leftover script tags from original content
+            document.querySelectorAll('script').forEach(script => script.remove());
+            
+            // Smooth scroll to top on load
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
