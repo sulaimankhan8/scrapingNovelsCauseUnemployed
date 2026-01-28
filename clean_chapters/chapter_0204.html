@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 204 - Visitor - Chapter 204</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .content {
+            font-size: 18px;
+            text-align: justify;
+        }
+        .content p {
+            margin-bottom: 1.5em;
+            text-indent: 2em;
+            line-height: 1.8;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .nav a {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .nav a:hover {
+            background-color: #2980b9;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            .content {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chapter 204: Chapter 204 - Visitor</h1>
+        <div class="content">
+            <p></p><div id="pf-15552-1" data-format="display" data-lazy="false" data-index="1" class="PUBFUTURE" data-unit="68523dcc4f9baf3f067b65b0" style="position: relative; margin: auto; clear: both; width: fit-content;"><div class="pf-config-68524173f0cb6b14b28e5e54" style="position: relative; display: block; width: fit-content;"><div class="pf-wrapper"></div></div><div class="pf-config-685241f9f0cb6b14b28e5f2e" style="position: relative; display: block;"><div class="pf-wrapper">
+</div></div><div class="pf-config-695e0b0180667b3a927a8909" style="position: relative; display: block;"><div class="pf-wrapper"></div></div><div class="pf-config-6852769b336f5a4cac548b39" style="position: relative; display: block;"><div class="pf-wrapper"></div></div></div>
+
+<div id="pf-15549-1" data-format="display" data-lazy="false" data-index="2" class="PUBFUTURE" data-unit="68523d5ff0cb6b14b28e5525" style="position: relative; margin: auto; clear: both; width: 970px;"><div class="pf-config-685240424f9baf3f067b6a5b" style="position: relative; display: block;"><div class="pf-wrapper" style="display: none;"><div id="pf-passback-config-685240424f9baf3f067b6a5b"></div></div><a target="_blank" class="pf-banner-default" href="https://s.click.aliexpress.com/e/_c3IvW06p" style="display: block; max-width: 100% !important; width: 970px !important; height: 100% !important; max-height: 250px !important; margin: 0px auto !important; overflow: hidden !important;"><img alt="Pubfuture Ads" loading="lazy" src="https://media.pubfuture.com/defaultBanner/2025/12/08/Pubfuture_106857377172_1765181909.png" style="width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 0px !important; display: block !important; padding: 0px !important; margin: 0px !important; opacity: 1 !important;"></a></div></div>
+                        <div></div><p></p><br><p></p><h4>Chapter 204: Visitor</h4><br><p></p><br><p><strong>Translator: </strong>AtlasStudios <strong>Editor: </strong>AtlasStudios
+</p><br><p>Klein and Leonard lifted their gaze from the letter and exchanged glances. They muttered, “He’s crazy, right?”
+</p><br><p>“Lanevus is secretly a lunatic?”
+</p><br><p><i>A lunatic who truly has a delusional disorder and an antisocial personality... </i>Klein thought and felt a tug at his heartstrings. He quickly redirected his gaze to the letter.
+</p><br><p>“Ladies and gentlemen, the hint is that I’ve placed a bomb in Tingen, a bomb that will grow stronger over time.
+</p><br><p>“Seek it and finish it before it explodes. If you lose the game, there will be a boom, and the entire city of Tingen will be reduced to a ruin. Trust me, I’m not lying at all about this.
+</p><br><p>“—Lanevus, who enjoys giving his friends pleasant surprises.”
+</p><br><p>“A bomb?” Klein looked at Leonard and muttered to himself, perplexed.
+</p><br><p>Leonard held the letter up to the sunlight and looked as he flipped it around. He didn’t find any other clues.
+</p><br><p>“The term ‘bomb’ is probably an expression. I’ve never heard of a bomb that can grow stronger.”
+</p><br><p>Klein creased his eyebrows and said thoughtfully, “No, I mean, he might be using ‘bomb’ to reference something in mysticism. Such as an evil ritual that continuously accumulates power...”
+</p><br><p>Leonard cocked his head as though he was listening to something when suddenly, his facial expression grew solemn.
+</p><br><p>He nodded as his green eyes constricted. “Maybe you’re right. Isn’t there a description at the beginning of the letter? Child laborers that die before their time, factory workers who seldom live past ten years after entering the factory because of their working conditions, female workers who risk severe illnesses for a meager salary... Boundless resentment surrounding every factory... Perhaps, that might be the energy source that constantly strengthens Lanevus’s bomb.”
+</p><br><p>“Yes... that’s very possible!” Klein suddenly tensed up and said, “We need to report to the Captain immediately!”
+</p><br><p>Leonard laughed and said, “There’s no need to be so nervous. You should know that Lanevus is a Swindler. The part where he said that he didn’t lie might be a lie itself.
+</p><br><p>“Of course, regardless, we have to return to Zouteland Street to report to the Captain. It’s best if we can request the Holy Cathedral to send a mysticism expert over and find the location of the altar through the abnormal accumulation of resentment.”
+</p><br><p><i>Someone is apparently very familiar with protocol... But why would the setup of such an altar need Hood Eugen’s help? What role does a Psychiatrist play in this? </i>Klein didn’t object to the idea. He left 62 Howes Street with Leonard and rushed back to Zouteland Street on a hired carriage.
+</p><br><p>Just as they entered the Blackthorn Security Company’s door, Klein saw two familiar faces, one voluptuous and one scrawny. They were Maynard’s wife and sister.
+</p><br><p>They were still in black dresses and black hats. The fine checkered black gauze concealed their faces.
+</p><br><p>The two ladies were chatting with Rozanne, and when they suddenly saw Klein’s return, they turned around and walked forward.
+</p><div id="pf-15550-1" data-format="display" data-lazy="false" data-index="3" class="PUBFUTURE" data-unit="68523d6f4f9baf3f067b654a" style="position: relative; margin: auto; clear: both; width: 300px;"><div class="pf-config-68526493f0cb6b14b28e7935" style="position: relative; display: block;"><div class="pf-wrapper" style="display: none;"><div id="pf-passback-config-68526493f0cb6b14b28e7935"></div></div><a target="_blank" class="pf-banner-default" href="https://s.click.aliexpress.com/e/_c4Ern4w9" style="display: block !important; max-width: 100% !important; width: 300px !important; height: 100% !important; max-height: 250px !important; margin: 0px auto !important; overflow: hidden !important;"><img alt="Pubfuture Ads" loading="lazy" src="https://media.pubfuture.com/defaultBanner/2025/12/08/Pubfuture_666630487787_1765166275.png" style="width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 0px !important; display: block !important; padding: 0px !important; margin: 0px !important; opacity: 1 !important;"></a></div></div><br><p>“You really are the cream of the crop in this industry.” Mrs. Maynard nodded slightly and said in a low voice, “I’m very pleased with the outcome and am also impressed with your work approach. Here’s the reward that you deserve.”
+</p><br><p>The scrawny woman passed a light brown paper bag to Klein. It was filled with thick stacks of cash. There were ten pound notes, five pound notes, one pound notes, and also five soli and one soli.
+</p><br><p>“It’s a total of 230 pounds,” the scrawny lady stated simply.
+</p><br><p>Klein was in no mood to pay any attention to the money. He passed it to Rozanne and said, “Take this to Mrs. Orianna. I doubt the two respectable women would make a mistake counting the money.”
+</p><br><p>At that moment, the corner of his eyes caught the Tingen City Honest Paper in Mrs. Maynard’s hands. On the most eye-catching spot on the front page, there were two pieces of news.
+</p><br><p><i>Old baron’s widow dies in involvement with MP Maynard’s murder.</i> </p><br><p><i>Mayor Dennis takes the blame for the worsening public security in Tingen for the past three months and resigns.</i> </p><br><p><i>So that’s the official excuse for Madam Sharon’s case? I’ve yet to read the newspaper today... </i>Klein nodded at the two ladies and followed Leonard through the partition to the Captain’s office.
+</p><br><p>“How was it? Did you find any clues?” Dunn Smith closed his document, lifted his head, and looked at Klein and Leonard with his deep gray eyes.
+</p><br><p>“We found a letter that was left behind by Lanevus.” Leonard didn’t provide any further descriptions and simply passed the Captain the letter filled with madness and provocation.
+</p><br><p>Dunn opened the letter and scanned through it quickly. He rubbed his temples as he said, “He really is a lunatic.”
+</p><br><p>“He’s only a Sequence 8, Sequence 7 at most.”
+</p><br><p>Klein agreed from the bottom of his heart. “Lanevus is a dangerous figure who can damage the stability of social order. Even though he’s weak, we can’t belittle him.”
+</p><br><p>Then, he told Captain about his and Leonard’s assumption.
+</p><br><p>Dunn touched his receding hairline as he said, “That was my thought as well. I’ll immediately send a telegram to the Holy Cathedral and ask them to send a mysticism expert over for assistance.
+</p><br><p>“Who knows how dangerous Lanevus’s bomb could be. We have to be extremely careful. When the Holy Cathedral replies to me, I’ll arrange for the follow-up.”
+</p><br><p>Klein and Leonard exchanged glances and nodded simultaneously as they said, “Alright.”
+</p><br><p>Seizing the moment when Captain was sending a telegram to the Holy Cathedral, Klein returned to the reception hall to grab a copy of the Tingen City Honest Paper from Rozanne.
+</p><br><p>He stood at the partition and read the two articles with full concentration.
+</p><br><p>“... The widow of the old baron of the Khoy family, Madam Sharon, was suspected to be involved in the sudden death of Member of Parliament Maynard... The police received a tip and took action at night. They discovered that Madam Sharon and her accomplice had knocked out her servants to carry out a pagan ceremony in her bedroom. They refused to surrender and attempted to resist arrest, resulting in the death of a heroic police officer.
+</p><br><p>“Finally, Madam Sharon and her accomplice paid the price for their evil deeds with their lives.”
+</p><br><p>...
+</p><br><p>“... Mayor Dennis takes the blame for the worsening public security in Tingen and resigns. He also announced that he wouldn’t be running for reelection next year. For the next few months, Deputy Mayor Mr. Harry will take on the responsibilities of mayor.”
+</p><br><p>...
+</p><div id="pf-15551-1" data-format="display" data-lazy="false" data-index="4" class="PUBFUTURE" data-unit="68523d7a4f9baf3f067b6572" style="position: relative; margin: auto; clear: both; width: 970px;"><div class="pf-config-685267354f9baf3f067b8e43" style="position: relative; display: block;"><div class="pf-wrapper" style="display: none;"><div id="pf-passback-config-685267354f9baf3f067b8e43"></div></div><a target="_blank" class="pf-banner-default" href="https://adsbanner.to9game.com?type=970x2502" style="display: block; max-width: 100% !important; width: 970px !important; height: 100% !important; max-height: 250px !important; margin: 0px auto !important; overflow: hidden !important;"><img alt="Pubfuture Ads" loading="lazy" src="https://media.pubfuture.com/defaultBanner/2025/12/24/Pubfuture_652177267201_1766562495.gif" style="width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 0px !important; display: block !important; padding: 0px !important; margin: 0px !important; opacity: 1 !important;"></a></div></div><br><p><i>A heroic police officer... Is that the description of Kenley? </i>Klein sighed and knew that it was the best way of handling the situation.
+</p><br><p>According to the internal rules of the Nighthawks, in order to prevent the forces of evil from taking revenge on their family members, their names would be kept confidential even if they sacrificed their lives.
+</p><br><p>He folded the newspaper quietly and returned it to the reception desk. Klein suddenly saw a visitor who walked through the entrance.
+</p><br><p>She was a young lady, in her twenties at most. She was in a ruffled hat and loose dress. She had lovely facial features, blonde hair, green eyes, and also a depressed yet silent temperament. She was quite a beauty.
+</p><br><p>The most eye-catching thing about her was her stomach that bulged out. She looked like she was more than seven months pregnant.
+</p><br><p>Klein was stunned, and he felt that he had seen the young pregnant lady before.
+</p><br><p>Suddenly, he heard Leonard say in surprise, “Miss Megose?”
+</p><br><p><i>Megose... Yes, the young lady who was conned by Lanevus! She’s pregnant with Lanevus’s child, and as such, there might be something wrong with her mental health. She says her child sings in her stomach and also whistles... </i>Klein was suddenly enlightened and he wasn’t surprised that Leonard knew Megose.
+</p><br><p>When they relaunched the investigations of people related to Lanevus, the lady’s photo had been seen by every Nighthawk.
+</p><br><p>Klein knew her even earlier. Her aunt Christina, whose savings had been conned by Lanevus, had brought her to the Divination Club to ask for help. Her aunt even asked if the child in her stomach could be used for divination.
+</p><br><p>Then, as Megose heard Leonard’s voice, she looked over at the both of them vacantly and replied politely, “Hello.”
+</p><br><p>“Miss Megose, what brings you here to the Blackthorn Security Company? Do you have anything that you’d like us to do for you?” Klein took two steps forward and asked.
+</p><br><p>He was very confused by Megose’s sudden visit. He felt it was an extreme coincidence.
+</p><br><p><i>We just found Lanevus’s letter, and Megose comes visiting?</i> </p><br><p>Megose touched her stomach and smiled faintly.
+</p><br><p>“Somehow or other, I suddenly thought of coming to Zouteland Street and suddenly thought of coming up to take a look.”
+</p><br><p><i>Her mental health seems to have worsened... </i>Klein recalled that he hadn’t managed to activate his Spirit Vision and check on Megose’s situation previously. Hence, he lifted his teeth and was about to tap his left molars.
+</p><br><p>Just then, a series of thoughts screamed through his head in increasing intensity.
+</p><br><p><i>“Don’t look!</i> </p><br><p><i>“Don’t look! Don’t look!</i> </p><br><p><i>“You’ll die!</i> </p><div id="pf-15559-1" data-format="display" data-lazy="false" data-index="5" class="PUBFUTURE" data-unit="685267864f9baf3f067b8f34" style="position: relative; margin: auto; clear: both; width: 970px;"><div class="pf-config-685267864f9baf3f067b8f3f" style="position: relative; display: block;"><div class="pf-wrapper" style="display: none;"><div id="pf-passback-config-685267864f9baf3f067b8f3f"></div></div><a target="_blank" class="pf-banner-default" href="https://adsbanner.to9game.com?type=970x2502" style="display: block; max-width: 100% !important; width: 970px !important; height: 100% !important; max-height: 250px !important; margin: 0px auto !important; overflow: hidden !important;"><img alt="Pubfuture Ads" loading="lazy" src="https://media.pubfuture.com/defaultBanner/2025/12/24/Pubfuture_652177267201_1766562495.gif" style="width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 0px !important; display: block !important; padding: 0px !important; margin: 0px !important; opacity: 1 !important;"></a></div></div><br><p><i>“You’ll die if you look!</i> </p><br><p><i>“You’ll die if you look!”</i> </p><br><p>...
+</p><br><p>Klein stood rooted on the spot like a statue as his forehead was covered in cold sweat.
+</p><br><p>It was like having a deep and heavy nightmare that he nearly couldn’t wake up from.
+</p><br><p>Suddenly, he understood something. He had failed to activate his Spirit Vision the last time because his spirituality had noticed an unimaginable danger. It slowed him down subconsciously, so he missed the opportunity and forgot the follow-up.
+</p><br><p>At that point, Klein had yet to digest the Seer potion entirely, and he had yet to advance to Sequence 8, so the warnings of spirituality were very subtle and difficult to notice. But now, Clown’s spiritual foresight was so clear and obvious!
+</p><br><p>After nearly twenty seconds, Klein finally shook off his paralysis. He looked sideways at Leonard and realized that the Midnight Poet was also covered in cold sweat, and his eyes were filled with horror.
+</p><br><p>Suddenly, Klein understood what the bomb Lanevus was referring to!
+</p><br><p><i>It’s the baby in Megose’s stomach!</i> </p><br><p><i>It’s the baby that he left behind!</i> </p><br><p>Klein suddenly associated the description in the letter with Hood Eugen’s answers, and he suddenly remembered something that he read in Emperor Roselle’s diary.
+</p><br><p><i>“I started the Industrial Revolution with my own hands and personally ushered in the Age of Steam and Machinery, but this will only become the hotbed for the descent of an Evil God upon this world?”</i> </p><br><p>Klein’s pupils constricted as he thought of a possibility that he instinctually refused to admit.
+</p><br><p><i>No! That’s not right!</i> </p><br><p><i>The baby in Megose’s stomach can’t be the son of some evil god or an evil god waiting to descend upon the world!</i> </p><br><p><i>No! Why would Hood Eugen do such a silly thing! Although his Psychiatrist power can help Lanevus fool Megose and use her as a spawning vessel in her semi-unconscious state...</i> </p><br><p><i>No! The resentment of child laborers that die before their time, and the factory workers and female workers who live less than ten years aren’t helping the son of an evil god to grow rapidly!</i> </p><br><p><i>No!</i> </p><br><p><i>Y-you may not look directly at God...</i></p>
+
+                        <div id="pf-15560-1" data-format="display" data-lazy="false" data-index="6" class="PUBFUTURE" data-unit="685269ad336f5a4cac547151" style="position: relative; margin: auto; clear: both; width: 300px;"><div  style="position: relative; display: block;"><div class="pf-wrapper" style="display: none;"><div ></div></div><a target="_blank" class="pf-banner-default" href="https://s.click.aliexpress.com/e/_oFhRz3V?bz=300*250" style="display: block; max-width: 100% !important; width: 300px !important; height: 100% !important; max-height: 250px !important; margin: 0px auto !important; overflow: hidden !important;"><img alt="Pubfuture Ads" loading="lazy" src="https://media.pubfuture.com/defaultBanner/2025/08/22/Pubfuture_291811829746_1755861758.png" style="width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 0px !important; display: block !important; padding: 0px !important; margin: 0px !important; opacity: 1 !important;"></a></div></div><br>
+        </div>
+        <div class="nav">
+            <a href="chapter_0203.html">← Previous</a>
+            <a href="index.html">🏠 Chapters</a>
+            <a href="chapter_0205.html">Next →</a>
+        </div>
+    </div>
+</body>
+</html>
