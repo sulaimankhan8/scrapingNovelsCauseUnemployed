@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 852: Observer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .novel-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            min-height: 100vh;
+        }
+        
+        .chapter-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .chapter-title {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        
+        .chapter-number {
+            color: #7f8c8d;
+            font-size: 16px;
+            font-weight: normal;
+        }
+        
+        .chapter-content {
+            font-size: 18px;
+            text-align: justify;
+        }
+        
+        .chapter-content p {
+            margin-bottom: 1.5em;
+            text-indent: 2em;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .chapter-content p:first-child {
+            text-indent: 0;
+        }
+        
+        .chapter-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .nav-button.prev {
+            background-color: #2c3e50;
+        }
+        
+        .nav-button.prev:hover {
+            background-color: #1a252f;
+        }
+        
+        .nav-button.disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .nav-button.disabled:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: #95a5a6;
+        }
+        
+        .home-button {
+            display: block;
+            text-align: center;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            width: fit-content;
+        }
+        
+        .chapter-info {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .novel-container {
+                padding: 20px;
+            }
+            
+            .chapter-title {
+                font-size: 22px;
+            }
+            
+            .chapter-content {
+                font-size: 16px;
+            }
+            
+            .chapter-content p {
+                text-indent: 1.5em;
+            }
+            
+            .nav-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .chapter-navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="novel-container">
+        <div class="chapter-header">
+            <h1 class="chapter-title">Observer</h1>
+            <div class="chapter-number">Chapter 852</div>
+        </div>
+        
+        <div class="chapter-info">
+            Downloaded from NovelBin • 1/29/2026
+        </div>
+        
+        <div class="chapter-content">
+            <br><p>Adam wasn't chasing fashion. He was a Phantom and he had more important tasks ahead of him. Sure, he had certain desires for his appearance, but it wasn't his first priority.</p><br><p>If he had a reason to change his style, he didn't mind seizing the opportunity - the clothing store at the Twilight Palace was that place.</p><br><br><p>A gentle hand touched his shoulder as a girl with blue eyes like a ghost swept behind him to appear on the other side.</p><br><p>"What do you say?" Misa uttered, smiling broadly, "I think it's a perfect fit for you, especially with Goran's haircut."</p><br><p>Before answering, Adam shifted his gaze slightly to the left, looking at Misa's reflection in the tall mirror going all the way to the ceiling.</p><br><p>Misa had spiky silver hair reaching the level of her chin, a look of enthusiasm, and a smile glowing with energy. Unlike Goran who favored a strict style, her clothes were loose and somewhat casual, a shirt and jeans at the core.</p><br><p>However, she made up for the simplicity and even plainness of her clothes with well-chosen jewelry, be it rings, bracelets, or chains hanging from her neck. Her skin was pale, which contrasted nicely with her black lipstick and the same nails.</p><br><p>Then, Adam took a look at himself, deep inside he felt he had made the right decision coming here.</p><br><p>A spacious black shirt covered his lean body, the shirt had no buttons or rivets, it was impossible to fasten. There were cosmetic scuffs on the edges as well as on the elongated collar as if it were actually an old thing with a history.</p><br><p>The material was quite thick, not wanting to be an unnoticeable sheet for Adam, but not as heavy as a vest.</p><br><p>Underneath the shirt was an equally plain white T-shirt, no prints or logos, the simplest thing one could think of, but the length was tailored perfectly to create a wave effect at the end.</p><br><p>There was no costume jewelry since Adam and Misa decided not to add any unnecessary details.</p><br><p>Adam's outfit was finished with wide dark gray pants and black sneakers with white soles tightly encircling his ankle like dark bandages.</p><br><p>Oddly enough, Adam didn't even think about picking out a coat. For some reason, he didn't feel the urge, even though he didn't think he'd ever forget about coats. Deep down he believed he already had a coat, but... he didn't understand why he felt that way.</p><br><p>After some pondering, Adam nodded deeply.</p><br><p>"Yeah, I'll only be able to give a full verdict after some time. However, if our goal was to achieve a clean and loose outfit, then we've accomplished that task."</p><br><p>"Good to hear!" Misa exclaimed and without restraint slammed Adam on the back.</p><br><p>A wave of deafening pain traveled down her arm, reflecting on Misa's face.</p><br><br><p>She exclaimed, grabbing her wrist and swinging her arm to take away the pain at least a little.</p><br><p>She was a simple person, after all. What she did was tantamount to slapping a solid steel beam on a man's back.</p><br><p>"Hah, looks like you're the type who can't control the outbursts of your emotions."</p><br><p>A smirk appeared on Adam's face as he slowly turned around.</p><br><p>"Can't say I don't like it, though."</p><br><p>Then, his gaze traveled forward. He saw that Goran just finished cutting Silvana's hair.</p><br><p>Without further ado, Adam headed for the exit with only a final wave of his hand.</p><br><p>"Thank you. I feel better now, it's like I'm climbing out of a deep sleep one step at a time. I have to go now, my Operator is waiting for me."</p><br><p>Sure enough, Misa didn't bother to stop him. He wasn't the first or the last K3-Phantom to come into her store at the Twilight Palace.</p><br><p>She leaned on the counter maintaining a vigor smile.</p><br><p>"Hah, whatever you say. You were much nicer to work with than the nobles. They have no taste at all and yet they're always displeased!"</p><br><p>With a short chuckle, Adam left the clothing store. He was glad that Misa shared his feelings about the nobles.</p><br><p>Adam was going back to Goran's to meet Silvana, to appreciate her new hairstyle.</p><br><p>Before he could do so, an indignant voice came from outside:</p><br><p>"Commoner! Stay where you are!"</p><br><p>In a hurry, afraid to miss the moment, a young man of medium height in white long robes showing his unusual origin appeared in front of Adam. However, at the Twilight Palace, this was the standard and it was rare to see people like Adam.</p><br><p>The young man had unusually bright blue hair. Sure, anyone could get such a hair color, especially with advanced technology, but for some reason, Adam was immediately sure that it was the young man's natural color.</p><br><p>He felt the same way he had upon first meeting Franz, his long purple hair a distinctive mark of the Balo Family.</p><br><p>The young man's eyes were the same color as his hair, they both had blue eyes, but even though the young man was clearly a nobleman, something in his eyes was very different from Adam's, for the worse.</p><br><p>Hearing his shriek, Adam actually stopped but didn't say anything. He examined the unknown young man intently.</p><br><p>The young nobleman was not so patient. He stepped forward and waved his hand majestically pointing at Adam.</p><br><p>"You! I am Spiro Lorenzo, challenging you to a duel, commoner! I don't know how you got here at this hour, but I will make you leave the Twilight Palace in shame."</p><br><p>There was only silence in response.</p><br><p>It couldn't help but anger Spiro, but he had to act by the rules - there was no other way.</p><br><p>"Do you accept my challenge or not? You must give your answer! Fight me if you're not afraid!"</p><br><p>Looking away, then returning his gaze to Spiro, Adam shrugged nonchalantly.</p><br><p>"Sure, why not? It'll be quick."</p><br><p>"Tsk." Spiro snorted, "Are you kidding me? Fine, our duel is now registered. All that's left to do is wait for the observer."</p><br><p>Adam raised an eyebrow in curiosity.</p><br><br><p>Not a moment later, measured footsteps were heard from the far side of the hallway, the figure moving towards them ready to make their fight official.</p>
+
+                        <br>
+        </div>
+        
+        <div class="chapter-navigation">
+            <a href="chapter_851.html" class="nav-button prev">← Chapter 851</a>
+            
+            <a href="index.html" class="nav-button">🏠 Chapters List</a>
+            
+            <a href="chapter_853.html" class="nav-button">Chapter 853 →</a>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add reading progress bar
+            const progressBar = document.createElement('div');
+            progressBar.style.position = 'fixed';
+            progressBar.style.top = '0';
+            progressBar.style.left = '0';
+            progressBar.style.width = '100%';
+            progressBar.style.height = '3px';
+            progressBar.style.backgroundColor = '#3498db';
+            progressBar.style.transform = 'scaleX(0)';
+            progressBar.style.transformOrigin = '0 0';
+            progressBar.style.transition = 'transform 0.1s';
+            progressBar.style.zIndex = '10000';
+            document.body.appendChild(progressBar);
+            
+            // Update progress
+            function updateProgress() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) : 0;
+                progressBar.style.transform = 'scaleX(' + progress + ')';
+            }
+            
+            window.addEventListener('scroll', updateProgress);
+            updateProgress();
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft' && true) {
+                    window.location.href = 'chapter_851.html';
+                } else if (e.key === 'ArrowRight' && true) {
+                    window.location.href = 'chapter_853.html';
+                } else if (e.key === 'Home' || e.key === 'h') {
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // Remove any leftover script tags from original content
+            document.querySelectorAll('script').forEach(script => script.remove());
+            
+            // Smooth scroll to top on load
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 935: Cave Grid (Part 1)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .novel-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            min-height: 100vh;
+        }
+        
+        .chapter-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .chapter-title {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        
+        .chapter-number {
+            color: #7f8c8d;
+            font-size: 16px;
+            font-weight: normal;
+        }
+        
+        .chapter-content {
+            font-size: 18px;
+            text-align: justify;
+        }
+        
+        .chapter-content p {
+            margin-bottom: 1.5em;
+            text-indent: 2em;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .chapter-content p:first-child {
+            text-indent: 0;
+        }
+        
+        .chapter-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .nav-button.prev {
+            background-color: #2c3e50;
+        }
+        
+        .nav-button.prev:hover {
+            background-color: #1a252f;
+        }
+        
+        .nav-button.disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .nav-button.disabled:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: #95a5a6;
+        }
+        
+        .home-button {
+            display: block;
+            text-align: center;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            width: fit-content;
+        }
+        
+        .chapter-info {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .novel-container {
+                padding: 20px;
+            }
+            
+            .chapter-title {
+                font-size: 22px;
+            }
+            
+            .chapter-content {
+                font-size: 16px;
+            }
+            
+            .chapter-content p {
+                text-indent: 1.5em;
+            }
+            
+            .nav-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .chapter-navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="novel-container">
+        <div class="chapter-header">
+            <h1 class="chapter-title">Cave Grid (Part 1)</h1>
+            <div class="chapter-number">Chapter 935</div>
+        </div>
+        
+        <div class="chapter-info">
+            Downloaded from NovelBin • 1/29/2026
+        </div>
+        
+        <div class="chapter-content">
+            <br><p>Adam supposed that at the Lower Ring, there was something that allowed this place to exist. The importance and value of the Cave Grid were beyond his expectations, but he wasn't going to delve into how the Citadel's economy worked.</p><br><p>His job was something else - fighting monsters.</p><br><p>"I see... The Cave Grid is the main source of the usual non-energy-infused materials, though if you go down deep enough you can find all the same stuff as at the Dead Lands, right?"</p><br><p>Orel nodded a new cigarette in his hand. "Yeah, in a way the Cave Grid is part of the Dead Lands. There are no monsters at the highest levels within the Lower Ring, but there aren't many energy-infused materials at all, or rather they're already gone too. All the rarest materials have already been mined."</p><br><p>"Tell me more about it," Adam asked quietly, watching the two trucks pull in from the east side, the White Tigers' territory.</p><br><p>"Sure. Those are the first three floors, think of them as caves, though the uppermost ones are more like technical areas and developed mines than caves. The first three floors, their area up to the borders of the Lower Ring or the Citadel walls - we call this area the Peaceful Zone."</p><br><p>Adam's eyes grew deeper remembering the division of the Dead Lands into two zones.</p><br><p>"I take it at the Peaceful Zone is where the common people work, right?"</p><br><p>"Yeah, mostly miners. The deposits are huge, there are still reserves left especially on the third floor, but it's all ordinary resources. The place is safe, the Phantoms killed all the monsters that lived there long ago, but that only applies to the Peaceful Zone."</p><br><p>Adam raised an eyebrow, a slight curiosity in his eyes. "What is further away? The Wild Zone?"</p><br><p>"Hahaha, no, it's much simpler than that. I mean, although anomalies and rockslides can be dangerous, it's nothing compared to the monsters. Therefore, all the other zones are named according to the possible dangers. The White Zone, the Green Zone, the Blue Zone, the Purple Zone, the Yellow Zone, and so on."</p><br><p>"Hm?" Adam turned in his direction, "The Yellow Zone? What about the Mid Yellow or the Dark Yellow?"</p><br><p>An ironic smile formed on Orel's face.</p><br><p>"Adam, we don't use that shit here. We have other designations for strong monsters, but more on that next. First, you must realize that the Cave Grid is not fully explored."</p><br><p>Puzzlement showed in Adam's eyes. "Yeah, you already mentioned that, I get it."</p><br><p>"No, I'm not just talking about the caves running horizontally along the Dead Lands, but also the vertical structure. We don't know how many total floors the Cave Grid has, no one knows, and..."</p><br><p>For a moment, Orel's eyes grew darker, as if hiding an important secret Adam wasn't yet entitled to hear.</p><br><p>"Not that that makes any sense. The lower the floor the less it's explored, because there are a lot of strong monsters there, but there aren't as many Phantoms able to fight them as there are on the upper floors."</p><br><p>At this time, Silvana turned to Orel, she as the Operator wanted to clarify one detail.</p><br><p>"Orel, what about the territories of the first three floors going further than the borders of the Lower Ring and the walls of the Citadel?"</p><br><p>"Well, that's where the Peaceful Zone ends, only three floors and only within the boundaries of the Citadel. Beyond that the Peaceful Zone becomes the White Zone and even the Green Zone if you decide to go far enough into the caves."</p><br><p>He shrugged nonchalantly. "I mean, it's no different than how the Dead Lands work. The farther the territory is from the Citadel, the more dangerous monsters are encountered. The White Threat Level, the Green Threat, and so on. However, the Cave Grid is more developed in depth rather than width."</p><br><p>Orel sighed heavily, trying to find the right words for Silvana to understand him.</p><br><p>"Let's say you're on the first floor, this is the Peaceful Zone. You need to dig kilometers of mines wide to reach an area with rarer resources and dangerous monsters. At the same time, you need to go down to the second floor, and within a one-kilometer radius, you'll immediately find what you want."</p><br><p>With a deep nod, Adam entered the conversation.</p><br><p>"At the Cave Grid, going down is much more profitable than digging kilometers of mines to get all the same stuff you have on the surface of the Dead Lands, am I right?"</p><br><p>"Hah, yeah... Furthermore, workers dig mines in the first three levels to extract resources, the same coal and iron, obviously the Phantoms don't do that. Each level is a complex system of caves, there are enough forks and places where valuable resources are located. What's more, below the Peaceful Zone, anomalies are starting to appear.</p><br><p>"From time to time it can change some floors quite a bit. Thanks to the anomalies, the Peaceful Zone changes as well as the Dead Lands, especially the Wild Lands."</p><br><p>Suddenly, Adam waved his hand, stopping him.</p><br><p>"Alright, Orel, we get your point. The Cave Grid is huge, it's more important to have the floors going deep rather than the mines going wide, the first three floors are basically for the regular people, there's nothing for me or you to do there," Adam said calmly, directing his gaze towards the light from the cracks. "So... You brought me here for a reason, didn't you?"</p><br><p>Orel only smiled slyly, taking the next puff of his cigarette.</p><br><p>Leaning forward, Adam asked. "What do you want me to do? And... What will you offer in return?"</p><br><br><br><p>Orel exhaled a club of smoke.</p><br><p>"I'll give you a task, a mission... The first time, you'll get nothing but reputation - it's one of the most important currencies at the Lower Ring.</p><br><p>"One of the best ways to earn reputation is to show how strong you are, not against other Phantoms, but monsters that have brought much trouble to our home."</p><br><p>Adam frowned but didn't interrupt, waiting for Orel to make his offer.</p><br><p>"The Red Threat monster. However, not the usual one," Orel smiled deviously, a gleam running across his narrowed eyes. "You're going to have to kill someone special if you want the people of the Lower Ring to recognize you - a Light Phantom."</p>
+
+                        <br>
+        </div>
+        
+        <div class="chapter-navigation">
+            <a href="chapter_934.html" class="nav-button prev">← Chapter 934</a>
+            
+            <a href="index.html" class="nav-button">🏠 Chapters List</a>
+            
+            <a href="chapter_936.html" class="nav-button">Chapter 936 →</a>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add reading progress bar
+            const progressBar = document.createElement('div');
+            progressBar.style.position = 'fixed';
+            progressBar.style.top = '0';
+            progressBar.style.left = '0';
+            progressBar.style.width = '100%';
+            progressBar.style.height = '3px';
+            progressBar.style.backgroundColor = '#3498db';
+            progressBar.style.transform = 'scaleX(0)';
+            progressBar.style.transformOrigin = '0 0';
+            progressBar.style.transition = 'transform 0.1s';
+            progressBar.style.zIndex = '10000';
+            document.body.appendChild(progressBar);
+            
+            // Update progress
+            function updateProgress() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) : 0;
+                progressBar.style.transform = 'scaleX(' + progress + ')';
+            }
+            
+            window.addEventListener('scroll', updateProgress);
+            updateProgress();
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft' && true) {
+                    window.location.href = 'chapter_934.html';
+                } else if (e.key === 'ArrowRight' && true) {
+                    window.location.href = 'chapter_936.html';
+                } else if (e.key === 'Home' || e.key === 'h') {
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // Remove any leftover script tags from original content
+            document.querySelectorAll('script').forEach(script => script.remove());
+            
+            // Smooth scroll to top on load
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

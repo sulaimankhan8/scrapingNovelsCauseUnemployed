@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 936: Cave Grid (Part 2)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .novel-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            min-height: 100vh;
+        }
+        
+        .chapter-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .chapter-title {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        
+        .chapter-number {
+            color: #7f8c8d;
+            font-size: 16px;
+            font-weight: normal;
+        }
+        
+        .chapter-content {
+            font-size: 18px;
+            text-align: justify;
+        }
+        
+        .chapter-content p {
+            margin-bottom: 1.5em;
+            text-indent: 2em;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .chapter-content p:first-child {
+            text-indent: 0;
+        }
+        
+        .chapter-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .nav-button.prev {
+            background-color: #2c3e50;
+        }
+        
+        .nav-button.prev:hover {
+            background-color: #1a252f;
+        }
+        
+        .nav-button.disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .nav-button.disabled:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: #95a5a6;
+        }
+        
+        .home-button {
+            display: block;
+            text-align: center;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            width: fit-content;
+        }
+        
+        .chapter-info {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .novel-container {
+                padding: 20px;
+            }
+            
+            .chapter-title {
+                font-size: 22px;
+            }
+            
+            .chapter-content {
+                font-size: 16px;
+            }
+            
+            .chapter-content p {
+                text-indent: 1.5em;
+            }
+            
+            .nav-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .chapter-navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="novel-container">
+        <div class="chapter-header">
+            <h1 class="chapter-title">Cave Grid (Part 2)</h1>
+            <div class="chapter-number">Chapter 936</div>
+        </div>
+        
+        <div class="chapter-info">
+            Downloaded from NovelBin • 1/29/2026
+        </div>
+        
+        <div class="chapter-content">
+            <br><p>The Yellow Threat was the last threat level Adam faced. He fought many monsters at the Fortress of the Lone Serpent and more down below as he made his way towards the temple.</p><br><p>However, none of them left as strong an impression on Adam as the Plague Reaper, the strongest monster of the Purple Threat Level. None but one - the Crimson Monarch.</p><br><p>Adam didn't know what Threat Level the Crimson Monarch had, it didn't matter to him at that moment because he had only one goal - to win.</p><br><p>However, he thought about his hard victory many times. Adam realized that either the Crimson Monarch was at the top of the Dark Yellow threat level or was even above that stage.</p><br><p>He would only get an answer when he returned to the Upper Ring and Silvana made a request to the military and the mission department.</p><br><p>Now, he finally found out about the next threat level, the Red Threat. However, something in Orel's gaze, in his predatory glare told Adam that it wasn't everything.</p><br><p>"A special monster?" Adam tilted his head in confusion. "Are you talking about Overlord Type?"</p><br><p>For a moment, Orel and Risha froze. Orel showed no reaction while Risha's eyes gradually grew wider.</p><br><p>Suddenly, she stepped forward and grabbed Adam by the collar.</p><br><p>"WHAT? You mean you got to kill the Overlord Type monster?!"</p><br><p>"Yes?" Adam replied with a bemused expression, he didn't understand what had caused Risha to have such a reaction.</p><br><p>'How strange...' he pondered looking at her.</p><br><p>At first, he thought that Risha was angry at him, but now he saw that there was no hint of it in her eyes, only pure envy like a hunter who saw that his rival had shot a rare animal he had never encountered before.</p><br><p>"Shit!" Risha stomped her foot letting go of Adam.</p><br><p>Then, she turned around abruptly, frowning at him. "And? What was that Overlord Type monster? I wanted to fight against one back when I was a K2-Phantom, but they're fucking rare! By the time I get information about finding one of them, so someone's already killed it!"</p><br><p>Adam and Silvana looked over at each other. The Crimson Monarch was a special monster.</p><br><p>But, Orel was right about something. If Adam wanted a favor from powerful people, he needed a reputation and a good relationship with one.</p><br><p>"The Crimson Monarch," Adam said quietly, his eyes growing deeper. "It was the first Overlord Type monster I fought against and my last worthy opponent among monsters."</p><br><p>Stumped, Risha tilted her head looking at Orel. "The Crimson Monarch? I have not heard of such a monster. Brother, what do you think?"</p><br><p>"Neither have I..." Orel muttered. "But, I don't think Adam is lying. It was most likely a previously unknown monster."</p><br><p>Adam nodded weakly in affirmation.</p><br><p>"NO WAY! The more I find out about this guy the more he pisses me off!" Risha shouted pointing at Adam.</p><br><p>In response, Orel smirked, shaking his head. "Well, it's no one's fault you're weaker than he is. If you want to fight against strong opponents then you have to match up."</p><br><p>Risha puffed up her cheeks but didn't say anything more.</p><br><p>Then, Orel shook off the ashes pointing to the Cave Grid.</p><br><p>"So, Adam, back to our business. As you realize I want you to kill the monster, it will allow you to gain a reputation and prove your strength - those are the two things most important at the Lower Ring."</p><br><p>Adam shrugged. "Just like everywhere else. I assure you, at the Upper Ring the situation isn't much different."</p><br><br><p>"And?" Adam raised an eyebrow. "What monster do you want me to kill? What's its name? What level is it? The Light Red? The Mid Red?"</p><br><p>Orel shook his head. "Do not hurry. As I mentioned earlier, we're using different designations here. I'm not sure about the Upper Ring, but at the Lower Ring, there isn't the Light Red or the Dark Red monsters. Instead, we use the star system, some call it the blood system."</p><br><p>A confused Silvana put her palm to her chest.</p><br><br><p>She didn't hear of anyone using such an evaluation method for monsters' strength.</p><br><p>"Ghm. The mission department has its own evaluation system, they have parameters where the monster's ability, rarity, and energy play a big part. From that, they conclude what threat level the monster has and what light, mid, or dark category it is. If we're talking about the Yellow Threat.</p><br><p>"At the Lower Ring, we have it much simpler."</p><br><p>Adam and Silvana held their breath listening intently to Orel.</p><br><p>"The star system is divided into five grades. From one star to five. The star system doesn't replace threat levels but complements them. That is, a K0-Phantom can fight against a One Star White Threat Monster. But only Operators say it that way, Phantoms shorten it to S1 White Threat, something like this."</p><br><p>They nodded at the same time, as long as it was clear.</p><br><p>Orel glanced at Adam, the corners of his lips going up. "You're probably wondering what monsters are awarded stars for. Well, I'll tell you.</p><br><p>"The only factor that affects how many stars a monster has is - the Phantom deaths."</p><br><p>Silvana's eyes went wide for a moment.</p><br><p>"Phantom deaths...?" she stammered.</p><br><p>"Yeah. The abilities? The monster's appearance? Physical and energy strength? None of that matters. All that counts is how many Phantoms a particular kind of monster killed."</p><br><br><p>Adam stepped forward. He tried to maintain a calm expression, but a fire slowly lit up in his eyes anticipating a battle as a K3-Phantom.</p><br><p>"So? How many kills does a monster have to perform to get one star? How about two?"</p><br><p>"Hah, 0 to 5 kills is one star. The two stars from 5 to 10 kills. The three stars from 10 to 25 kills. The four stars from 25 to 100 kills.</p><br><p>"And, the most dangerous and powerful bastards, the five-star monsters. It's a very rare grade because to qualify, a monster must kill over 100 Phantoms."</p><br><p>Tremble. Tremble. Tremble.</p><br><p>Adam's aura trembled slightly as he towered over Orel like a shadow.</p><br><p>"What monster do you want me to kill?"</p><br><p>Orel's eyes flickered. "Hah, the four-star one for starters.</p><br><p>"But... Nobody's going to stop you if you want to rid the Cave Grid of the Five Star beast."</p>
+
+                        <br>
+        </div>
+        
+        <div class="chapter-navigation">
+            <a href="chapter_935.html" class="nav-button prev">← Chapter 935</a>
+            
+            <a href="index.html" class="nav-button">🏠 Chapters List</a>
+            
+            <a href="chapter_937.html" class="nav-button">Chapter 937 →</a>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add reading progress bar
+            const progressBar = document.createElement('div');
+            progressBar.style.position = 'fixed';
+            progressBar.style.top = '0';
+            progressBar.style.left = '0';
+            progressBar.style.width = '100%';
+            progressBar.style.height = '3px';
+            progressBar.style.backgroundColor = '#3498db';
+            progressBar.style.transform = 'scaleX(0)';
+            progressBar.style.transformOrigin = '0 0';
+            progressBar.style.transition = 'transform 0.1s';
+            progressBar.style.zIndex = '10000';
+            document.body.appendChild(progressBar);
+            
+            // Update progress
+            function updateProgress() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) : 0;
+                progressBar.style.transform = 'scaleX(' + progress + ')';
+            }
+            
+            window.addEventListener('scroll', updateProgress);
+            updateProgress();
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft' && true) {
+                    window.location.href = 'chapter_935.html';
+                } else if (e.key === 'ArrowRight' && true) {
+                    window.location.href = 'chapter_937.html';
+                } else if (e.key === 'Home' || e.key === 'h') {
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // Remove any leftover script tags from original content
+            document.querySelectorAll('script').forEach(script => script.remove());
+            
+            // Smooth scroll to top on load
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

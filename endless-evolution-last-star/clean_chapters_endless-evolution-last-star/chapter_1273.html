@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1273: Three Threads (Part 2)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .novel-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            min-height: 100vh;
+        }
+        
+        .chapter-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .chapter-title {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        
+        .chapter-number {
+            color: #7f8c8d;
+            font-size: 16px;
+            font-weight: normal;
+        }
+        
+        .chapter-content {
+            font-size: 18px;
+            text-align: justify;
+        }
+        
+        .chapter-content p {
+            margin-bottom: 1.5em;
+            text-indent: 2em;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .chapter-content p:first-child {
+            text-indent: 0;
+        }
+        
+        .chapter-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .nav-button.prev {
+            background-color: #2c3e50;
+        }
+        
+        .nav-button.prev:hover {
+            background-color: #1a252f;
+        }
+        
+        .nav-button.disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .nav-button.disabled:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: #95a5a6;
+        }
+        
+        .home-button {
+            display: block;
+            text-align: center;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            width: fit-content;
+        }
+        
+        .chapter-info {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .novel-container {
+                padding: 20px;
+            }
+            
+            .chapter-title {
+                font-size: 22px;
+            }
+            
+            .chapter-content {
+                font-size: 16px;
+            }
+            
+            .chapter-content p {
+                text-indent: 1.5em;
+            }
+            
+            .nav-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .chapter-navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="novel-container">
+        <div class="chapter-header">
+            <h1 class="chapter-title">Three Threads (Part 2)</h1>
+            <div class="chapter-number">Chapter 1273</div>
+        </div>
+        
+        <div class="chapter-info">
+            Downloaded from NovelBin • 1/29/2026
+        </div>
+        
+        <div class="chapter-content">
+            <br><p><strong>Chapter 1273: Three Threads (Part 2)</strong></p><br><p>Throughout his long journey, Adam had fought dozens of powerful monsters and thousands of weaker ones. However, none of them possessed abilities like his.</p><br><p>Only recently did he realize that this was not surprising, because his abilities, like those of any Phantom, developed from the first monster he killed, or more precisely, from his Initial Gene. The Silver Weaver that Adam killed was the first of all the Silver Weavers.</p><br><p>Sure, any Initial Gene could be replaced or changed beyond recognition, but Adam wanted to preserve the essence of his powers, not wanting to completely abandon his origin as a Phantom.</p><br><p>True, if Adam had started his journey right now, he would most likely have encountered more monsters like himself, or even Phantoms with abilities similar to his.</p><br><p>But Adam had long since passed that stage. He was one of the first on this path and moved faster than most Phantoms overall.</p><br><p>Now, he had the opportunity to meet creatures like himself.</p><br><p>Gareyna was a monster, but… what did that matter at this level if she wasn’t his enemy?</p><br><p>This was a stage where one monster couldn’t decide the fate of humanity or all monsters. Here, global factions had the greatest influence, and the Citadel was just one of them — the only one that belonged to humanity.</p><br><p>The white threads, reminiscent of his silver ones, floated around Gareyna like her obedient, noble guards, ready to carry out her every command with a wave of her hand.</p><br><p>Adam’s eyes were wide open, watching the threads in disbelief.</p><br><p>Perhaps to some other Phantom, his reaction would have seemed excessive. After all, he himself possessed similar threads and had used them many times in his battles.</p><br><p>But… Something about Gareyna’s threads charmed him. A strange feeling consumed him, wanting to know more about Gareyna and the other monsters of the Forgotten Mills.</p><br><p>After all, the Silver Weaver most likely came from here. When he used the Connected String, he saw several directions. The Forgotten Mills were not the only ones of their kind, but there were a limited number of other similar territories, and the Forgotten Mills were definitely the largest and most powerful.</p><br><p>Seeing Adam’s reaction, Gareyna smiled.</p><br><p>“Oh, it seems you like my threads much more than I expected. Well, in that case, you deserve a little show, just for you, young man.”</p><br><br><p>She waved her hand as her threads sprang into motion to quickly transform into a great knight with a large sword towering behind her.</p><br><p>Each thread pressed tightly against the other to form a sturdy frame. This creature could move freely and attack, temporarily becoming Gareyna’s personal guard.</p><br><p>Adam gasped in disbelief.</p><br><p>This time, even Silvana was shocked.</p><br><p>Only recently, thanks to Adam becoming a K4-Phantom and receiving help from Lone Blaze, was he able to control his threads at a fairly decent level, and for that, he needed a new ability from the Path Construct.</p><br><p>However, he wasn’t sure he could create even a simple sphere from his threads that could be used effectively in battle, let alone something more complex.</p><br><p>At the same time, Gareyna created a real warrior with a wave of her hand.</p><br><p>Adam understood that it was possible that, just like with ordinary threads, his or Gareyna’s threads could be used to create almost anything, any object of any shape.</p><br><p>The problem was the level of control required to do so.</p><br><p>“Hahaha! Adam, your gaze confuses me.” Gareyna laughed, covering her mouth with her wide sleeve. “You look like a child who has seen fireworks for the first time.”</p><br><p>“B-But!” Adam stammered. “That’s incredible! And, you can control this knight however you want?”</p><br><br><p>Before Adam could ask his next question, he felt something wrap around his wrist.</p><br><p>Adam’s eyes darted as Gareyna waved her hand, throwing Adam aside with the thread she had secretly directed at him a few seconds ago.</p><br><p>However, she wasn’t trying to take him prisoner. Gareyna didn’t want to ruin her table and tea set.</p><br><br><p>Adam’s feet touched the ground as Gareyna withdrew her thread.</p><br><p>“You can try it for yourself. I’m sure someone like you won’t turn down such an offer. Am I right, Adam Vinter?”</p><br><p>Adam didn’t fully understand what Gareyna was talking about, but she wasn’t going to give him much time. If he was going to stay in these lands longer and achieve his goals, he had to be ready for anything.</p><br><br><p>Without warning, the thread knight swung his sword directly at Adam, who jumped aside.</p><br><p>However, the sword stopped just before the ground and broke into many threads that immediately turned into dozens of daggers.</p><br><p>‘What?!’ Adam exclaimed inwardly as he watched the blades approaching him.</p><br><p>Energy flowed to his hand, and he was about to deflect the daggers, but as soon as they approached Adam, they trembled, breaking into threads that instantly became a large net that fell on Adam.</p><br><p>Adam tried to tear the net, unable to keep up with the pace of events, but at the same time, the thread knight turned into four guards with long spears.</p><br><p>Before Adam could get out of the net, four sharp tips were right at his neck, preventing him from moving.</p><br><p>Perhaps another Phantom in Adam’s place would have been frightened or even panicked, but Adam’s gaze showed no sign of this.</p><br><p>He was deeply impressed. He couldn’t imagine what level of mastery Gareyna possessed to perform such complicated attacks so freely.</p><br><p>‘What’s more…’ Adam thought, looking at Gareyna’s back. ‘She’s not even looking in my direction. She continues to drink her tea, having defeated me with ease.’</p><br><p>Then, Adam realized that even if he wanted to, he could never compare to someone like Gareyna, at least not now.</p><br><p>This was not Garrah or Targon, in the form he had shown himself to be, this was a true master of abilities that he also partially possessed.</p><br><br><p>Gareyna placed the cup on the saucer.</p><br><p>“What do you say, Adam? Would you like to learn more about me, about the mills, about threads, and about yourself?”</p><br><p>Adam smiled nervously, a fire burning in his eyes.</p><br><p>“Do you really think I would refuse? Hah, of course I want to!”</p>
+
+                        <br>
+        </div>
+        
+        <div class="chapter-navigation">
+            <a href="chapter_1272.html" class="nav-button prev">← Chapter 1272</a>
+            
+            <a href="index.html" class="nav-button">🏠 Chapters List</a>
+            
+            <a href="chapter_1274.html" class="nav-button">Chapter 1274 →</a>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add reading progress bar
+            const progressBar = document.createElement('div');
+            progressBar.style.position = 'fixed';
+            progressBar.style.top = '0';
+            progressBar.style.left = '0';
+            progressBar.style.width = '100%';
+            progressBar.style.height = '3px';
+            progressBar.style.backgroundColor = '#3498db';
+            progressBar.style.transform = 'scaleX(0)';
+            progressBar.style.transformOrigin = '0 0';
+            progressBar.style.transition = 'transform 0.1s';
+            progressBar.style.zIndex = '10000';
+            document.body.appendChild(progressBar);
+            
+            // Update progress
+            function updateProgress() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) : 0;
+                progressBar.style.transform = 'scaleX(' + progress + ')';
+            }
+            
+            window.addEventListener('scroll', updateProgress);
+            updateProgress();
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft' && true) {
+                    window.location.href = 'chapter_1272.html';
+                } else if (e.key === 'ArrowRight' && true) {
+                    window.location.href = 'chapter_1274.html';
+                } else if (e.key === 'Home' || e.key === 'h') {
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // Remove any leftover script tags from original content
+            document.querySelectorAll('script').forEach(script => script.remove());
+            
+            // Smooth scroll to top on load
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
