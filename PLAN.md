@@ -233,7 +233,16 @@ Build: `.uild_apk.ps1` (needs the Android NDK; `sdkmanager ndk/29.0.14206865`).
 - Android: the same button saves straight to the phone's Downloads folder.
 - Verified: a 274-chapter export on the emulator, with 279 XML documents and 0 malformed.
 
+**Release APK (done 2026-11-22):** `.uild_apk.ps1 -Release` builds a shrunk APK.
+- Size: 21 MB instead of 45 MB, because it's ARM phones only, the Go symbols are stripped, and R8 shrinking is on with keep rules for the JNI code.
+- It's signed with the user's key from `android/keystore.properties` (git-ignored); the README explains how to create the key.
+- `-DebugSign` makes a debug-key test build with WebView inspection on.
+- Verified on the emulator (ARM translation):
+  - discovery, the site browser and downloads;
+  - EPUB export to Downloads;
+  - offline failure followed by recovery once the network is back.
+- That run also found and fixed a bug: after a failed load, the site browser kept reporting the failed URL as its current page.
+
 **Next:**
-1. Test on a real phone (Cloudflare usually lets real devices through).
-2. Release-signed APK.
-3. Optional: check exports with the official `epubcheck` validator.
+1. The user creates the signing key and tests on a real phone.
+2. Optional: check exports with the official `epubcheck` validator.

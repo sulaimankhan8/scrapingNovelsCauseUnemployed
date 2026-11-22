@@ -55,6 +55,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Debug builds are inspectable automatically; release test builds
+        // made with -PdebugSign turn it on through this resource.
+        if (getResources().getBoolean(R.bool.webview_inspectable)) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
         FrameLayout root = new FrameLayout(this);
         webView = new WebView(this);
         webView.setBackgroundColor(0xFF0E1216);

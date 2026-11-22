@@ -82,11 +82,22 @@ public class SiteBrowser implements BrowserDriver {
             public void onReceivedError(WebView v, WebResourceRequest req, WebResourceError err) {
                 if (req.isForMainFrame()) {
                     loadError = String.valueOf(err.getDescription());
+                    // The view now shows Chrome's error page, not this site:
+                    // forget it so the next request navigates again.
+                    curUrl = "";
+                    curTitle = "";
                 }
             }
 
             @Override
             public void onPageFinished(WebView v, String url) {
+                if (loadError != null || url.startsWith("chrome-error:")) {
+                    curUrl = "";
+                    curTitle = "";
+                    CountDownLatch l = loadLatch;
+                    if (l != null) l.countDown();
+                    return;
+                }
                 curUrl = url;
                 String t = v.getTitle();
                 if (t != null && !t.equals(url)) curTitle = t;

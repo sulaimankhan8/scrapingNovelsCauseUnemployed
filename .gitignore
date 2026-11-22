@@ -42,3 +42,8 @@ library/
 
 # Go core built by build_apk.ps1
 android/app/libs/
+
+# Release signing (keep your key and passwords out of git)
+android/keystore.properties
+*.jks
+*.keystore

@@ -87,16 +87,34 @@ Alternatively, launch from PowerShell or Command Prompt:
 
 ### Installing on Android (Mobile APK)
 
-NovelArchiver is also available as a standalone native Android application:
+The Android app runs the same Go engine as the desktop app, so the same 10 sites, formatting and offline reader work on your phone.
 
-1. **Get the APK:** Transfer [`NovelArchiver.apk`](./NovelArchiver.apk) (~5.6 MB) to your Android phone or tablet (via USB, Google Drive, WhatsApp, or local network).
-2. **Install:** Tap the APK on your device and select **Install** (allow "Install unknown apps" if prompted).
-3. **Enjoy:** Launch NovelArchiver from your app drawer. It operates with the same **zero-backend guarantee** (in-process WebViewAssetLoader, zero background servers, local storage, touch-optimized typography, and live mobile scraper).
+1. **Get the APK:** build it (below), then copy `NovelArchiver-release.apk` to your phone (USB, Google Drive, etc.).
+2. **Install:** tap the APK and choose **Install**. Allow "Install unknown apps" if Android asks.
+3. **Use it:** paste a novel or chapter link, download, and read offline. **Export EPUB** in a novel's details saves an e-book to your phone's Downloads folder.
 
-To re-compile the Android APK anytime from source:
+#### Building the APK
+
+You need the Android SDK, the NDK (`sdkmanager ndk/29.0.14206865`) and Go. Then run:
+
 ```powershell
-.\build_apk.ps1  # Or double-click build_apk.bat
+.\build_apk.ps1                      # debug build for phones and emulators -> NovelArchiver.apk
+.\build_apk.ps1 -Release             # signed, shrunk build for phones     -> NovelArchiver-release.apk
+.\build_apk.ps1 -Release -DebugSign  # release build signed with the debug key, for local testing only
 ```
+
+#### Android release: create your signing key (once)
+
+Android only installs updates signed with the **same key** as the first install. Create your key once and keep the file and passwords safe. If you lose them, you can't update the app in place; you'd have to uninstall it first, which deletes the phone's library.
+
+1. Create the key. `keytool` comes with Java; it asks you to choose a password and asks for a name:
+
+```powershell
+keytool -genkeypair -v -keystore "$HOME\novelarchiver-release.jks" -alias novelarchiver -keyalg RSA -keysize 4096 -validity 10000
+```
+
+2. Copy `android\keystore.properties.example` to `android\keystore.properties` and fill in the path and your passwords. Your key file (`*.jks`) and `keystore.properties` are git-ignored, so they're never committed.
+3. Run `.\build_apk.ps1 -Release`.
 
 ---
 
