@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"errors"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -82,3 +84,25 @@ func (a *App) DeleteChapters(slug string, from, to int) (map[string]any, error) 
 }
 func (a *App) CancelTask() error                { return a.svc.CancelTask() }
 func (a *App) OpenSiteBrowser(url string) error { return a.svc.OpenSiteBrowser(url) }
+
+// ExportEPUB asks where to save, then writes the novel as an EPUB.
+// Returns nil (no error) if the user cancels the dialog.
+func (a *App) ExportEPUB(slug string) (*service.ExportResult, error) {
+	if a.ctx == nil {
+		return nil, errors.New("app not ready")
+	}
+	home, _ := os.UserHomeDir()
+	dest, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Title:            "Save EPUB",
+		DefaultDirectory: filepath.Join(home, "Downloads"),
+		DefaultFilename:  a.svc.EPUBFileName(slug),
+		Filters:          []runtime.FileFilter{{DisplayName: "EPUB e-book (*.epub)", Pattern: "*.epub"}},
+	})
+	if err != nil || dest == "" {
+		return nil, err
+	}
+	if filepath.Ext(dest) == "" {
+		dest += ".epub"
+	}
+	return a.svc.ExportEPUB(slug, dest, 0, 0)
+}

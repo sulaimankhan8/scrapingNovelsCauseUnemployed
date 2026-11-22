@@ -215,7 +215,6 @@ func (b *Window) polite(ctx context.Context) error {
 	}
 }
 
-
 // Get implements fetch.Fetcher. If the window is already on the target's
 // origin (or the referer's, for cross-origin API calls) it uses the page's
 // own fetch() with its cookies; otherwise it navigates the window there.

@@ -15,6 +15,7 @@ import (
 
 	"novelarchiver/internal/archiver"
 	"novelarchiver/internal/browser"
+	"novelarchiver/internal/export"
 	"novelarchiver/internal/fetch"
 	"novelarchiver/internal/library"
 	"novelarchiver/internal/sites"
@@ -516,4 +517,38 @@ func friendly(err error) error {
 		return errors.New("that page doesn't exist (404). Check the link")
 	}
 	return err
+}
+
+// ExportResult describes a written EPUB.
+type ExportResult struct {
+	Path     string `json:"path"`
+	FileName string `json:"fileName"`
+	Chapters int    `json:"chapters"`
+	Images   int    `json:"images"`
+	SizeMb   string `json:"sizeMb"`
+}
+
+// EPUBFileName suggests a file name for a novel's EPUB.
+func (a *Service) EPUBFileName(slug string) string {
+	if a.store == nil {
+		return "novel.epub"
+	}
+	if b, err := a.store.Load(slug); err == nil {
+		return export.FileName(b.Title)
+	}
+	return export.FileName(slug)
+}
+
+// ExportEPUB writes the downloaded chapters (from..to, 0 = all) of a novel
+// to dest as an EPUB file.
+func (a *Service) ExportEPUB(slug, dest string, from, to int) (*ExportResult, error) {
+	if err := a.ready(); err != nil {
+		return nil, err
+	}
+	res, err := export.EPUBFile(a.store, slug, dest, export.Options{From: from, To: to})
+	if err != nil {
+		return nil, err
+	}
+	return &ExportResult{Path: dest, FileName: filepath.Base(dest), Chapters: res.Chapters, Images: res.Images,
+		SizeMb: fmt.Sprintf("%.1f MB", float64(res.Bytes)/(1<<20))}, nil
 }

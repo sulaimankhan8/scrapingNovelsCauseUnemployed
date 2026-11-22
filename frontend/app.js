@@ -1417,6 +1417,19 @@ document.addEventListener('DOMContentLoaded', () => {
             refreshSystemStats();
         } catch (e) { showToast(`Delete failed: ${e.message || e}`); }
     });
+    document.getElementById('detailsExportBtn').addEventListener('click', async () => {
+        if (!activeNovelDetails) return;
+        const btn = document.getElementById('detailsExportBtn');
+        btn.disabled = true;
+        try {
+            const res = await window.go.main.App.ExportEPUB(activeNovelDetails.slug);
+            if (res) showToast(`Saved ${res.fileName} (${res.chapters} chapters, ${res.sizeMb}) to ${res.path}`);
+        } catch (e) {
+            showToast(`Export failed: ${e.message || e}`);
+        } finally {
+            btn.disabled = false;
+        }
+    });
     document.getElementById('openSiteBrowserBtn').addEventListener('click', async () => {
         try { await window.go.main.App.OpenSiteBrowser(novelUrlInput.value.trim()); }
         catch (e) { showToast(`Couldn't open the site browser: ${e.message || e}`); }

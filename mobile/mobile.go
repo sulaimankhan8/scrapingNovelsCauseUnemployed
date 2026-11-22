@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http/httptest"
+	"path/filepath"
 	"strings"
 
 	"novelarchiver/internal/browser"
@@ -159,6 +160,18 @@ func (c *Core) Serve(path string) *Response {
 		mime = "application/octet-stream"
 	}
 	return &Response{Status: rec.Code, MimeType: mime, Body: rec.Body.Bytes()}
+}
+
+// ExportEPUB writes a novel's downloaded chapters as an EPUB into dir and
+// returns {"path","fileName","chapters","images","sizeMb"} as JSON. The
+// Android shell then copies it to the phone's Downloads folder.
+func (c *Core) ExportEPUB(slug string, dir string) (string, error) {
+	res, err := c.svc.ExportEPUB(slug, filepath.Join(dir, c.svc.EPUBFileName(slug)), 0, 0)
+	if err != nil {
+		return "", err
+	}
+	b, err := json.Marshal(res)
+	return string(b), err
 }
 
 // LibraryPath is the absolute library folder.

@@ -227,7 +227,13 @@ All 10 sites now download (verified live 2026-11-22). EmpireNovel shows a Cloudf
 
 Build: `.uild_apk.ps1` (needs the Android NDK; `sdkmanager ndk/29.0.14206865`).
 
+**EPUB export (done 2026-11-22):** `internal/export` writes EPUB 3 (plus toc.ncx for older readers).
+- Contents: cover, title page, the downloaded chapters (system boxes, tables, images), and a contents page.
+- Desktop: **Export EPUB** in a novel's details opens a save dialog (defaults to Downloads).
+- Android: the same button saves straight to the phone's Downloads folder.
+- Verified: a 274-chapter export on the emulator, with 279 XML documents and 0 malformed.
+
 **Next:**
 1. Test on a real phone (Cloudflare usually lets real devices through).
-2. EPUB export.
-3. Release-signed APK.
+2. Release-signed APK.
+3. Optional: check exports with the official `epubcheck` validator.
