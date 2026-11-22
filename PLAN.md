@@ -208,9 +208,8 @@ For Cloudflare sites the window becomes visible so the **user** can tick "Verify
 - If a site shows "Verify you are human", the window comes to the front and waits up to 3 minutes for the user. The app never clicks it.
 - Cookies persist in `%AppData%/NovelArchiver/SiteBrowser`.
 
-NovelBin, NovelFire, Royal Road and Webnovel now download. EmpireNovel and ScribbleHub need one manual tick, then their selectors confirmed.
+All 10 sites now download (verified live 2026-11-22). EmpireNovel shows a Cloudflare check, which the user ticks once in the site browser window.
 
 **Next:**
-1. Tick the Cloudflare check for EmpireNovel/ScribbleHub once, then confirm their selectors with `na dump`.
-2. Android on the shared core (phase 4). The Android WebView can be the browser fetcher there.
-3. EPUB export.
+1. Android on the shared core (phase 4). The Android WebView can be the browser fetcher there.
+2. EPUB export.

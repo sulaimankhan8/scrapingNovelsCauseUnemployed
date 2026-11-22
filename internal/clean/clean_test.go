@@ -112,3 +112,10 @@ func TestUnwrapsLayoutDivs(t *testing.T) {
 		t.Errorf("got %s", r.HTML)
 	}
 }
+
+func TestDropsBrBetweenParagraphs(t *testing.T) {
+	r := Chapter(`<h3>Chapter 3 Turncoats</h3><br/><br/><p>One.</p><br/><p>Two<br/>lines.</p>`, "Chapter 3 Turncoats", "")
+	if strings.Contains(r.HTML, "<br/><p>") || strings.HasPrefix(r.HTML, "<br") || !strings.Contains(r.HTML, "Two<br/>lines.") {
+		t.Errorf("got %s", r.HTML)
+	}
+}

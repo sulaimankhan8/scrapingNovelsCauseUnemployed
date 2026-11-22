@@ -46,8 +46,8 @@ The app never tries to bypass a bot check. Sites marked `browser` / `human-check
 | NovelFire | list over HTTP, chapters in site browser | ✅ |
 | Royal Road | site browser | ✅ list + chapters, decoy lines removed |
 | Webnovel | site browser | ✅ catalog (1,274; 1,239 paid skipped) + free chapters |
-| EmpireNovel | site browser | ⏳ Cloudflare checkbox; needs one manual tick, then selectors to confirm |
-| ScribbleHub | site browser | ⏳ same as EmpireNovel |
+| EmpireNovel | site browser | ✅ numbered list (2,531) + chapters; Cloudflare check passed in the window |
+| ScribbleHub | site browser | ✅ follows "Next" from chapter 1 (its TOC is 15 per page, newest first) |
 
 To fix or add a site, save the page as the engine sees it and probe it:
 

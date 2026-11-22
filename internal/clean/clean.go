@@ -44,11 +44,12 @@ var watermarkRes = []*regexp.Regexp{
 }
 
 var (
-	emptyParaRe   = regexp.MustCompile(`(?i)<p[^>]*>(\s|&nbsp;|<br\s*/?>)*</p>`)
-	multiBrRe     = regexp.MustCompile(`(?i)(<br\s*/?>\s*){3,}`)
-	sysOpenClose  = [][2]string{{"[", "]"}, {"【", "】"}, {"「", "」"}, {"<", ">"}, {"『", "』"}}
-	alnumOnly     = regexp.MustCompile(`[^\p{L}\p{N}]+`)
-	chapterPrefix = regexp.MustCompile(`(?i)^(chapter|ch\.?|episode|ep\.?)\s*0*`)
+	emptyParaRe     = regexp.MustCompile(`(?i)<p[^>]*>(\s|&nbsp;|<br\s*/?>)*</p>`)
+	brBetweenBlocks = regexp.MustCompile(`(?i)(^|</p>|</h[1-6]>|</table>|</blockquote>|<hr\s*/?>)(\s*<br\s*/?>)+`)
+	multiBrRe       = regexp.MustCompile(`(?i)(<br\s*/?>\s*){3,}`)
+	sysOpenClose    = [][2]string{{"[", "]"}, {"【", "】"}, {"「", "」"}, {"<", ">"}, {"『", "』"}}
+	alnumOnly       = regexp.MustCompile(`[^\p{L}\p{N}]+`)
+	chapterPrefix   = regexp.MustCompile(`(?i)^(chapter|ch\.?|episode|ep\.?)\s*0*`)
 )
 
 var policy = func() *bluemonday.Policy {
@@ -178,6 +179,8 @@ func Chapter(rawHTML, title, baseURL string) Result {
 	out := policy.Sanitize(inner)
 	out = emptyParaRe.ReplaceAllString(out, "")
 	out = multiBrRe.ReplaceAllString(out, "<br/><br/>")
+	// <br>s between paragraphs only add gaps the reader's spacing already gives.
+	out = brBetweenBlocks.ReplaceAllString(out, "$1")
 	out = strings.TrimSpace(out)
 
 	plain, _ := goquery.NewDocumentFromReader(strings.NewReader(out))

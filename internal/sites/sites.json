@@ -5,7 +5,12 @@
     {
       "id": "novelbin",
       "name": "NovelBin",
-      "domains": ["novelbin.xyz", "novelbin.com", "novelbin.me", "novelbin.net"],
+      "domains": [
+        "novelbin.xyz",
+        "novelbin.com",
+        "novelbin.me",
+        "novelbin.net"
+      ],
       "status": "browser-only",
       "fetchMode": "browser",
       "verified": "Verified 2026-11-22 through the in-app browser: discovery (1,432 chapters for LotM) and chapter downloads work. The JSON CDN returns 403 to plain HTTP but works from inside the page. novelbin.com/.me return 503.",
@@ -16,9 +21,19 @@
       },
       "novel": {
         "api": "https://boxnovela.b-cdn.net/novel/{slug}.json",
-        "fields": { "id": "id", "title": "name", "author": "author", "cover": "cover", "description": "description" }
+        "fields": {
+          "id": "id",
+          "title": "name",
+          "author": "author",
+          "cover": "cover",
+          "description": "description"
+        }
       },
-      "toc": { "strategy": "api", "api": "https://boxnovela.b-cdn.net/chapters/{id}.json", "titleField": "title|name" },
+      "toc": {
+        "strategy": "api",
+        "api": "https://boxnovela.b-cdn.net/chapters/{id}.json",
+        "titleField": "title|name"
+      },
       "chapter": {
         "strategy": "api",
         "api": "https://boxnovela.b-cdn.net/read/{id}/{index}.json",
@@ -30,7 +45,10 @@
     {
       "id": "novelfull",
       "name": "NovelFull",
-      "domains": ["novelfull.com", "novelfull.net"],
+      "domains": [
+        "novelfull.com",
+        "novelfull.net"
+      ],
       "status": "verified",
       "fetchMode": "http",
       "input": {
@@ -54,14 +72,24 @@
       "chapter": {
         "title": "a.chapter-title@title",
         "content": "#chapter-content",
-        "remove": ["iframe", "script", "div[align='center']", ".ads", "[id^='pf-']"],
+        "remove": [
+          "iframe",
+          "script",
+          "div[align='center']",
+          ".ads",
+          "[id^='pf-']"
+        ],
         "next": "#next_chap@href"
       }
     },
     {
       "id": "readnovelfull",
       "name": "ReadNovelFull (also AllNovelFull)",
-      "domains": ["readnovelfull.com", "allnovelfull.net", "allnovelfull.com"],
+      "domains": [
+        "readnovelfull.com",
+        "allnovelfull.net",
+        "allnovelfull.com"
+      ],
       "status": "verified",
       "fetchMode": "http",
       "input": {
@@ -85,14 +113,21 @@
       "chapter": {
         "title": "a.chr-title@title",
         "content": "#chr-content",
-        "remove": ["iframe", "script", "div[id^='pf-']", ".ads"],
+        "remove": [
+          "iframe",
+          "script",
+          "div[id^='pf-']",
+          ".ads"
+        ],
         "next": "#next_chap@href"
       }
     },
     {
       "id": "royalroad",
       "name": "Royal Road",
-      "domains": ["royalroad.com"],
+      "domains": [
+        "royalroad.com"
+      ],
       "status": "browser-only",
       "fetchMode": "browser",
       "verified": "Verified 2026-11-22 through the in-app browser (chapters 1-4 downloaded, decoy paragraphs removed). Cloudflare serves 'Just a moment...' (403) to Go's HTTP client.",
@@ -107,11 +142,18 @@
         "cover": ".cover-art-container img@src",
         "description": ".description .hidden-content"
       },
-      "toc": { "strategy": "inline", "items": "table#chapters tr.chapter-row td:first-child a", "notes": "The whole TOC is on the fiction page." },
+      "toc": {
+        "strategy": "inline",
+        "items": "table#chapters tr.chapter-row td:first-child a",
+        "notes": "The whole TOC is on the fiction page."
+      },
       "chapter": {
         "title": "h1.font-white",
         "content": ".chapter-inner.chapter-content",
-        "remove": ["script", ".author-note-portlet"],
+        "remove": [
+          "script",
+          ".author-note-portlet"
+        ],
         "removeHiddenByPageCss": true,
         "next": "a.btn-primary[href*='/chapter/']:contains('Next')@href",
         "notes": "Paragraph classes are randomised. The page CSS hides decoy anti-piracy paragraphs (display:none), and those must be dropped. System screens are often <table> elements, so keep tables."
@@ -120,7 +162,9 @@
     {
       "id": "wuxiaworld",
       "name": "WuxiaWorld",
-      "domains": ["wuxiaworld.com"],
+      "domains": [
+        "wuxiaworld.com"
+      ],
       "status": "verified",
       "fetchMode": "http",
       "input": {
@@ -142,14 +186,19 @@
       "chapter": {
         "title": "[data-testid='title']",
         "content": ".chapter-content .fr-view",
-        "remove": ["script", "button"],
+        "remove": [
+          "script",
+          "button"
+        ],
         "next": "embedded-json:nextChapter.slug -> /novel/{slug}/{value}"
       }
     },
     {
       "id": "freewebnovel",
       "name": "FreeWebNovel",
-      "domains": ["freewebnovel.com"],
+      "domains": [
+        "freewebnovel.com"
+      ],
       "status": "verified",
       "fetchMode": "http",
       "input": {
@@ -176,14 +225,22 @@
       "chapter": {
         "title": "span.chapter",
         "content": "#article",
-        "remove": ["script", "iframe", "div[align='center']"],
+        "remove": [
+          "script",
+          "iframe",
+          "div[align='center']"
+        ],
         "next": "#next_url@href"
       }
     },
     {
       "id": "novelfire",
       "name": "NovelFire (formerly LightNovelPub/LightNovelWorld)",
-      "domains": ["novelfire.net", "novelphoenix.com", "readnovel.site"],
+      "domains": [
+        "novelfire.net",
+        "novelphoenix.com",
+        "readnovel.site"
+      ],
       "status": "partial",
       "fetchMode": "http+browser",
       "verified": "Verified 2026-11-22: TOC over plain HTTP, chapters through the in-app browser. Chapter pages send non-browsers to a JS 'Loading...' page (readnovel.site), which then redirects to the mirror novelphoenix.com. That works in a real browser.",
@@ -209,14 +266,21 @@
         "fetchMode": "browser",
         "title": ".chapter-title",
         "content": "#chapter-container",
-        "remove": ["[data-chapter-ad]", ".nf-ads", "iframe", "script"],
+        "remove": [
+          "[data-chapter-ad]",
+          ".nf-ads",
+          "iframe",
+          "script"
+        ],
         "next": "a[rel='next'].nextchap@href"
       }
     },
     {
       "id": "webnovel",
       "name": "Webnovel (Qidian International)",
-      "domains": ["webnovel.com"],
+      "domains": [
+        "webnovel.com"
+      ],
       "status": "browser-only",
       "fetchMode": "browser",
       "verified": "Verified 2026-11-22 through the in-app browser: catalog (1,274 chapters, 1,239 paid and skipped) and free chapters download. Cloudflare serves 'Just a moment...' (403) to Go's HTTP client. The catalog is at /book/{id}/catalog. Most later chapters are paid or locked, so only free chapters can be saved.",
@@ -232,11 +296,23 @@
         "description": "meta[property='og:description']@content",
         "tags": "meta[property='og:tag']@content"
       },
-      "toc": { "strategy": "inline", "pageUrl": "{novelUrl}/catalog", "items": ".volume-item li a:has(i._num)", "lockedMarker": "svg._icon", "notes": "Volume 0 (auxiliary) entries have no number and are skipped. A lock icon marks paid chapters." },
+      "toc": {
+        "strategy": "inline",
+        "pageUrl": "{novelUrl}/catalog",
+        "items": ".volume-item li a:has(i._num)",
+        "lockedMarker": "svg._icon",
+        "notes": "Volume 0 (auxiliary) entries have no number and are skipped. A lock icon marks paid chapters."
+      },
       "chapter": {
         "title": ".cha-tit h1",
         "content": ".cha-words",
-        "remove": ["script", ".cha-bts", ".para-comment", "[class*='j_para_comment']", ".cha-paragraph .pr > :not(p)"],
+        "remove": [
+          "script",
+          ".cha-bts",
+          ".para-comment",
+          "[class*='j_para_comment']",
+          ".cha-paragraph .pr > :not(p)"
+        ],
         "next": "link[rel=next]@href",
         "notes": "Verified 2026-11-22 through the in-app browser. Paid chapters are marked locked from the catalog and skipped."
       }
@@ -244,25 +320,53 @@
     {
       "id": "empirenovel",
       "name": "EmpireNovel",
-      "domains": ["empirenovel.com"],
+      "domains": [
+        "empirenovel.com"
+      ],
       "status": "human-check",
       "fetchMode": "browser",
-      "verified": "Cloudflare 'Verify you are human' checkbox, both over plain HTTP and in a real browser. The user must pass it once in the in-app browser, then the app reuses that session's cookies. Selectors are still TODO and need capturing after a manual pass.",
+      "verified": "Verified 2026-11-22 through the in-app browser after one manual Cloudflare tick (remembered afterwards). Chapter URLs are /novel/{slug}/{n}, numbered 1..last.",
       "input": {
         "novelUrl": "^https?://(www\\.)?empirenovel\\.com/novel/(?<slug>[a-z0-9-]+)/?$",
-        "chapterUrl": "^https?://(www\\.)?empirenovel\\.com/novel/(?<slug>[a-z0-9-]+)/.+"
+        "chapterUrl": "^https?://(www\\.)?empirenovel\\.com/novel/(?<slug>[a-z0-9-]+)/(?<num>\\d+)",
+        "novelFromChapter": "slug -> {origin}/novel/{slug}"
       },
-      "novel": { "strategy": "generic" },
-      "toc": { "strategy": "generic" },
-      "chapter": { "strategy": "generic" }
+      "novel": {
+        "title": "h1.show_title, h1",
+        "author": "[itemprop='author'] a",
+        "cover": ".cover img@data-src|src",
+        "description": "dd[itemprop='description']",
+        "firstChapter": "a:contains('First Chapter')@href",
+        "latestChapterUrl": "a:contains('Last Chapter')@href"
+      },
+      "toc": {
+        "strategy": "sequential",
+        "pattern": "{novelUrl}/{n}",
+        "from": 1,
+        "to": "latestChapterUrl ~ /(\\d+)/?$",
+        "notes": "The site's own list is 30 per page, newest first (85 pages for a 2,500-chapter novel); numbered URLs avoid all of that."
+      },
+      "chapter": {
+        "title": "#read-novel h3",
+        "content": "#read-novel",
+        "remove": [
+          "script",
+          "iframe",
+          "ins",
+          ".pub"
+        ],
+        "next": "a#chapter-right@href"
+      }
     },
     {
       "id": "scribblehub",
       "name": "ScribbleHub",
-      "domains": ["scribblehub.com"],
-      "status": "human-check",
+      "domains": [
+        "scribblehub.com"
+      ],
+      "status": "browser-only",
       "fetchMode": "browser",
-      "verified": "Cloudflare challenge, the same situation as EmpireNovel. Its known public layout is filled in below, but it needs confirming after a manual pass.",
+      "verified": "Verified 2026-11-22 through the in-app browser (Cloudflare let the browser through without a tick).",
       "input": {
         "novelUrl": "^https?://(www\\.)?scribblehub\\.com/series/(?<id>\\d+)(/[^/]+)?/?$",
         "chapterUrl": "^https?://(www\\.)?scribblehub\\.com/read/(?<id>\\d+)-[^/]+/chapter/\\d+",
@@ -272,13 +376,21 @@
         "title": ".fic_title",
         "author": ".auth_name_fic",
         "cover": ".fic_image img@src",
-        "description": ".wi_fic_desc"
+        "description": ".wi_fic_desc",
+        "firstChapter": "a:has(span.btn_read)@href"
       },
-      "toc": { "strategy": "ajax", "notes": "The TOC is served through admin-ajax.php (action=wi_getreleases_pagination). Following the next link from chapter 1 is the fallback." },
+      "toc": {
+        "strategy": "next-link",
+        "notes": "The TOC shows 15 chapters per page, newest first (154 pages for 2,296 chapters), so chapters are found by following Next from chapter 1."
+      },
       "chapter": {
         "title": ".chapter-title",
         "content": "#chp_raw",
-        "remove": ["script", ".wi_authornotes"],
+        "remove": [
+          "script",
+          ".wi_authornotes",
+          "h1:empty"
+        ],
         "next": "a.btn-next@href"
       }
     }
