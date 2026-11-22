@@ -6,8 +6,20 @@ export function AuditNovel(arg1) {
   return window['go']['main']['App']['AuditNovel'](arg1);
 }
 
+export function BackupLibrary() {
+  return window['go']['main']['App']['BackupLibrary']();
+}
+
+export function CancelAll() {
+  return window['go']['main']['App']['CancelAll']();
+}
+
 export function CancelTask() {
   return window['go']['main']['App']['CancelTask']();
+}
+
+export function ChooseBackup() {
+  return window['go']['main']['App']['ChooseBackup']();
 }
 
 export function CleanNovel(arg1) {
@@ -34,6 +46,10 @@ export function ExportEPUB(arg1) {
   return window['go']['main']['App']['ExportEPUB'](arg1);
 }
 
+export function GetActivity() {
+  return window['go']['main']['App']['GetActivity']();
+}
+
 export function GetNovel(arg1) {
   return window['go']['main']['App']['GetNovel'](arg1);
 }
@@ -42,8 +58,16 @@ export function GetNovels() {
   return window['go']['main']['App']['GetNovels']();
 }
 
+export function GetSettings() {
+  return window['go']['main']['App']['GetSettings']();
+}
+
 export function GetSystemStats() {
   return window['go']['main']['App']['GetSystemStats']();
+}
+
+export function Notify(arg1, arg2) {
+  return window['go']['main']['App']['Notify'](arg1, arg2);
 }
 
 export function OpenExternalURL(arg1) {
@@ -58,10 +82,50 @@ export function OpenSiteBrowser(arg1) {
   return window['go']['main']['App']['OpenSiteBrowser'](arg1);
 }
 
+export function Platform() {
+  return window['go']['main']['App']['Platform']();
+}
+
+export function RedownloadNovel(arg1) {
+  return window['go']['main']['App']['RedownloadNovel'](arg1);
+}
+
+export function RemoveQueued(arg1) {
+  return window['go']['main']['App']['RemoveQueued'](arg1);
+}
+
+export function RestoreBackup(arg1) {
+  return window['go']['main']['App']['RestoreBackup'](arg1);
+}
+
 export function RetryNovel(arg1) {
   return window['go']['main']['App']['RetryNovel'](arg1);
 }
 
+export function SaveSettings(arg1) {
+  return window['go']['main']['App']['SaveSettings'](arg1);
+}
+
+export function SetReading(arg1, arg2) {
+  return window['go']['main']['App']['SetReading'](arg1, arg2);
+}
+
+export function ShowFileInFolder(arg1) {
+  return window['go']['main']['App']['ShowFileInFolder'](arg1);
+}
+
+export function ShowNovelFolder(arg1) {
+  return window['go']['main']['App']['ShowNovelFolder'](arg1);
+}
+
 export function StartScrape(arg1) {
   return window['go']['main']['App']['StartScrape'](arg1);
+}
+
+export function UpdateAll(arg1) {
+  return window['go']['main']['App']['UpdateAll'](arg1);
+}
+
+export function UpdateNovel(arg1) {
+  return window['go']['main']['App']['UpdateNovel'](arg1);
 }

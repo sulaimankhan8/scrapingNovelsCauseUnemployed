@@ -1,7 +1,9 @@
 package com.novelarchiver.app;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +22,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -27,6 +31,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.novelarchiver.core.mobile.Core;
 import com.novelarchiver.core.mobile.Mobile;
+import com.novelarchiver.core.mobile.Network;
 import com.novelarchiver.core.mobile.Response;
 
 import java.io.ByteArrayInputStream;
@@ -34,6 +39,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Hosts the shared frontend in a WebView. All app logic runs in the Go core
@@ -49,6 +55,36 @@ public class MainActivity extends AppCompatActivity {
     private SiteBrowser siteBrowser;
     private NovelBridge bridge;
     private Core core;
+    private CompletableFuture<Uri> pendingPick;
+    private final ActivityResultLauncher<String[]> openBackup =
+            registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> {
+                if (pendingPick != null) {
+                    pendingPick.complete(uri);
+                    pendingPick = null;
+                }
+            });
+    private final ActivityResultLauncher<String> notifyPermission =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> { });
+    private boolean askedNotify;
+
+    /** NovelBridge asks for a backup file to restore. */
+    void pickBackup(CompletableFuture<Uri> result) {
+        if (pendingPick != null) pendingPick.complete(null);
+        pendingPick = result;
+        try {
+            openBackup.launch(new String[]{"application/zip", "application/x-zip-compressed", "application/octet-stream"});
+        } catch (Exception e) {
+            pendingPick = null;
+            result.complete(null);
+        }
+    }
+
+    /** Android 13+: ask once for permission to post notifications. */
+    void askNotificationPermission() {
+        if (askedNotify || android.os.Build.VERSION.SDK_INT < 33) return;
+        askedNotify = true;
+        notifyPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
+    }
 
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     @Override
@@ -62,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         }
         FrameLayout root = new FrameLayout(this);
         webView = new WebView(this);
-        webView.setBackgroundColor(0xFF0E1216);
+        webView.setBackgroundColor(0xFF121417);
         root.addView(webView, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
@@ -76,11 +112,11 @@ public class MainActivity extends AppCompatActivity {
         bar.setGravity(Gravity.CENTER_VERTICAL);
         bar.setPadding(24, 12, 12, 12);
         TextView label = new TextView(this);
-        label.setText("Site browser: complete any check, then tap Hide");
+        label.setText("Tick the check below. We’ll continue as soon as it passes.");
         label.setTextColor(0xFFE7E2D9);
         bar.addView(label, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         Button hide = new Button(this);
-        hide.setText("Hide");
+        hide.setText("Done");
         hide.setOnClickListener(v -> siteBrowserPanel.setVisibility(View.GONE));
         bar.addView(hide);
         column.addView(bar);
@@ -113,6 +149,14 @@ public class MainActivity extends AppCompatActivity {
             File library = new File(getFilesDir(), "library");
             core = Mobile.new_(library.getAbsolutePath(), bridge, siteBrowser);
             bridge.setCore(core);
+            // "Only on Wi-Fi": downloads pause while the connection is metered.
+            final ConnectivityManager cm = getSystemService(ConnectivityManager.class);
+            core.setNetwork(new Network() {
+                @Override
+                public boolean unmetered() {
+                    return cm == null || !cm.isActiveNetworkMetered();
+                }
+            });
         } catch (Exception e) {
             Log.e(TAG, "core start failed", e);
         }

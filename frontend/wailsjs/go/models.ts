@@ -1,5 +1,236 @@
+export namespace archiver {
+	
+	export class Progress {
+	    stage: string;
+	    current: number;
+	    total: number;
+	    scraped: number;
+	    cached: number;
+	    failed: number;
+	    speed: string;
+	    eta: string;
+	    percentage: number;
+	    chapterNum?: number;
+	    chapterTitle?: string;
+	    status?: string;
+	    message?: string;
+	    slug?: string;
+	    title?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Progress(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.stage = source["stage"];
+	        this.current = source["current"];
+	        this.total = source["total"];
+	        this.scraped = source["scraped"];
+	        this.cached = source["cached"];
+	        this.failed = source["failed"];
+	        this.speed = source["speed"];
+	        this.eta = source["eta"];
+	        this.percentage = source["percentage"];
+	        this.chapterNum = source["chapterNum"];
+	        this.chapterTitle = source["chapterTitle"];
+	        this.status = source["status"];
+	        this.message = source["message"];
+	        this.slug = source["slug"];
+	        this.title = source["title"];
+	    }
+	}
+
+}
+
 export namespace service {
 	
+	export class Settings {
+	    theme: string;
+	    chime: boolean;
+	    notify: boolean;
+	    speed: string;
+	    keepImages: boolean;
+	    revise: string;
+	    updateOnOpen: boolean;
+	    wifiOnly: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new Settings(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.theme = source["theme"];
+	        this.chime = source["chime"];
+	        this.notify = source["notify"];
+	        this.speed = source["speed"];
+	        this.keepImages = source["keepImages"];
+	        this.revise = source["revise"];
+	        this.updateOnOpen = source["updateOnOpen"];
+	        this.wifiOnly = source["wifiOnly"];
+	    }
+	}
+	export class QueueItem {
+	    id: number;
+	    kind: string;
+	    slug?: string;
+	    title: string;
+	    url: string;
+	    cover?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new QueueItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.kind = source["kind"];
+	        this.slug = source["slug"];
+	        this.title = source["title"];
+	        this.url = source["url"];
+	        this.cover = source["cover"];
+	    }
+	}
+	export class Current {
+	    id: number;
+	    kind: string;
+	    slug?: string;
+	    title: string;
+	    url: string;
+	    cover?: string;
+	    phase: string;
+	    message?: string;
+	    progress?: archiver.Progress;
+	    challenge?: string;
+	    // Go type: time
+	    startedAt: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new Current(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.kind = source["kind"];
+	        this.slug = source["slug"];
+	        this.title = source["title"];
+	        this.url = source["url"];
+	        this.cover = source["cover"];
+	        this.phase = source["phase"];
+	        this.message = source["message"];
+	        this.progress = this.convertValues(source["progress"], archiver.Progress);
+	        this.challenge = source["challenge"];
+	        this.startedAt = this.convertValues(source["startedAt"], null);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Activity {
+	    current?: Current;
+	    queue: QueueItem[];
+	    waiting?: string;
+	    settings: Settings;
+	
+	    static createFrom(source: any = {}) {
+	        return new Activity(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.current = this.convertValues(source["current"], Current);
+	        this.queue = this.convertValues(source["queue"], QueueItem);
+	        this.waiting = source["waiting"];
+	        this.settings = this.convertValues(source["settings"], Settings);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class BackupInfo {
+	    app: string;
+	    version: number;
+	    // Go type: time
+	    createdAt: any;
+	    novels: number;
+	    chapters: number;
+	    bytes: number;
+	    path?: string;
+	    fileName?: string;
+	    newHere: number;
+	    merged: number;
+	    sizeMb?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new BackupInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.app = source["app"];
+	        this.version = source["version"];
+	        this.createdAt = this.convertValues(source["createdAt"], null);
+	        this.novels = source["novels"];
+	        this.chapters = source["chapters"];
+	        this.bytes = source["bytes"];
+	        this.path = source["path"];
+	        this.fileName = source["fileName"];
+	        this.newHere = source["newHere"];
+	        this.merged = source["merged"];
+	        this.sizeMb = source["sizeMb"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class ChapterRow {
 	    number: number;
 	    title: string;
@@ -7,6 +238,9 @@ export namespace service {
 	    error?: string;
 	    readerUrl: string;
 	    isClean: boolean;
+	    words?: number;
+	    revised?: string;
+	    removed?: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new ChapterRow(source);
@@ -20,8 +254,12 @@ export namespace service {
 	        this.error = source["error"];
 	        this.readerUrl = source["readerUrl"];
 	        this.isClean = source["isClean"];
+	        this.words = source["words"];
+	        this.revised = source["revised"];
+	        this.removed = source["removed"];
 	    }
 	}
+	
 	export class DiscoverResult {
 	    siteId: string;
 	    siteName: string;
@@ -125,6 +363,23 @@ export namespace service {
 	    catalogUrl: string;
 	    sizeBytes: number;
 	    sizeMb: string;
+	    status?: string;
+	    pendingCount: number;
+	    removedCount: number;
+	    revisedCount: number;
+	    lastRead: number;
+	    // Go type: time
+	    lastReadAt: any;
+	    // Go type: time
+	    addedAt: any;
+	    // Go type: time
+	    updatedAt: any;
+	    // Go type: time
+	    checkedAt: any;
+	    lastNew: number;
+	    lastNewAt?: string;
+	    crawlMode: boolean;
+	    imageBytes: number;
 	    chapters: ChapterRow[];
 	
 	    static createFrom(source: any = {}) {
@@ -149,6 +404,19 @@ export namespace service {
 	        this.catalogUrl = source["catalogUrl"];
 	        this.sizeBytes = source["sizeBytes"];
 	        this.sizeMb = source["sizeMb"];
+	        this.status = source["status"];
+	        this.pendingCount = source["pendingCount"];
+	        this.removedCount = source["removedCount"];
+	        this.revisedCount = source["revisedCount"];
+	        this.lastRead = source["lastRead"];
+	        this.lastReadAt = this.convertValues(source["lastReadAt"], null);
+	        this.addedAt = this.convertValues(source["addedAt"], null);
+	        this.updatedAt = this.convertValues(source["updatedAt"], null);
+	        this.checkedAt = this.convertValues(source["checkedAt"], null);
+	        this.lastNew = source["lastNew"];
+	        this.lastNewAt = source["lastNewAt"];
+	        this.crawlMode = source["crawlMode"];
+	        this.imageBytes = source["imageBytes"];
 	        this.chapters = this.convertValues(source["chapters"], ChapterRow);
 	    }
 	
@@ -187,6 +455,22 @@ export namespace service {
 	    catalogUrl: string;
 	    sizeBytes: number;
 	    sizeMb: string;
+	    status?: string;
+	    pendingCount: number;
+	    removedCount: number;
+	    revisedCount: number;
+	    lastRead: number;
+	    // Go type: time
+	    lastReadAt: any;
+	    // Go type: time
+	    addedAt: any;
+	    // Go type: time
+	    updatedAt: any;
+	    // Go type: time
+	    checkedAt: any;
+	    lastNew: number;
+	    lastNewAt?: string;
+	    crawlMode: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new NovelItem(source);
@@ -210,6 +494,53 @@ export namespace service {
 	        this.catalogUrl = source["catalogUrl"];
 	        this.sizeBytes = source["sizeBytes"];
 	        this.sizeMb = source["sizeMb"];
+	        this.status = source["status"];
+	        this.pendingCount = source["pendingCount"];
+	        this.removedCount = source["removedCount"];
+	        this.revisedCount = source["revisedCount"];
+	        this.lastRead = source["lastRead"];
+	        this.lastReadAt = this.convertValues(source["lastReadAt"], null);
+	        this.addedAt = this.convertValues(source["addedAt"], null);
+	        this.updatedAt = this.convertValues(source["updatedAt"], null);
+	        this.checkedAt = this.convertValues(source["checkedAt"], null);
+	        this.lastNew = source["lastNew"];
+	        this.lastNewAt = source["lastNewAt"];
+	        this.crawlMode = source["crawlMode"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	export class RestoreResult {
+	    added: number;
+	    merged: number;
+	    chapters: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new RestoreResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.added = source["added"];
+	        this.merged = source["merged"];
+	        this.chapters = source["chapters"];
 	    }
 	}
 	export class ScrapeOptions {
@@ -236,6 +567,7 @@ export namespace service {
 	        this.fromPasted = source["fromPasted"];
 	    }
 	}
+	
 	export class SystemStats {
 	    totalNovels: number;
 	    totalRawChapters: number;

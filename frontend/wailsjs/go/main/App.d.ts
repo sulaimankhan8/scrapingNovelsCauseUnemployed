@@ -4,7 +4,13 @@ import {service} from '../models';
 
 export function AuditNovel(arg1:string):Promise<Record<string, any>>;
 
+export function BackupLibrary():Promise<service.BackupInfo>;
+
+export function CancelAll():Promise<void>;
+
 export function CancelTask():Promise<void>;
+
+export function ChooseBackup():Promise<service.BackupInfo>;
 
 export function CleanNovel(arg1:string):Promise<Record<string, any>>;
 
@@ -18,11 +24,17 @@ export function DiscoverNovel(arg1:string):Promise<service.DiscoverResult>;
 
 export function ExportEPUB(arg1:string):Promise<service.ExportResult>;
 
+export function GetActivity():Promise<service.Activity>;
+
 export function GetNovel(arg1:string):Promise<service.NovelDetail>;
 
 export function GetNovels():Promise<Array<service.NovelItem>>;
 
+export function GetSettings():Promise<service.Settings>;
+
 export function GetSystemStats():Promise<service.SystemStats>;
+
+export function Notify(arg1:string,arg2:string):Promise<void>;
 
 export function OpenExternalURL(arg1:string):Promise<void>;
 
@@ -30,6 +42,26 @@ export function OpenLibraryFolder():Promise<void>;
 
 export function OpenSiteBrowser(arg1:string):Promise<void>;
 
+export function Platform():Promise<string>;
+
+export function RedownloadNovel(arg1:string):Promise<Record<string, any>>;
+
+export function RemoveQueued(arg1:number):Promise<void>;
+
+export function RestoreBackup(arg1:string):Promise<service.RestoreResult>;
+
 export function RetryNovel(arg1:string):Promise<Record<string, any>>;
 
+export function SaveSettings(arg1:service.Settings):Promise<service.Settings>;
+
+export function SetReading(arg1:string,arg2:number):Promise<void>;
+
+export function ShowFileInFolder(arg1:string):Promise<void>;
+
+export function ShowNovelFolder(arg1:string):Promise<void>;
+
 export function StartScrape(arg1:service.ScrapeOptions):Promise<Record<string, any>>;
+
+export function UpdateAll(arg1:boolean):Promise<Record<string, any>>;
+
+export function UpdateNovel(arg1:string):Promise<Record<string, any>>;

@@ -11,9 +11,13 @@ NovelArchiver runs locally on **Windows** and **Android**. Paste a novel page or
 - **10 supported sites:** NovelBin, NovelFull, ReadNovelFull, Royal Road, WuxiaWorld, FreeWebNovel, NovelFire, Webnovel, ScribbleHub, EmpireNovel. Other sites fall back to a generic reader-mode parser.
 - **Paste either link:** a novel's page or any chapter page. From a chapter link you can download everything, or from that chapter onward.
 - **Formatting kept:** system screens like `[Would you like to quit the game?]` become styled boxes; ads, scripts and watermark lines are removed without touching story text.
-- **Offline reader:** light, dark and sepia themes, font size, keyboard navigation, remembers where you stopped.
-- **Resume and update:** interrupted downloads continue where they left off; **Update** fetches newly released chapters.
+- **Offline reader:** light, dark and sepia themes, font size, keyboard navigation, remembers where you stopped (shown as **Continue** in the library).
+- **Download queue:** add novels while one is downloading; they run one at a time. Pause and resume any time.
+- **Full update:** **Update** (or **Update all**) refreshes the description, status and poster, downloads new and missing chapters, re-checks saved chapters for revisions on the site, and keeps chapters the site removed. You get a short summary of what changed.
+- **Your poster, or a generated one:** the site's poster is shown; novels without one get a clean generated cover until a poster appears.
 - **Storage control:** see each novel's size, delete a chapter range you've read, or delete images only.
+- **Back up and restore:** one file with every novel, reading place and setting; restoring merges, never deletes.
+- **Notifications:** when a download finishes or a site needs you to tick a human check. On Android, downloads can wait for Wi-Fi.
 - **EPUB export:** one file for Google Play Books, Apple Books, Moon+ Reader, KOReader or Send to Kindle.
 - **Polite fetching:** at most 3 requests at a time per site, with retries and back-off.
 

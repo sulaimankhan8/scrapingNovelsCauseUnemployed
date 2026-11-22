@@ -12,6 +12,7 @@ import (
 	"net/http/httptest"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"novelarchiver/internal/browser"
 	"novelarchiver/internal/reader"
@@ -65,7 +66,41 @@ func New(libraryDir string, events Events, driver BrowserDriver) (*Core, error) 
 			},
 		}))
 	}
+	if svc.GetSettings().UpdateOnOpen {
+		go func() {
+			time.Sleep(3 * time.Second)
+			_, _ = svc.UpdateAll(true)
+		}()
+	}
 	return &Core{svc: svc, reader: &reader.Handler{Store: svc.Store()}}, nil
+}
+
+// Network is implemented in Java: Unmetered is true on Wi-Fi/Ethernet.
+type Network interface {
+	Unmetered() bool
+}
+
+// SetNetwork lets "only on Wi-Fi" pause downloads on mobile data.
+func (c *Core) SetNetwork(n Network) {
+	if n == nil {
+		c.svc.NetworkOK = nil
+		return
+	}
+	c.svc.NetworkOK = n.Unmetered
+}
+
+// NotifyEnabled says whether the user wants system notifications.
+func (c *Core) NotifyEnabled() bool { return c.svc.GetSettings().Notify }
+
+// Backup writes the whole library to a zip in dir (the Android shell then
+// copies it to Downloads) and returns the BackupInfo as JSON.
+func (c *Core) Backup(dir string) (string, error) {
+	res, err := c.svc.Backup(filepath.Join(dir, service.BackupFileName()))
+	if err != nil {
+		return "", err
+	}
+	b, err := json.Marshal(res)
+	return string(b), err
 }
 
 // Call invokes a service method by name with a JSON array of arguments and
@@ -127,6 +162,42 @@ func (c *Core) Call(method string, argsJSON string) (string, error) {
 		err = c.svc.CancelTask()
 	case "OpenSiteBrowser":
 		err = c.svc.OpenSiteBrowser(str(0))
+	case "GetActivity":
+		out = c.svc.GetActivity()
+	case "GetSettings":
+		out = c.svc.GetSettings()
+	case "SaveSettings":
+		var st service.Settings
+		if len(args) > 0 {
+			if err := json.Unmarshal(args[0], &st); err != nil {
+				return "", err
+			}
+		}
+		out, err = c.svc.SaveSettings(st)
+	case "UpdateNovel":
+		out, err = c.svc.UpdateNovel(str(0))
+	case "RedownloadNovel":
+		out, err = c.svc.RedownloadNovel(str(0))
+	case "UpdateAll":
+		var auto bool
+		if len(args) > 0 {
+			_ = json.Unmarshal(args[0], &auto)
+		}
+		out, err = c.svc.UpdateAll(auto)
+	case "RemoveQueued":
+		err = c.svc.RemoveQueued(num(0))
+	case "CancelAll":
+		err = c.svc.CancelAll()
+	case "SetReading":
+		err = c.svc.SetReading(str(0), num(1))
+	case "InspectBackup":
+		out, err = c.svc.InspectBackup(str(0))
+	case "RestoreBackup":
+		out, err = c.svc.Restore(str(0))
+	case "Platform":
+		out = "android"
+	case "ShowNovelFolder", "ShowFileInFolder", "OpenLibraryFolder":
+		// No file manager to open on Android; the UI hides these.
 	default:
 		return "", fmt.Errorf("unknown method %q", method)
 	}

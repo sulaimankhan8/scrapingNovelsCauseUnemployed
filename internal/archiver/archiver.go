@@ -3,11 +3,14 @@
 package archiver
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"math"
+	"os"
 	"path"
+	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -29,6 +32,25 @@ type Options struct {
 	Concurrency int  // parallel chapter downloads (capped by per-host limit)
 	Force       bool // re-download chapters already saved
 	SkipImages  bool
+	// Revise re-reads chapters that are already saved and replaces those
+	// whose text changed on the site: 0 = off, -1 = every chapter,
+	// N > 0 = only the last N saved chapters.
+	Revise int
+	// Gate, when set, is called before each chapter download. It may block
+	// (e.g. "waiting for Wi-Fi") and returns an error to stop the job.
+	Gate func(ctx context.Context) error
+	// NoDone suppresses the "done" event so the caller can send its own
+	// (with an update summary).
+	NoDone bool
+	// Result, when set, receives what the job changed.
+	Result *Result
+}
+
+// Result reports what a job changed, for the update summary.
+type Result struct {
+	CoverChanged bool
+	Revised      []int // chapter numbers whose saved text was replaced
+	Checked      int   // saved chapters re-read for revisions
 }
 
 // Progress matches the event shape the frontend already understands.
@@ -94,6 +116,23 @@ func (a *Archiver) BookFromNovel(n *source.Novel) (*library.Book, error) {
 			}
 			merged = append(merged, c)
 		}
+		// A saved chapter the site no longer lists is kept (marked Removed),
+		// unless its number is now used by a different chapter.
+		seen := map[string]bool{}
+		used := map[int]bool{}
+		for _, c := range merged {
+			seen[chapterKey(c.URL, c.Index)] = true
+			used[c.Number] = true
+		}
+		for _, c := range b.Chapters {
+			if c.State != library.StateOK || seen[chapterKey(c.URL, c.Index)] || used[c.Number] {
+				continue
+			}
+			c.Removed = true
+			merged = append(merged, c)
+			used[c.Number] = true
+		}
+		sort.SliceStable(merged, func(i, j int) bool { return merged[i].Number < merged[j].Number })
 		b.Chapters = merged
 	}
 	return b, nil
@@ -112,7 +151,9 @@ func (a *Archiver) Run(ctx context.Context, b *library.Book, novel *source.Novel
 		return err
 	}
 	emit("started", map[string]any{"slug": b.Slug, "title": b.Title, "stage": "scraping"})
-	a.saveCover(ctx, b)
+	if changed := a.saveCover(ctx, b); changed && opts.Result != nil {
+		opts.Result.CoverChanged = true
+	}
 
 	var err error
 	if b.TOCMode == "crawl" {
@@ -120,11 +161,17 @@ func (a *Archiver) Run(ctx context.Context, b *library.Book, novel *source.Novel
 	} else {
 		err = a.downloadList(ctx, b, novel, opts, emit)
 	}
+	if err == nil && opts.Revise != 0 {
+		err = a.revise(ctx, b, novel, opts, emit)
+	}
 	if saveErr := a.Store.Save(b); err == nil {
 		err = saveErr
 	}
 	if err != nil {
 		return err
+	}
+	if opts.NoDone {
+		return nil
 	}
 	ok, failed, locked, _ := b.Counts()
 	emit("done", map[string]any{
@@ -198,6 +245,12 @@ func (a *Archiver) downloadList(ctx context.Context, b *library.Book, novel *sou
 		go func() {
 			defer wg.Done()
 			for i := range queue {
+				if opts.Gate != nil {
+					if err := opts.Gate(jobCtx); err != nil {
+						stopJobs()
+						return
+					}
+				}
 				mu.Lock()
 				ref := b.Chapters[i]
 				mu.Unlock()
@@ -287,6 +340,11 @@ func (a *Archiver) crawl(ctx context.Context, b *library.Book, novel *source.Nov
 	for next != "" && !seen[next] {
 		if err := ctx.Err(); err != nil {
 			return err
+		}
+		if opts.Gate != nil {
+			if err := opts.Gate(ctx); err != nil {
+				return err
+			}
 		}
 		num := len(b.Chapters) + 1
 		if limit > 0 && num > limit {
@@ -415,18 +473,34 @@ func (a *Archiver) saveImage(ctx context.Context, b *library.Book, u string) (st
 	return name, a.Store.WriteFile(b.Slug, "img/"+name, page.Body)
 }
 
-func (a *Archiver) saveCover(ctx context.Context, b *library.Book) {
+// saveCover downloads the site's poster. The saved one is replaced only
+// when the new download worked and differs; it reports whether it changed.
+func (a *Archiver) saveCover(ctx context.Context, b *library.Book) bool {
 	if b.CoverURL == "" {
-		return
+		return false
 	}
 	page, err := a.GetFile(ctx, b.CoverURL, b.URL)
 	if err != nil || len(page.Body) < 200 {
-		return
+		return false
+	}
+	if b.CoverFile != "" {
+		if p, err := a.Store.FilePath(b.Slug, b.CoverFile); err == nil {
+			if old, err := os.ReadFile(p); err == nil && bytes.Equal(old, page.Body) {
+				return false
+			}
+		}
 	}
 	name := "cover" + path.Ext(library.ImageName(b.CoverURL, page.Header.Get("Content-Type")))
-	if err := a.Store.WriteFile(b.Slug, name, page.Body); err == nil {
-		b.CoverFile = name
+	if err := a.Store.WriteFile(b.Slug, name, page.Body); err != nil {
+		return false
 	}
+	if b.CoverFile != "" && b.CoverFile != name {
+		if p, err := a.Store.FilePath(b.Slug, b.CoverFile); err == nil {
+			_ = os.Remove(p)
+		}
+	}
+	b.CoverFile = name
+	return true
 }
 
 func htmlEscape(s string) string {
@@ -435,3 +509,135 @@ func htmlEscape(s string) string {
 
 // htmlAttrEscape mirrors how bluemonday serialises '&' in attribute values.
 func htmlAttrEscape(s string) string { return strings.ReplaceAll(s, "&", "&amp;") }
+
+// revise re-reads saved chapters and replaces the ones whose text changed
+// on the site. Unchanged chapters are left untouched (images included).
+func (a *Archiver) revise(ctx context.Context, b *library.Book, novel *source.Novel, opts Options, emit Emit) error {
+	var idx []int
+	for i, c := range b.Chapters {
+		if c.State != library.StateOK || c.Removed {
+			continue
+		}
+		if b.TOCMode == "crawl" && c.URL == "" {
+			continue // crawled chapters can only be re-read by their link
+		}
+		idx = append(idx, i)
+	}
+	if opts.Revise > 0 && len(idx) > opts.Revise {
+		idx = idx[len(idx)-opts.Revise:]
+	}
+	if len(idx) == 0 {
+		return nil
+	}
+	workers := opts.Concurrency
+	if workers <= 0 {
+		workers = 4
+	}
+	if workers > 8 {
+		workers = 8
+	}
+	var (
+		mu      sync.Mutex
+		done    int64
+		revised []int
+		start   = time.Now()
+		queue   = make(chan int)
+		wg      sync.WaitGroup
+		today   = time.Now().Format("2006-01-02")
+		total   = len(idx)
+	)
+	for w := 0; w < workers; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for i := range queue {
+				if opts.Gate != nil && opts.Gate(ctx) != nil {
+					return
+				}
+				mu.Lock()
+				c := b.Chapters[i]
+				mu.Unlock()
+				changed := a.reviseOne(ctx, b, novel, c, opts)
+				if ctx.Err() != nil {
+					return
+				}
+				mu.Lock()
+				if changed {
+					b.Chapters[i].Revised = today
+					revised = append(revised, c.Number)
+				}
+				nrev := len(revised)
+				mu.Unlock()
+				n := atomic.AddInt64(&done, 1)
+				elapsed := math.Max(time.Since(start).Seconds(), 0.1)
+				speed := float64(n) / elapsed
+				eta := time.Duration(float64(total-int(n))/math.Max(speed, 0.01)) * time.Second
+				emit("progress", Progress{
+					Stage: "revising", Current: int(n), Total: total, Scraped: nrev,
+					Speed: fmt.Sprintf("%.1f ch/s", speed), Eta: eta.Round(time.Second).String(),
+					Percentage: int(math.Round(float64(n) / float64(total) * 100)),
+					ChapterNum: c.Number, ChapterTitle: c.Title, Slug: b.Slug, Title: b.Title,
+				})
+			}
+		}()
+	}
+feed:
+	for _, i := range idx {
+		select {
+		case queue <- i:
+		case <-ctx.Done():
+			break feed
+		}
+	}
+	close(queue)
+	wg.Wait()
+	sort.Ints(revised)
+	if opts.Result != nil {
+		opts.Result.Revised = revised
+		opts.Result.Checked = int(atomic.LoadInt64(&done))
+	}
+	return ctx.Err()
+}
+
+// reviseOne fetches one saved chapter again and rewrites it if the cleaned
+// text differs from the saved copy. Images are only downloaded when the
+// chapter actually changed.
+func (a *Archiver) reviseOne(ctx context.Context, b *library.Book, novel *source.Novel, c library.Chapter, opts Options) bool {
+	ref := source.ChapterRef{Number: c.Number, Title: c.Title, URL: c.URL, Index: c.Index, Locked: c.Locked}
+	ch, err := a.Engine.FetchChapter(ctx, novel, ref)
+	if err != nil {
+		return false
+	}
+	old, err := a.Store.ReadChapter(b.Slug, c.Number)
+	if err != nil {
+		return false
+	}
+	res := clean.Chapter(ch.HTML, ch.Title, ch.BaseURL)
+	fresh := "<h1 class=\"ch-title\">" + htmlEscape(ch.Title) + "</h1>\n" + res.HTML
+	if TextOf(old) == TextOf(fresh) {
+		return false
+	}
+	if _, err := a.saveChapter(ctx, b, c.Number, ch, opts); err != nil {
+		return false
+	}
+	return true
+}
+
+// TextOf reduces a fragment to its visible words, so image paths (local
+// vs remote) and markup details don't count as a revision.
+func TextOf(html string) string {
+	var out strings.Builder
+	in := false
+	for _, r := range html {
+		switch {
+		case r == '<':
+			in = true
+			out.WriteByte(' ')
+		case r == '>':
+			in = false
+		case !in:
+			out.WriteRune(r)
+		}
+	}
+	return strings.Join(strings.Fields(out.String()), " ")
+}

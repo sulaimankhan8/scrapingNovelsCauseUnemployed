@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
@@ -45,9 +47,21 @@ func NewApp() *App {
 	return a
 }
 
-func (a *App) startup(ctx context.Context) { a.ctx = ctx }
+func (a *App) startup(ctx context.Context) {
+	a.ctx = ctx
+	_ = runtime.InitializeNotifications(ctx)
+	if a.svc.GetSettings().UpdateOnOpen {
+		go func() {
+			time.Sleep(3 * time.Second) // let the window show first
+			_, _ = a.svc.UpdateAll(true)
+		}()
+	}
+}
 
-func (a *App) shutdown(context.Context) { a.svc.Shutdown() }
+func (a *App) shutdown(ctx context.Context) {
+	a.svc.Shutdown()
+	runtime.CleanupNotifications(ctx)
+}
 
 // OpenLibraryFolder shows the library folder in Explorer.
 func (a *App) OpenLibraryFolder() {
@@ -105,4 +119,97 @@ func (a *App) ExportEPUB(slug string) (*service.ExportResult, error) {
 		dest += ".epub"
 	}
 	return a.svc.ExportEPUB(slug, dest, 0, 0)
+}
+
+// ---- Queue, settings, reading place ----
+
+func (a *App) GetActivity() *service.Activity { return a.svc.GetActivity() }
+func (a *App) GetSettings() service.Settings  { return a.svc.GetSettings() }
+func (a *App) SaveSettings(s service.Settings) (service.Settings, error) {
+	return a.svc.SaveSettings(s)
+}
+func (a *App) UpdateNovel(slug string) (map[string]any, error) { return a.svc.UpdateNovel(slug) }
+func (a *App) RedownloadNovel(slug string) (map[string]any, error) {
+	return a.svc.RedownloadNovel(slug)
+}
+func (a *App) UpdateAll(auto bool) (map[string]any, error) { return a.svc.UpdateAll(auto) }
+func (a *App) RemoveQueued(id int) error                   { return a.svc.RemoveQueued(id) }
+func (a *App) CancelAll() error                            { return a.svc.CancelAll() }
+func (a *App) SetReading(slug string, chapter int) error   { return a.svc.SetReading(slug, chapter) }
+
+// Platform tells the shared frontend which shell it runs in.
+func (a *App) Platform() string { return "desktop" }
+
+// Notify shows a system notification (the page only asks when it isn't in
+// front).
+func (a *App) Notify(title, body string) error {
+	if a.ctx == nil || !a.svc.GetSettings().Notify {
+		return nil
+	}
+	return runtime.SendNotification(a.ctx, runtime.NotificationOptions{
+		ID: fmt.Sprint(time.Now().UnixNano()), Title: title, Body: body,
+	})
+}
+
+// ShowNovelFolder opens a novel's folder in Explorer.
+func (a *App) ShowNovelFolder(slug string) {
+	if a.ctx == nil || a.svc.LibraryRoot() == "" || slug == "" || strings.ContainsAny(slug, `/\.`) {
+		return
+	}
+	runtime.BrowserOpenURL(a.ctx, "file:///"+filepath.ToSlash(filepath.Join(a.svc.LibraryRoot(), slug)))
+}
+
+// ShowFileInFolder opens the folder that holds a saved file (EPUB, backup).
+func (a *App) ShowFileInFolder(path string) {
+	if a.ctx == nil || path == "" {
+		return
+	}
+	runtime.BrowserOpenURL(a.ctx, "file:///"+filepath.ToSlash(filepath.Dir(path)))
+}
+
+// ---- Backup and restore ----
+
+// BackupLibrary asks where to save, then writes one zip with every novel,
+// reading places and settings. Returns nil if the dialog is cancelled.
+func (a *App) BackupLibrary() (*service.BackupInfo, error) {
+	if a.ctx == nil {
+		return nil, errors.New("app not ready")
+	}
+	home, _ := os.UserHomeDir()
+	dest, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Title:            "Back up library",
+		DefaultDirectory: filepath.Join(home, "Documents"),
+		DefaultFilename:  service.BackupFileName(),
+		Filters:          []runtime.FileFilter{{DisplayName: "NovelArchiver backup (*.zip)", Pattern: "*.zip"}},
+	})
+	if err != nil || dest == "" {
+		return nil, err
+	}
+	if filepath.Ext(dest) == "" {
+		dest += ".zip"
+	}
+	return a.svc.Backup(dest)
+}
+
+// ChooseBackup picks a backup file and describes what restoring would do.
+// Returns nil if the dialog is cancelled.
+func (a *App) ChooseBackup() (*service.BackupInfo, error) {
+	if a.ctx == nil {
+		return nil, errors.New("app not ready")
+	}
+	home, _ := os.UserHomeDir()
+	src, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+		Title:            "Restore from backup",
+		DefaultDirectory: filepath.Join(home, "Documents"),
+		Filters:          []runtime.FileFilter{{DisplayName: "NovelArchiver backup (*.zip)", Pattern: "*.zip"}},
+	})
+	if err != nil || src == "" {
+		return nil, err
+	}
+	return a.svc.InspectBackup(src)
+}
+
+// RestoreBackup merges a backup chosen with ChooseBackup.
+func (a *App) RestoreBackup(path string) (*service.RestoreResult, error) {
+	return a.svc.Restore(path)
 }

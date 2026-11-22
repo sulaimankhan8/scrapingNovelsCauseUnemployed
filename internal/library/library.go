@@ -40,6 +40,12 @@ type Chapter struct {
 	State  string `json:"state,omitempty"`
 	Error  string `json:"error,omitempty"`
 	Words  int    `json:"words,omitempty"`
+	// Revised is the date (YYYY-MM-DD) an update found the site's text had
+	// changed and replaced the saved copy.
+	Revised string `json:"revised,omitempty"`
+	// Removed marks a saved chapter the site no longer lists. Its file is
+	// kept; it is never deleted silently.
+	Removed bool `json:"removed,omitempty"`
 }
 
 // Book is the contents of book.json.
@@ -60,6 +66,8 @@ type Book struct {
 	Chapters        []Chapter         `json:"chapters"`
 	AddedAt         time.Time         `json:"addedAt"`
 	UpdatedAt       time.Time         `json:"updatedAt"`
+	// CheckedAt is when an update last finished for this book.
+	CheckedAt time.Time `json:"checkedAt,omitempty"`
 }
 
 // Counts summarises chapter states.
@@ -334,6 +342,55 @@ func (s *Store) DeleteImages(slug string) error {
 func (s *Store) Size(slug string) int64 {
 	var total int64
 	_ = filepath.WalkDir(s.dir(slug), func(_ string, d fs.DirEntry, err error) error {
+		if err == nil && !d.IsDir() {
+			if info, err := d.Info(); err == nil {
+				total += info.Size()
+			}
+		}
+		return nil
+	})
+	return total
+}
+
+// Reading is where the reader last stopped in a book. It lives in its own
+// file (reading.json) so a download saving book.json never overwrites it.
+type Reading struct {
+	Chapter int       `json:"chapter"`
+	At      time.Time `json:"at"`
+}
+
+// Reading returns the saved reading place (zero if none).
+func (s *Store) Reading(slug string) Reading {
+	var r Reading
+	if validSlug(slug) != nil {
+		return r
+	}
+	if data, err := os.ReadFile(filepath.Join(s.dir(slug), "reading.json")); err == nil {
+		_ = json.Unmarshal(data, &r)
+	}
+	return r
+}
+
+// SetReading records the chapter the reader is on.
+func (s *Store) SetReading(slug string, chapter int) error {
+	if err := validSlug(slug); err != nil {
+		return err
+	}
+	if _, err := os.Stat(filepath.Join(s.dir(slug), "book.json")); err != nil {
+		return err
+	}
+	data, _ := json.Marshal(Reading{Chapter: chapter, At: time.Now()})
+	tmp := filepath.Join(s.dir(slug), "reading.json.tmp")
+	if err := os.WriteFile(tmp, data, 0o644); err != nil {
+		return err
+	}
+	return os.Rename(tmp, filepath.Join(s.dir(slug), "reading.json"))
+}
+
+// ImageBytes returns the bytes used by a book's chapter images.
+func (s *Store) ImageBytes(slug string) int64 {
+	var total int64
+	_ = filepath.WalkDir(s.ImageDir(slug), func(_ string, d fs.DirEntry, err error) error {
 		if err == nil && !d.IsDir() {
 			if info, err := d.Info(); err == nil {
 				total += info.Size()

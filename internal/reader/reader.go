@@ -102,6 +102,9 @@ func (h *Handler) chapter(w http.ResponseWriter, b *library.Book, n int) {
 	c := b.Chapters[idx]
 	body, err := h.Store.ReadChapter(b.Slug, n)
 	missing := err != nil
+	if !missing {
+		_ = h.Store.SetReading(b.Slug, n) // the library shows "Continue · Ch. n"
+	}
 	prev, next := 0, 0
 	if idx > 0 {
 		prev = b.Chapters[idx-1].Number
@@ -167,13 +170,13 @@ article td,article th{border:1px solid var(--sys-line);padding:.4em .6em;vertica
 .nav span{opacity:.4}
 </style></head><body>
 <div class="bar">
- <a href="./" aria-label="Contents">☰ Contents</a>
+ <a href="/#/novel/{{.Book.Slug}}" aria-label="Novel page and chapters">☰ Contents</a>
  <span class="title">{{.Book.Title}} — {{.Ch.Number}}/{{.Total}}</span>
  <button id="theme" type="button" aria-label="Change theme">Aa</button>
 </div>
 <main><article>
 {{if .Missing}}<h1 class="ch-title">{{.Ch.Title}}</h1>
-<p class="missing">This chapter isn't downloaded{{if .Ch.Error}} ({{.Ch.Error}}){{end}}. Use <b>Retry</b> in the library to fetch it.</p>
+<p class="missing">This chapter isn't downloaded{{if .Ch.Error}} ({{.Ch.Error}}){{end}}. Press <b>Update</b> on the <a href="/#/novel/{{.Book.Slug}}">novel page</a> to fetch it.</p>
 {{else}}{{.Body}}{{end}}
 </article>
 <nav class="nav">
@@ -185,7 +188,8 @@ article td,article th{border:1px solid var(--sys-line);padding:.4em .6em;vertica
  var KEY='na-reader', s={};
  try{s=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
  var root=document.documentElement;
- function apply(){ if(s.theme)root.dataset.theme=s.theme; if(s.font)root.dataset.font=s.font;
+ var app=''; try{app=localStorage.getItem('na-theme')||''}catch(e){}
+ function apply(){ if(s.theme)root.dataset.theme=s.theme; else if(app&&app!=='system')root.dataset.theme=app; if(s.font)root.dataset.font=s.font;
    if(s.size)root.style.setProperty('--size',s.size+'px'); }
  function save(){ try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){} }
  apply();
@@ -201,6 +205,7 @@ article td,article th{border:1px solid var(--sys-line);padding:.4em .6em;vertica
    if(e.key==='+'||e.key==='='){s.size=Math.min(30,(s.size||19)+1);apply();save()}
    if(e.key==='-'){s.size=Math.max(13,(s.size||19)-1);apply();save()}
    if(e.key==='f'){s.font=s.font==='sans'?'':'sans'; if(!s.font)delete root.dataset.font; apply();save()}
+   if(e.key==='h'||e.key==='H'){location.href='/#/novel/{{.Book.Slug}}'}
  });
 })();
 </script></body></html>`))
@@ -243,7 +248,7 @@ li .tag{margin-left:auto;font-size:12px;color:var(--muted)}
 </main>
 <script>
 (function(){
- try{var s=JSON.parse(localStorage.getItem('na-reader')||'{}'); if(s.theme)document.documentElement.dataset.theme=s.theme;}catch(e){}
+ try{var s=JSON.parse(localStorage.getItem('na-reader')||'{}'),app=localStorage.getItem('na-theme')||''; if(s.theme)document.documentElement.dataset.theme=s.theme; else if(app&&app!=='system')document.documentElement.dataset.theme=app;}catch(e){}
  try{var last=localStorage.getItem('na-last-{{.Book.Slug}}'); if(last){var c=document.getElementById('continue'); c.href=last; c.textContent='Continue · chapter '+last;}}catch(e){}
  var q=document.getElementById('q'), items=[].slice.call(document.querySelectorAll('#list li'));
  q.addEventListener('input',function(){var v=q.value.toLowerCase().trim();

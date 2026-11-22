@@ -7,5 +7,12 @@
   "author": {
     "name": "Sulaiman",
     "email": ""
+  },
+  "info": {
+    "companyName": "NovelArchiver",
+    "productName": "NovelArchiver",
+    "productVersion": "2.1.0",
+    "copyright": "\u00a9 2026 Sulaiman",
+    "comments": "Read web novels offline"
   }
 }
