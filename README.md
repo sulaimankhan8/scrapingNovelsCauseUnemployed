@@ -4,7 +4,7 @@ Save web novels to your own device and read them offline, with no ads, pop-ups o
 
 NovelArchiver runs locally on **Windows** and **Android**. Paste a novel page or any chapter link. It saves the chapters with their formatting (bold, italics, tables, images and in-story **[System]** boxes) into a library on your device, with a clean reader and EPUB export.
 
-**Download:** see [Releases](../../releases) or the [download page](https://novelarchiver.vercel.app).
+**Download:** see [Releases](../../releases) or the [download page](https://sulaimankhan8.github.io/novelarchiver/).
 
 ## Features
 
