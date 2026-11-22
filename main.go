@@ -1,0 +1,57 @@
+package main
+
+import (
+	"embed"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/options"
+	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/windows"
+
+	"novelarchiver/internal/reader"
+)
+
+//go:embed all:frontend
+var assets embed.FS
+
+func main() {
+	app := NewApp()
+
+	// The offline reader is served in-process at /library/... — no ports.
+	var libHandler http.Handler = http.NotFoundHandler()
+	if app.store != nil {
+		libHandler = &reader.Handler{Store: app.store}
+	}
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/library/") {
+			libHandler.ServeHTTP(w, r)
+			return
+		}
+		http.NotFound(w, r)
+	})
+
+	err := wails.Run(&options.App{
+		Title:     "NovelArchiver",
+		Width:     1280,
+		Height:    840,
+		MinWidth:  360,
+		MinHeight: 520,
+		AssetServer: &assetserver.Options{
+			Assets:  assets,
+			Handler: handler,
+		},
+		BackgroundColour: &options.RGBA{R: 14, G: 18, B: 22, A: 255},
+		OnStartup:        app.startup,
+		Bind:             []interface{}{app},
+		Windows: &windows.Options{
+			WebviewUserDataPath: filepath.Join(os.Getenv("LOCALAPPDATA"), "NovelArchiver", "WebView2"),
+		},
+	})
+	if err != nil {
+		println("Error:", err.Error())
+	}
+}

@@ -1,0 +1,65 @@
+[
+  {
+    "slug": "endless-evolution-last-star",
+    "title": "Endless Evolution: Last Star",
+    "author": "Arlemit",
+    "url": "https://novelbin.xyz/novel/endless-evolution-last-star",
+    "cover": "https://boxnovela.b-cdn.net/thumbnail/endless-evolution-last-star.jpg",
+    "totalChapters": 2059,
+    "rawChaptersOnDisk": 2059,
+    "firstChapter": {
+      "title": "Chapter 1: Failed Experiment",
+      "url": "https://novelbin.xyz/read/endless-evolution-last-star/chapter-1",
+      "cdnUrl": "https://boxnovela.b-cdn.net/read/1603095/0.json"
+    },
+    "lastChapter": {
+      "title": "Chapter 2059: Home for Artifacts",
+      "url": "https://novelbin.xyz/read/endless-evolution-last-star/chapter-2059"
+    },
+    "notes": "Formatting check: system boxes like [Would you like to quit the game?] in bold should survive cleaning (horror-game ch.1)."
+  },
+  {
+    "slug": "horror-game-developer-my-games-arent-that-scary",
+    "title": "Horror Game Developer: My games aren't that scary!",
+    "author": "Entrail_JI",
+    "url": "https://novelbin.xyz/novel/horror-game-developer-my-games-arent-that-scary",
+    "cover": "https://boxnovela.b-cdn.net/thumbnail/horror-game-developer-my-games-arent-that-scary.jpg",
+    "totalChapters": 821,
+    "rawChaptersOnDisk": 821,
+    "firstChapter": {
+      "title": "Chapter 1: Prologue",
+      "url": "https://novelbin.xyz/read/horror-game-developer-my-games-arent-that-scary/chapter-1",
+      "cdnUrl": "https://boxnovela.b-cdn.net/read/1634149/0.json"
+    },
+    "lastChapter": {
+      "title": "Chapter 821: The House [4]",
+      "url": "https://novelbin.xyz/read/horror-game-developer-my-games-arent-that-scary/chapter-821"
+    },
+    "notes": "Formatting check: system boxes like [Would you like to quit the game?] in bold should survive cleaning (horror-game ch.1)."
+  },
+  {
+    "slug": "lord-of-the-mysteries",
+    "title": "Lord of the Mysteries",
+    "author": "Cuttlefish That Loves Diving",
+    "url": "https://novelbin.xyz/novel/lord-of-the-mysteries",
+    "cover": "https://boxnovela.b-cdn.net/thumbnail/lord-of-the-mysteries.jpg",
+    "totalChapters": 1260,
+    "rawChaptersOnDisk": 1260,
+    "firstChapter": {
+      "title": "Chapter 1 - Crimson",
+      "url": "https://novelbin.xyz/read/lord-of-the-mysteries/chapter-1",
+      "cdnUrl": "https://boxnovela.b-cdn.net/read/29231/0.json"
+    },
+    "lastChapter": {
+      "title": "Chapter 1432 - END - 1432 Bonus Chapter: That Corner (2)",
+      "url": "https://novelbin.xyz/read/lord-of-the-mysteries/chapter-1260"
+    },
+    "notes": "Formatting check: system boxes like [Would you like to quit the game?] in bold should survive cleaning (horror-game ch.1)."
+  },
+  {
+    "slug": "super-gene",
+    "title": "Super Gene",
+    "url": "https://novelbin.com/b/super-gene",
+    "notes": "Only in git history (commit 4a01812), was scraped by the old Node scripts; not in the Go library."
+  }
+]

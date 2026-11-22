@@ -1,0 +1,11 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "NovelArchiver",
+  "outputfilename": "NovelArchiver",
+  "frontend:dir": "./frontend",
+  "wailsjsdir": "./frontend",
+  "author": {
+    "name": "Sulaiman",
+    "email": ""
+  }
+}
