@@ -58,6 +58,8 @@ type result struct {
 	status int
 	url    string
 	body   string
+	ct     string
+	b64    bool
 }
 
 type loadEvent struct{ url, title string }
@@ -101,13 +103,13 @@ func (b *Window) ensure() (*view, error) {
 			return
 		}
 		v.w = w
-		_ = w.Bind("__naResult", func(id string, status int, u string, body string) {
+		_ = w.Bind("__naResult", func(id string, status int, u string, body string, ct string, b64 bool) {
 			v.mu.Lock()
 			ch := v.wait[id]
 			delete(v.wait, id)
 			v.mu.Unlock()
 			if ch != nil {
-				ch <- result{status, u, body}
+				ch <- result{status, u, body, ct, b64}
 			}
 		})
 		_ = w.Bind("__naLoaded", func(u, title string) {
@@ -228,7 +230,9 @@ func (b *Window) Get(ctx context.Context, rawURL, referer string) (*fetch.Page, 
 	}
 	target := origin(rawURL)
 	base := target
-	isAPI := referer != "" && origin(referer) != target
+	// Cross-origin calls and assets (images, JSON) are fetched from inside
+	// the referer's page instead of being navigated to.
+	isAPI := referer != "" && (origin(referer) != target || isAsset(rawURL))
 	if isAPI {
 		base = origin(referer)
 	}
@@ -306,10 +310,7 @@ func (b *Window) fetchOnce(ctx context.Context, v *view, rawURL string) (*fetch.
 	v.wait[id] = ch
 	v.mu.Unlock()
 	u, _ := json.Marshal(rawURL)
-	v.eval(fmt.Sprintf(`(async function(){ try {
-  const r = await fetch(%s, {credentials: 'same-origin', redirect: 'follow'});
-  const t = await r.text(); window.__naResult(%q, r.status, r.url, t);
-} catch (e) { window.__naResult(%q, -1, '', String(e)); } })();`, u, id, id))
+	v.eval(fetchJS(string(u), fmt.Sprintf(`function(s, u, b, ct, b64){ window.__naResult(%q, s, u, b, ct, b64); }`, id)))
 	select {
 	case r, ok := <-ch:
 		if !ok {
@@ -318,7 +319,7 @@ func (b *Window) fetchOnce(ctx context.Context, v *view, rawURL string) (*fetch.
 		if r.status < 0 {
 			return nil, fmt.Errorf("browser fetch failed for %s: %s", rawURL, r.body)
 		}
-		return &fetch.Page{URL: r.url, Status: r.status, Body: []byte(r.body)}, nil
+		return pageFromResult(r.status, r.url, r.body, r.ct, r.b64)
 	case <-time.After(45 * time.Second):
 		v.drop(id)
 		return nil, fmt.Errorf("browser fetch timed out: %s", rawURL)
@@ -399,7 +400,7 @@ func (b *Window) captureOnce(ctx context.Context, v *view) (*fetch.Page, error) 
 	v.mu.Lock()
 	v.wait[id] = ch
 	v.mu.Unlock()
-	v.eval(fmt.Sprintf(`window.__naResult(%q, 200, location.href, document.documentElement.outerHTML);`, id))
+	v.eval(fmt.Sprintf(`window.__naResult(%q, 200, location.href, document.documentElement.outerHTML, 'text/html', false);`, id))
 	select {
 	case r, ok := <-ch:
 		if !ok {

@@ -6,8 +6,10 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"net/http"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -260,7 +262,10 @@ type DiscoverResult struct {
 	*source.Novel
 	TotalChapters int    `json:"totalChapters"`
 	ExistingSlug  string `json:"existingSlug,omitempty"`
-	Downloaded    int    `json:"downloaded"`
+	// CoverData is the cover as a data: URL fetched by the engine, so it
+	// shows even when the site refuses hot-linking (Cloudflare etc.).
+	CoverData  string `json:"coverData,omitempty"`
+	Downloaded int    `json:"downloaded"`
 }
 
 // DiscoverNovel accepts a novel page or chapter link and returns the
@@ -280,7 +285,7 @@ func (a *Service) DiscoverNovel(url string) (*DiscoverResult, error) {
 			res.Downloaded, _, _, _ = b.Counts()
 		}
 	}
-	// The UI shows the cover straight from the site during preview.
+	res.CoverData = a.coverData(n)
 	return res, nil
 }
 
@@ -551,4 +556,26 @@ func (a *Service) ExportEPUB(slug, dest string, from, to int) (*ExportResult, er
 	}
 	return &ExportResult{Path: dest, FileName: filepath.Base(dest), Chapters: res.Chapters, Images: res.Images,
 		SizeMb: fmt.Sprintf("%.1f MB", float64(res.Bytes)/(1<<20))}, nil
+}
+
+// coverData fetches the preview cover (plain HTTP, then the site browser)
+// and returns it as a data: URL, or "" if it can't be fetched.
+func (a *Service) coverData(n *source.Novel) string {
+	if n.Cover == "" || a.arch == nil {
+		return ""
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 40*time.Second)
+	defer cancel()
+	page, err := a.arch.GetFile(ctx, n.Cover, n.URL)
+	if err != nil || len(page.Body) > 3<<20 {
+		return ""
+	}
+	ct := page.Header.Get("Content-Type")
+	if i := strings.Index(ct, ";"); i >= 0 {
+		ct = ct[:i]
+	}
+	if !strings.HasPrefix(ct, "image/") {
+		ct = http.DetectContentType(page.Body)
+	}
+	return "data:" + ct + ";base64," + base64.StdEncoding.EncodeToString(page.Body)
 }

@@ -6,10 +6,16 @@
 package browser
 
 import (
+	"encoding/base64"
 	"errors"
+	"fmt"
+	"net/http"
 	"net/url"
+	"path"
 	"regexp"
 	"strings"
+
+	"novelarchiver/internal/fetch"
 )
 
 // ErrUnsupported is returned on platforms without a browser backend yet.
@@ -56,6 +62,55 @@ func looksLikeLoader(body string) bool {
 	}
 	m := regexp.MustCompile(`(?is)<title>(.*?)</title>`).FindStringSubmatch(body)
 	return m != nil && isInterstitial(m[1])
+}
+
+// fetchJS is the in-page fetch used by every platform. Text responses come
+// back as-is; binary ones (images) as base64, so covers and chapter images
+// survive the trip through the JavaScript bridge. cb(status, url, body,
+// contentType, isBase64) receives the result.
+func fetchJS(urlJSON, cb string) string {
+	return `(async function(){ const cb = ` + cb + `; try {
+  const r = await fetch(` + urlJSON + `, {credentials: 'same-origin', redirect: 'follow'});
+  const ct = (r.headers.get('content-type') || '').toLowerCase();
+  if (ct === '' || /^text\/|json|xml|javascript/.test(ct)) {
+    cb(r.status, r.url, await r.text(), ct, false);
+  } else {
+    const a = new Uint8Array(await r.arrayBuffer()); let s = '';
+    for (let i = 0; i < a.length; i += 0x8000) s += String.fromCharCode.apply(null, a.subarray(i, i + 0x8000));
+    cb(r.status, r.url, btoa(s), ct, true);
+  }
+} catch (e) { cb(-1, '', String(e), '', false); } })();`
+}
+
+// isAsset reports URLs that must be fetched from inside a page (never
+// navigated to): images and JSON.
+func isAsset(u string) bool {
+	p, err := url.Parse(u)
+	if err != nil {
+		return false
+	}
+	switch strings.ToLower(path.Ext(p.Path)) {
+	case ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".avif", ".json":
+		return true
+	}
+	return false
+}
+
+// pageFromResult turns an in-page fetch result into a fetch.Page,
+// decoding base64 bodies (binary responses such as images).
+func pageFromResult(status int, u, body, ct string, b64 bool) (*fetch.Page, error) {
+	data := []byte(body)
+	if b64 {
+		var err error
+		if data, err = base64.StdEncoding.DecodeString(body); err != nil {
+			return nil, fmt.Errorf("bad binary response for %s: %w", u, err)
+		}
+	}
+	h := http.Header{}
+	if ct != "" {
+		h.Set("Content-Type", ct)
+	}
+	return &fetch.Page{URL: u, Status: status, Body: data, Header: h}, nil
 }
 
 func origin(u string) string {

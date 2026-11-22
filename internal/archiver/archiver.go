@@ -367,11 +367,47 @@ func (a *Archiver) saveChapter(ctx context.Context, b *library.Book, num int, ch
 	return res.Words, a.Store.WriteChapter(b.Slug, num, header+html)
 }
 
-func (a *Archiver) saveImage(ctx context.Context, b *library.Book, u string) (string, error) {
-	if a.Files == nil {
-		return "", errors.New("no file fetcher")
+// GetFile downloads a cover or image: plain HTTP first, then the site
+// browser when the site refuses plain requests (e.g. behind Cloudflare).
+func (a *Archiver) GetFile(ctx context.Context, u, referer string) (*fetch.Page, error) {
+	var lastErr error
+	if a.Files != nil {
+		page, err := a.Files.Get(ctx, u, referer)
+		if err == nil && looksLikeImage(page) {
+			return page, nil
+		}
+		lastErr = err
 	}
-	page, err := a.Files.Get(ctx, u, b.URL)
+	if a.Engine != nil && a.Engine.Browser != nil {
+		page, err := a.Engine.Browser.Get(ctx, u, referer)
+		if err == nil && looksLikeImage(page) {
+			return page, nil
+		}
+		if err != nil {
+			lastErr = err
+		}
+	}
+	if lastErr == nil {
+		lastErr = fmt.Errorf("no image at %s", u)
+	}
+	return nil, lastErr
+}
+
+// looksLikeImage rejects HTML error/challenge pages served instead of an image.
+func looksLikeImage(p *fetch.Page) bool {
+	if p == nil || len(p.Body) < 64 {
+		return false
+	}
+	ct := strings.ToLower(p.Header.Get("Content-Type"))
+	if strings.HasPrefix(ct, "image/") {
+		return true
+	}
+	head := strings.ToLower(string(p.Body[:min(len(p.Body), 256)]))
+	return !strings.Contains(head, "<html") && !strings.Contains(head, "<!doctype")
+}
+
+func (a *Archiver) saveImage(ctx context.Context, b *library.Book, u string) (string, error) {
+	page, err := a.GetFile(ctx, u, b.URL)
 	if err != nil {
 		return "", err
 	}
@@ -380,10 +416,10 @@ func (a *Archiver) saveImage(ctx context.Context, b *library.Book, u string) (st
 }
 
 func (a *Archiver) saveCover(ctx context.Context, b *library.Book) {
-	if b.CoverURL == "" || a.Files == nil {
+	if b.CoverURL == "" {
 		return
 	}
-	page, err := a.Files.Get(ctx, b.CoverURL, b.URL)
+	page, err := a.GetFile(ctx, b.CoverURL, b.URL)
 	if err != nil || len(page.Body) < 200 {
 		return
 	}

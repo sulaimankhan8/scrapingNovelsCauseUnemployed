@@ -40,6 +40,7 @@ export namespace service {
 	    warnings?: string[];
 	    totalChapters: number;
 	    existingSlug?: string;
+	    coverData?: string;
 	    downloaded: number;
 	
 	    static createFrom(source: any = {}) {
@@ -65,6 +66,7 @@ export namespace service {
 	        this.warnings = source["warnings"];
 	        this.totalChapters = source["totalChapters"];
 	        this.existingSlug = source["existingSlug"];
+	        this.coverData = source["coverData"];
 	        this.downloaded = source["downloaded"];
 	    }
 	
@@ -85,6 +87,26 @@ export namespace service {
 		    }
 		    return a;
 		}
+	}
+	export class ExportResult {
+	    path: string;
+	    fileName: string;
+	    chapters: number;
+	    images: number;
+	    sizeMb: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ExportResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.path = source["path"];
+	        this.fileName = source["fileName"];
+	        this.chapters = source["chapters"];
+	        this.images = source["images"];
+	        this.sizeMb = source["sizeMb"];
+	    }
 	}
 	export class NovelDetail {
 	    slug: string;

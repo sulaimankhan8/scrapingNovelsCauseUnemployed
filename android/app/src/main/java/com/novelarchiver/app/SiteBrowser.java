@@ -143,10 +143,17 @@ public class SiteBrowser implements BrowserDriver {
         CountDownLatch l = new CountDownLatch(1);
         results.put(id, r);
         latches.put(id, l);
-        String js = "(async function(){try{const r=await fetch(" + JSONObject.quote(url)
-                + ",{credentials:'same-origin',redirect:'follow'});const t=await r.text();"
-                + "__naSB.result(" + id + ",JSON.stringify({status:r.status,url:r.url,body:t}));}"
-                + "catch(e){__naSB.result(" + id + ",JSON.stringify({status:-1,url:'',body:String(e)}));}})();";
+        // Same contract as internal/browser fetchJS: text as-is, binary
+        // (images) as base64 so it survives the bridge.
+        String js = "(async function(){const cb=function(s,u,b,ct,b64){__naSB.result(" + id
+                + ",JSON.stringify({status:s,url:u,body:b,contentType:ct,b64:b64}));};try{"
+                + "const r=await fetch(" + JSONObject.quote(url) + ",{credentials:'same-origin',redirect:'follow'});"
+                + "const ct=(r.headers.get('content-type')||'').toLowerCase();"
+                + "if(ct===''||/^text\\/|json|xml|javascript/.test(ct)){cb(r.status,r.url,await r.text(),ct,false);}"
+                + "else{const a=new Uint8Array(await r.arrayBuffer());let s='';"
+                + "for(let i=0;i<a.length;i+=0x8000)s+=String.fromCharCode.apply(null,a.subarray(i,i+0x8000));"
+                + "cb(r.status,r.url,btoa(s),ct,true);}"
+                + "}catch(e){cb(-1,'',String(e),'',false);}})();";
         activity.runOnUiThread(() -> view.evaluateJavascript(js, null));
         try {
             if (!l.await(45, TimeUnit.SECONDS)) throw new Exception("browser fetch timed out: " + url);

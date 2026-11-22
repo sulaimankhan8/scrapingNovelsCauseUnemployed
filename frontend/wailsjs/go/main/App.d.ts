@@ -16,6 +16,8 @@ export function DeleteNovel(arg1:string):Promise<Record<string, any>>;
 
 export function DiscoverNovel(arg1:string):Promise<service.DiscoverResult>;
 
+export function ExportEPUB(arg1:string):Promise<service.ExportResult>;
+
 export function GetNovel(arg1:string):Promise<service.NovelDetail>;
 
 export function GetNovels():Promise<Array<service.NovelItem>>;

@@ -48,10 +48,12 @@ func NewDriven(d Driver, opts Options) *Driven {
 }
 
 type pageInfo struct {
-	URL    string `json:"url"`
-	Title  string `json:"title"`
-	Status int    `json:"status"`
-	Body   string `json:"body"`
+	URL         string `json:"url"`
+	Title       string `json:"title"`
+	Status      int    `json:"status"`
+	Body        string `json:"body"`
+	ContentType string `json:"contentType"`
+	B64         bool   `json:"b64"`
 }
 
 func decode(s string) pageInfo {
@@ -95,7 +97,7 @@ func (b *Driven) Get(ctx context.Context, rawURL, referer string) (*fetch.Page, 
 	}
 	target := origin(rawURL)
 	base := target
-	isAPI := referer != "" && origin(referer) != target
+	isAPI := referer != "" && (origin(referer) != target || isAsset(rawURL))
 	if isAPI {
 		base = origin(referer)
 	}
@@ -158,7 +160,7 @@ func (b *Driven) inPageFetch(ctx context.Context, rawURL string) (*fetch.Page, e
 			lastErr = fmt.Errorf("browser fetch failed for %s: %s", rawURL, p.Body)
 			continue
 		}
-		return &fetch.Page{URL: p.URL, Status: p.Status, Body: []byte(p.Body)}, nil
+		return pageFromResult(p.Status, p.URL, p.Body, p.ContentType, p.B64)
 	}
 	return nil, lastErr
 }

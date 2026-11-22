@@ -30,6 +30,10 @@ export function DiscoverNovel(arg1) {
   return window['go']['main']['App']['DiscoverNovel'](arg1);
 }
 
+export function ExportEPUB(arg1) {
+  return window['go']['main']['App']['ExportEPUB'](arg1);
+}
+
 export function GetNovel(arg1) {
   return window['go']['main']['App']['GetNovel'](arg1);
 }

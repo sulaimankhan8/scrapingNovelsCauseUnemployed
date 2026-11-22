@@ -574,7 +574,8 @@ document.addEventListener('DOMContentLoaded', () => {
             previewDesc.textContent = currentMetadata.description || "No synopsis available for this title.";
             
             const fallbackCover = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="175"><rect width="100%" height="100%" fill="%23222933"/><text x="50%" y="50%" fill="%23a3acb9" font-family="serif" text-anchor="middle">Book</text></svg>';
-            previewCover.src = currentMetadata.cover || fallbackCover;
+            previewCover.src = currentMetadata.coverData || currentMetadata.cover || fallbackCover;
+            previewCover.onerror = () => { previewCover.onerror = null; previewCover.src = fallbackCover; };
             previewCover.alt = `Cover art for ${currentMetadata.title}`;
 
             previewCard.classList.remove('hidden');
