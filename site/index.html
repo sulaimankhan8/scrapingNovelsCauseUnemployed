@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NovelArchiver: read web novels offline</title>
+<meta name="description" content="Save web novels to your PC or phone and read them offline, without ads. Keeps formatting and system boxes; exports EPUB.">
+<style>
+:root{--bg:#f6f2ea;--panel:#fffdf8;--ink:#1d1b18;--muted:#625b51;--line:#e2d9c9;--accent:#b5461f;--accent-ink:#fff;
+--sys-bg:#eef3f8;--sys-line:#7d9bb8;--sys-ink:#1f3347;--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#121417;--panel:#191c20;--ink:#ebe6dd;--muted:#a19b91;--line:#2b3036;--accent:#e0794f;--accent-ink:#1a0f0a;
+--sys-bg:#16222e;--sys-line:#3f6a92;--sys-ink:#cfe2f5}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--sans)}
+a{color:var(--accent)}
+.wrap{max-width:62rem;margin:0 auto;padding:0 16px}
+header{padding:56px 0 32px}
+.brand{font:600 15px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font:600 clamp(2rem,5vw,3.2rem)/1.12 var(--serif);margin:.3em 0 .4em;max-width:18ch}
+.lede{font-size:1.15rem;color:var(--muted);max-width:40rem;margin:0 0 28px}
+.downloads{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:13px 20px;border-radius:10px;text-decoration:none;font-weight:600;
+border:1px solid var(--line);color:var(--ink);background:var(--panel);min-height:48px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn small{font-weight:400;opacity:.8}
+.note{font-size:.9rem;color:var(--muted);margin:6px 0 0}
+section{padding:36px 0;border-top:1px solid var(--line)}
+h2{font:600 1.5rem var(--serif);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+.card h3{margin:0 0 6px;font-size:1.02rem}
+.card p{margin:0;color:var(--muted);font-size:.95rem}
+.demo{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px;font:1.05rem/1.7 var(--serif);max-width:40rem}
+.demo p{margin:0 0 .8em}
+.sys{background:var(--sys-bg);color:var(--sys-ink);border-left:3px solid var(--sys-line);padding:.5em .8em;margin:0 0 .8em;
+font:.9rem/1.5 ui-monospace,"Cascadia Mono",Consolas,monospace}
+.sites{display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:0;list-style:none}
+.sites li{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:.92rem;background:var(--panel)}
+ol.steps{padding-left:1.2em;margin:0}
+ol.steps li{margin:0 0 10px}
+footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line)}
+code{font:.9em ui-monospace,Consolas,monospace;background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand">NovelArchiver</div>
+  <h1>Read web novels offline, without the ads.</h1>
+  <p class="lede">Paste a novel page or any chapter link. NovelArchiver saves the chapters to your PC or phone, keeps their formatting and system boxes, and gives you a clean reader that works on a plane.</p>
+  <div class="downloads">
+    <a class="btn primary" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/NovelArchiver.exe">Download for Windows <small>.exe</small></a>
+    <a class="btn" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/NovelArchiver-android-test.apk">Download for Android <small>test build .apk</small></a>
+    <a class="btn" href="https://github.com/sulaimankhan8/novelarchiver">Source code</a>
+  </div>
+  <p class="note">Windows 10/11 (uses the built-in WebView2). Android 7+. The Android download is a test build: a later signed release will need a reinstall.</p>
+</header>
+
+<section>
+  <h2>Formatting stays intact</h2>
+  <div class="demo" aria-label="Example of a saved chapter">
+    <p><strong><em>Click. Click.</em></strong></p>
+    <p>The rhythmic sound of the keyboard echoed in the otherwise quiet office.</p>
+    <p class="sys"><strong>[Would you like to quit the game?]</strong></p>
+    <p class="sys">[▶ Yes] [▷ No]</p>
+    <p>I didn't hesitate.</p>
+  </div>
+</section>
+
+<section>
+  <h2>What it does</h2>
+  <div class="grid">
+    <div class="card"><h3>Novel or chapter link</h3><p>Paste either. From a chapter you can save the whole novel or everything from there on.</p></div>
+    <div class="card"><h3>Clean, offline reader</h3><p>Light, dark and sepia themes, adjustable text, and it remembers where you stopped. No internet needed.</p></div>
+    <div class="card"><h3>Resume and update</h3><p>Interrupted downloads pick up where they left off. Update fetches newly released chapters.</p></div>
+    <div class="card"><h3>Your storage, your call</h3><p>See each novel's size, delete chapters you've read, or drop images to save space.</p></div>
+    <div class="card"><h3>EPUB export</h3><p>One file for Play Books, Apple Books, Moon+ Reader, KOReader or Send to Kindle.</p></div>
+    <div class="card"><h3>Polite by design</h3><p>A few requests at a time per site. When a site asks you to verify you're human, you tick it yourself in a built-in browser window.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Supported sites</h2>
+  <ul class="sites">
+    <li>NovelBin</li><li>NovelFull</li><li>ReadNovelFull</li><li>Royal Road</li><li>WuxiaWorld</li>
+    <li>FreeWebNovel</li><li>NovelFire</li><li>Webnovel (free chapters)</li><li>ScribbleHub</li><li>EmpireNovel</li>
+  </ul>
+  <p class="note">Other sites fall back to a generic reader-mode parser. Site layouts change; parser rules live in a JSON file and can be fixed without a rebuild.</p>
+</section>
+
+<section>
+  <h2>Getting started</h2>
+  <ol class="steps">
+    <li>Download and open the app. On Android, allow "Install unknown apps" when asked.</li>
+    <li>Paste a link, for example <code>https://novelfull.com/some-novel.html</code>, and press <strong>Inspect</strong>.</li>
+    <li>Choose all chapters or a range, then <strong>Archive</strong>. Read from your library any time, online or not.</li>
+  </ol>
+</section>
+
+<footer>
+  For keeping a personal offline copy of stories you read. Please don't redistribute downloaded chapters, and support authors and translators where you can.
+  · <a href="https://github.com/sulaimankhan8/novelarchiver">GitHub</a>
+</footer>
+</div>
+</body>
+</html>
