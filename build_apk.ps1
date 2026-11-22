@@ -1,11 +1,13 @@
 # Builds the Android app.
 #   .\build_apk.ps1                 debug APK (phones + emulators)          -> NovelArchiver.apk
 #   .\build_apk.ps1 -Release        signed, shrunk APK for phones           -> NovelArchiver-release.apk
-#   .\build_apk.ps1 -Release -DebugSign   same, signed with the debug key (local testing only)
+#   .\build_apk.ps1 -Release -DebugSign   same, signed with the debug key (test builds)
+#   add -Inspectable to allow chrome://inspect on the WebViews (developer testing only)
 # Release signing reads android\keystore.properties; see README "Android release".
 param(
     [switch]$Release,
-    [switch]$DebugSign
+    [switch]$DebugSign,
+    [switch]$Inspectable
 )
 
 Write-Host "=======================================================" -ForegroundColor Cyan
@@ -68,6 +70,7 @@ if ($Release) {
     $task = "assembleRelease"
     $extra = @()
     if ($DebugSign) { $extra += "-PdebugSign" }
+    if ($Inspectable) { $extra += "-Pinspectable" }
     $apk = "android\app\build\outputs\apk\release\app-release.apk"
     $out = "NovelArchiver-release.apk"
 } else {

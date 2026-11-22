@@ -47,9 +47,12 @@ android {
             if (keystoreProps['storeFile']) {
                 signingConfig signingConfigs.release
             } else if (project.hasProperty('debugSign')) {
-                // Local test build: shrunk exactly like a real release, but signed
-                // with the debug key and with WebView inspection switched on.
+                // Test build: shrunk exactly like a real release, signed with
+                // the debug key.
                 signingConfig signingConfigs.debug
+            }
+            if (project.hasProperty('inspectable')) {
+                // Developer testing only: chrome://inspect for the WebViews.
                 resValue "bool", "webview_inspectable", "true"
             }
         }
