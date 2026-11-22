@@ -37,8 +37,8 @@ android/local.properties
 crash.log
 
 # Local library data (never commit scraped books)
-novels/
-library/
+/novels/
+/library/
 
 # Go core built by build_apk.ps1
 android/app/libs/

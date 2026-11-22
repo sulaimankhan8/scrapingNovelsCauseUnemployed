@@ -1,0 +1,345 @@
+// Package library stores downloaded novels on disk:
+//
+//	<root>/<slug>/book.json          metadata + chapter list + per-chapter state
+//	<root>/<slug>/cover.<ext>        downloaded cover
+//	<root>/<slug>/chapters/0001.html sanitised chapter fragment (no CSS)
+//	<root>/<slug>/img/<hash>.<ext>   images used inside chapters
+package library
+
+import (
+	"crypto/sha1"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"regexp"
+	"sort"
+	"strings"
+	"sync"
+	"time"
+)
+
+// Chapter states.
+const (
+	StatePending = ""
+	StateOK      = "ok"
+	StateFailed  = "failed"
+	StateLocked  = "locked"
+)
+
+// Chapter is one entry of a stored book.
+type Chapter struct {
+	Number int    `json:"number"`
+	Title  string `json:"title"`
+	URL    string `json:"url,omitempty"`
+	Index  int    `json:"index"`
+	Locked bool   `json:"locked,omitempty"`
+	State  string `json:"state,omitempty"`
+	Error  string `json:"error,omitempty"`
+	Words  int    `json:"words,omitempty"`
+}
+
+// Book is the contents of book.json.
+type Book struct {
+	Slug            string            `json:"slug"`
+	SiteID          string            `json:"siteId"`
+	SiteName        string            `json:"siteName"`
+	URL             string            `json:"url"`
+	Title           string            `json:"title"`
+	Author          string            `json:"author"`
+	Description     string            `json:"description"`
+	Status          string            `json:"status,omitempty"`
+	CoverURL        string            `json:"coverUrl,omitempty"`
+	CoverFile       string            `json:"coverFile,omitempty"`
+	TOCMode         string            `json:"tocMode"`
+	FirstChapterURL string            `json:"firstChapterUrl,omitempty"`
+	Vars            map[string]string `json:"vars,omitempty"`
+	Chapters        []Chapter         `json:"chapters"`
+	AddedAt         time.Time         `json:"addedAt"`
+	UpdatedAt       time.Time         `json:"updatedAt"`
+}
+
+// Counts summarises chapter states.
+func (b *Book) Counts() (ok, failed, locked, pending int) {
+	for _, c := range b.Chapters {
+		switch c.State {
+		case StateOK:
+			ok++
+		case StateFailed:
+			failed++
+		case StateLocked:
+			locked++
+		default:
+			pending++
+		}
+	}
+	return
+}
+
+// Store is the on-disk library.
+type Store struct {
+	Root string
+	mu   sync.Mutex
+}
+
+// DefaultRoot is %AppData%/NovelArchiver/library (or the platform
+// equivalent). NOVELARCHIVER_LIBRARY overrides it.
+func DefaultRoot() string {
+	if v := os.Getenv("NOVELARCHIVER_LIBRARY"); v != "" {
+		return v
+	}
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		dir, _ = os.UserHomeDir()
+	}
+	return filepath.Join(dir, "NovelArchiver", "library")
+}
+
+// Open creates the root directory if needed.
+func Open(root string) (*Store, error) {
+	abs, err := filepath.Abs(root)
+	if err != nil {
+		return nil, err
+	}
+	if err := os.MkdirAll(abs, 0o755); err != nil {
+		return nil, err
+	}
+	return &Store{Root: abs}, nil
+}
+
+var slugRe = regexp.MustCompile(`[^a-z0-9]+`)
+
+// Slugify makes a filesystem-safe folder name.
+func Slugify(s string) string {
+	s = slugRe.ReplaceAllString(strings.ToLower(s), "-")
+	s = strings.Trim(s, "-")
+	if len(s) > 80 {
+		s = strings.Trim(s[:80], "-")
+	}
+	if s == "" {
+		s = "novel"
+	}
+	return s
+}
+
+// validSlug guards every path built from a slug coming from the UI.
+func validSlug(slug string) error {
+	if slug == "" || slug != Slugify(slug) {
+		return fmt.Errorf("invalid novel id %q", slug)
+	}
+	return nil
+}
+
+func (s *Store) dir(slug string) string { return filepath.Join(s.Root, slug) }
+
+// ChapterPath is where a chapter fragment lives.
+func (s *Store) ChapterPath(slug string, num int) string {
+	return filepath.Join(s.dir(slug), "chapters", fmt.Sprintf("%04d.html", num))
+}
+
+// ImageDir holds chapter images.
+func (s *Store) ImageDir(slug string) string { return filepath.Join(s.dir(slug), "img") }
+
+// FindByURL returns the slug of a stored book with this source URL.
+func (s *Store) FindByURL(u string) string {
+	books, _ := s.List()
+	norm := func(x string) string {
+		x = strings.TrimPrefix(strings.TrimPrefix(x, "https://"), "http://")
+		return strings.TrimRight(strings.TrimPrefix(x, "www."), "/")
+	}
+	for _, b := range books {
+		if norm(b.URL) == norm(u) {
+			return b.Slug
+		}
+	}
+	return ""
+}
+
+// NewSlug picks an unused slug for a title.
+func (s *Store) NewSlug(title string) string {
+	base := Slugify(title)
+	slug := base
+	for i := 2; ; i++ {
+		if _, err := os.Stat(s.dir(slug)); errors.Is(err, fs.ErrNotExist) {
+			return slug
+		}
+		slug = fmt.Sprintf("%s-%d", base, i)
+	}
+}
+
+// Load reads book.json.
+func (s *Store) Load(slug string) (*Book, error) {
+	if err := validSlug(slug); err != nil {
+		return nil, err
+	}
+	data, err := os.ReadFile(filepath.Join(s.dir(slug), "book.json"))
+	if err != nil {
+		return nil, err
+	}
+	var b Book
+	if err := json.Unmarshal(data, &b); err != nil {
+		return nil, err
+	}
+	return &b, nil
+}
+
+// Save writes book.json atomically (temp file + rename), so a crash never
+// leaves a half-written file.
+func (s *Store) Save(b *Book) error {
+	if err := validSlug(b.Slug); err != nil {
+		return err
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	b.UpdatedAt = time.Now()
+	if b.AddedAt.IsZero() {
+		b.AddedAt = b.UpdatedAt
+	}
+	dir := s.dir(b.Slug)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return err
+	}
+	data, err := json.MarshalIndent(b, "", "  ")
+	if err != nil {
+		return err
+	}
+	tmp := filepath.Join(dir, "book.json.tmp")
+	if err := os.WriteFile(tmp, data, 0o644); err != nil {
+		return err
+	}
+	return os.Rename(tmp, filepath.Join(dir, "book.json"))
+}
+
+// List returns every stored book, newest first.
+func (s *Store) List() ([]*Book, error) {
+	entries, err := os.ReadDir(s.Root)
+	if err != nil {
+		return nil, err
+	}
+	var out []*Book
+	for _, e := range entries {
+		if !e.IsDir() {
+			continue
+		}
+		if b, err := s.Load(e.Name()); err == nil {
+			out = append(out, b)
+		}
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].UpdatedAt.After(out[j].UpdatedAt) })
+	return out, nil
+}
+
+// WriteChapter stores a cleaned fragment.
+func (s *Store) WriteChapter(slug string, num int, html string) error {
+	p := s.ChapterPath(slug, num)
+	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(p, []byte(html), 0o644)
+}
+
+// ReadChapter loads a cleaned fragment.
+func (s *Store) ReadChapter(slug string, num int) (string, error) {
+	if err := validSlug(slug); err != nil {
+		return "", err
+	}
+	b, err := os.ReadFile(s.ChapterPath(slug, num))
+	return string(b), err
+}
+
+// ImageName is the stored file name for an image URL.
+func ImageName(url, contentType string) string {
+	h := sha1.Sum([]byte(url))
+	ext := ".jpg"
+	switch {
+	case strings.Contains(contentType, "png"), strings.HasSuffix(strings.ToLower(url), ".png"):
+		ext = ".png"
+	case strings.Contains(contentType, "webp"), strings.HasSuffix(strings.ToLower(url), ".webp"):
+		ext = ".webp"
+	case strings.Contains(contentType, "gif"), strings.HasSuffix(strings.ToLower(url), ".gif"):
+		ext = ".gif"
+	}
+	return hex.EncodeToString(h[:8]) + ext
+}
+
+// WriteFile stores an arbitrary file (cover or image) under the book folder.
+func (s *Store) WriteFile(slug, rel string, data []byte) error {
+	p := filepath.Join(s.dir(slug), filepath.FromSlash(rel))
+	if !strings.HasPrefix(p, s.dir(slug)+string(os.PathSeparator)) {
+		return fmt.Errorf("bad path %q", rel)
+	}
+	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(p, data, 0o644)
+}
+
+// FilePath resolves a file inside a book folder, refusing path escapes.
+func (s *Store) FilePath(slug, rel string) (string, error) {
+	if err := validSlug(slug); err != nil {
+		return "", err
+	}
+	p := filepath.Join(s.dir(slug), filepath.FromSlash(rel))
+	if !strings.HasPrefix(p, s.dir(slug)+string(os.PathSeparator)) {
+		return "", fmt.Errorf("bad path %q", rel)
+	}
+	return p, nil
+}
+
+// DeleteBook removes a novel completely.
+func (s *Store) DeleteBook(slug string) error {
+	if err := validSlug(slug); err != nil {
+		return err
+	}
+	return os.RemoveAll(s.dir(slug))
+}
+
+// DeleteChapters frees space by removing downloaded chapters from..to
+// (inclusive). They stay in the chapter list so they can be re-downloaded.
+func (s *Store) DeleteChapters(slug string, from, to int) (int, error) {
+	b, err := s.Load(slug)
+	if err != nil {
+		return 0, err
+	}
+	if from < 1 || to < from {
+		return 0, fmt.Errorf("invalid range %d–%d", from, to)
+	}
+	n := 0
+	for i := range b.Chapters {
+		c := &b.Chapters[i]
+		if c.Number < from || c.Number > to || c.State != StateOK {
+			continue
+		}
+		if err := os.Remove(s.ChapterPath(slug, c.Number)); err == nil || errors.Is(err, fs.ErrNotExist) {
+			c.State, c.Words = StatePending, 0
+			n++
+		}
+	}
+	return n, s.Save(b)
+}
+
+// DeleteImages removes chapter images (text stays readable; images show as
+// broken until re-downloaded).
+func (s *Store) DeleteImages(slug string) error {
+	if err := validSlug(slug); err != nil {
+		return err
+	}
+	return os.RemoveAll(s.ImageDir(slug))
+}
+
+// Size returns the bytes used by one book.
+func (s *Store) Size(slug string) int64 {
+	var total int64
+	_ = filepath.WalkDir(s.dir(slug), func(_ string, d fs.DirEntry, err error) error {
+		if err == nil && !d.IsDir() {
+			if info, err := d.Info(); err == nil {
+				total += info.Size()
+			}
+		}
+		return nil
+	})
+	return total
+}
