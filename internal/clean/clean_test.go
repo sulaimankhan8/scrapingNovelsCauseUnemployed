@@ -105,3 +105,10 @@ func TestBrOnlyTextBecomesParagraphs(t *testing.T) {
 		t.Errorf("got %s", r.HTML)
 	}
 }
+
+func TestUnwrapsLayoutDivs(t *testing.T) {
+	r := Chapter(`<div><div> <p>One.</p> </div></div><div><div><p>Two.</p></div></div><div class="x">Keep <b>inline</b> text</div>`, "", "")
+	if strings.Contains(r.HTML, "<div><div>") || !strings.Contains(r.HTML, "<p>One.</p>") || !strings.Contains(r.HTML, "Keep <b>inline</b> text") {
+		t.Errorf("got %s", r.HTML)
+	}
+}

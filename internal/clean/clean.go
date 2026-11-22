@@ -11,7 +11,11 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/microcosm-cc/bluemonday"
+	"golang.org/x/net/html"
 )
+
+var blockTags = map[string]bool{"p": true, "div": true, "table": true, "blockquote": true, "ul": true, "ol": true,
+	"h1": true, "h2": true, "h3": true, "h4": true, "h5": true, "h6": true, "hr": true, "figure": true, "pre": true}
 
 // Result is a cleaned chapter.
 type Result struct {
@@ -140,6 +144,30 @@ func Chapter(rawHTML, title, baseURL string) Result {
 			s.RemoveAttr("class")
 		}
 	})
+	// Unwrap plain layout <div>s that only wrap other blocks (Webnovel wraps
+	// every paragraph in two of them), innermost first.
+	divs := root.Find("div")
+	for i := divs.Length() - 1; i >= 0; i-- {
+		d := divs.Eq(i)
+		if d.AttrOr("class", "") != "" || d.AttrOr("style", "") != "" {
+			continue
+		}
+		onlyBlocks := true
+		for n := d.Nodes[0].FirstChild; n != nil; n = n.NextSibling {
+			if n.Type == html.TextNode && strings.TrimSpace(n.Data) != "" {
+				onlyBlocks = false
+				break
+			}
+			if n.Type == html.ElementNode && !blockTags[n.Data] {
+				onlyBlocks = false
+				break
+			}
+		}
+		if onlyBlocks {
+			d.ReplaceWithSelection(d.Children())
+		}
+	}
+
 	// Tables are commonly used for status windows; keep them, mark as box.
 	root.Find("table").Each(func(_ int, t *goquery.Selection) { t.SetAttr("class", "sys-box") })
 	root.Find("[align=center]").Each(func(_ int, s *goquery.Selection) {

@@ -13,8 +13,10 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 
 	"novelarchiver/internal/archiver"
+	"novelarchiver/internal/browser"
 	"novelarchiver/internal/fetch"
 	"novelarchiver/internal/library"
 	"novelarchiver/internal/sites"
@@ -47,8 +49,15 @@ func main() {
 	reg, err := sites.Load("")
 	check(err)
 	httpF := fetch.NewHTTP(fetch.Options{})
-	eng := &source.Engine{Registry: reg, HTTP: httpF}
 	status := func(m string) { fmt.Fprintln(os.Stderr, "…", m) }
+	eng := &source.Engine{Registry: reg, HTTP: httpF}
+	if win, err := browser.New(browser.Options{
+		DataPath: filepath.Join(filepath.Dir(store.Root), "SiteBrowser"),
+		OnStatus: status,
+	}); err == nil {
+		eng.Browser = win
+		defer win.Close()
+	}
 
 	switch cmd {
 	case "inspect":
@@ -91,6 +100,17 @@ func main() {
 				fmt.Printf("  failed ch %d: %s\n", c.Number, c.Error)
 			}
 		}
+	case "dump":
+		// Save a page exactly as the engine sees it (browser for browser-only
+		// sites), for writing or fixing site profiles.
+		need(url)
+		var f fetch.Fetcher = httpF
+		if m, err := reg.Match(url); err == nil && m.Profile != nil && m.Profile.FetchMode != "http" && eng.Browser != nil {
+			f = eng.Browser
+		}
+		page, err := f.Get(ctx, url, "")
+		check(err)
+		os.Stdout.Write(page.Body)
 	case "list":
 		books, err := store.List()
 		check(err)
@@ -110,7 +130,7 @@ func need(url string) {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: na inspect <url> | na get <url> [-from N] [-to N] [-lib DIR] | na list")
+	fmt.Fprintln(os.Stderr, "usage: na inspect <url> | na dump <url> | na get <url> [-from N] [-to N] [-lib DIR] | na list")
 	os.Exit(2)
 }
 

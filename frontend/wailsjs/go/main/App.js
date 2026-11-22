@@ -50,6 +50,10 @@ export function OpenLibraryFolder() {
   return window['go']['main']['App']['OpenLibraryFolder']();
 }
 
+export function OpenSiteBrowser(arg1) {
+  return window['go']['main']['App']['OpenSiteBrowser'](arg1);
+}
+
 export function RetryNovel(arg1) {
   return window['go']['main']['App']['RetryNovel'](arg1);
 }

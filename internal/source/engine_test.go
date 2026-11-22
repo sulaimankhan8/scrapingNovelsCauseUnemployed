@@ -122,10 +122,13 @@ func TestSites(t *testing.T) {
 			wantTitle: "Lord of the Mysteries", minChapters: 100, wantMode: "list",
 		},
 		{
-			name:     "webnovel metadata",
-			routes:   map[string]string{`webnovel\.com/book/32824130400116105$`: "webnovel_novel.html", `/catalog$`: "webnovel_novel.html"},
+			name: "webnovel",
+			routes: map[string]string{`webnovel\.com/book/32824130400116105$`: "webnovel_novel.html", `/catalog$`: "webnovel_catalog.html",
+				`lectures_88133292359994362$`: "webnovel_chapter.html"},
 			input:    "https://www.webnovel.com/book/32824130400116105",
-			wantSite: "webnovel", wantTitle: "CLEAVER OF SIN", wantAuthor: "LORDTEE",
+			wantSite: "webnovel", wantTitle: "CLEAVER OF SIN", wantAuthor: "LORDTEE", minChapters: 1274, wantMode: "list",
+			chapterURL: "https://www.webnovel.com/book/cleaver-of-sin_32824130400116105/lectures_88133292359994362",
+			wantInText: "no older than twenty-three", wantNext: "/book/32824130400116105/88133316921845011",
 		},
 	}
 
@@ -158,6 +161,9 @@ func TestSites(t *testing.T) {
 			}
 			if len(n.Chapters) < c.minChapters {
 				t.Errorf("chapters = %d, want >= %d", len(n.Chapters), c.minChapters)
+			}
+			if c.wantSite == "webnovel" && (n.Chapters[0].Title != "Lectures" || len(n.Warnings) == 0) {
+				t.Errorf("webnovel: first=%q warnings=%v", n.Chapters[0].Title, n.Warnings)
 			}
 			if c.inputChap != 0 && n.InputChapter != c.inputChap {
 				t.Errorf("inputChapter = %d, want %d", n.InputChapter, c.inputChap)

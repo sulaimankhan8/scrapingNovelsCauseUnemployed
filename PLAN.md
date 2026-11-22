@@ -203,7 +203,14 @@ For Cloudflare sites the window becomes visible so the **user** can tick "Verify
 - Cloudflare blocks Go's HTTP client, so these need the in-app browser: Royal Road, Webnovel, NovelBin (CDN).
 - Need the user to tick the "Verify you are human" checkbox: EmpireNovel, ScribbleHub.
 
+**Site browser (done 2026-11-22):** `internal/browser` opens a WebView2 window (minimized in the taskbar) for sites that refuse plain HTTP.
+- Pages load as in Edge. Once the window is on a site, the engine reads pages with that page's own `fetch()`, using its cookies.
+- If a site shows "Verify you are human", the window comes to the front and waits up to 3 minutes for the user. The app never clicks it.
+- Cookies persist in `%AppData%/NovelArchiver/SiteBrowser`.
+
+NovelBin, NovelFire, Royal Road and Webnovel now download. EmpireNovel and ScribbleHub need one manual tick, then their selectors confirmed.
+
 **Next:**
-1. `BrowserFetcher` (hidden WebView2 window on desktop) to unlock the 6 browser sites.
-2. Android on the shared core (phase 4).
+1. Tick the Cloudflare check for EmpireNovel/ScribbleHub once, then confirm their selectors with `na dump`.
+2. Android on the shared core (phase 4). The Android WebView can be the browser fetcher there.
 3. EPUB export.

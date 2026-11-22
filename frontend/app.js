@@ -494,6 +494,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.runtime.EventsOn('progress', handleProgress);
                 window.runtime.EventsOn('done', handleDone);
                 window.runtime.EventsOn('error', handleError);
+                window.runtime.EventsOn('challenge', (data) => {
+                    progressCurrentStatus.textContent = data.message;
+                    appendLog(`[Action needed] ${data.message}`);
+                    showToast(data.message);
+                });
                 appendLog('[System] Wails native IPC event bus active.');
                 return true;
             }
@@ -560,6 +565,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const warns = currentMetadata.warnings || [];
             warnEl.innerHTML = warns.map(w => `<li>${escapeHtml(w)}</li>`).join('');
             warnEl.classList.toggle('hidden', warns.length === 0);
+            document.getElementById('openSiteBrowserBtn').classList.toggle('hidden', !window.go?.main?.App?.OpenSiteBrowser || warns.length === 0);
             const fromBtn = document.getElementById('startFromChapterBtn');
             const fromCh = currentMetadata.inputKind === 'chapter' ? (currentMetadata.inputChapter || 0) : 0;
             fromBtn.classList.toggle('hidden', fromCh <= 1);
@@ -1410,6 +1416,10 @@ document.addEventListener('DOMContentLoaded', () => {
             openDetailsModal(activeNovelDetails.slug);
             refreshSystemStats();
         } catch (e) { showToast(`Delete failed: ${e.message || e}`); }
+    });
+    document.getElementById('openSiteBrowserBtn').addEventListener('click', async () => {
+        try { await window.go.main.App.OpenSiteBrowser(novelUrlInput.value.trim()); }
+        catch (e) { showToast(`Couldn't open the site browser: ${e.message || e}`); }
     });
     document.getElementById('startFromChapterBtn').addEventListener('click', () => {
         startScrape(novelUrlInput.value.trim(), { fromPasted: true });

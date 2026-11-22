@@ -8,10 +8,11 @@
       "domains": ["novelbin.xyz", "novelbin.com", "novelbin.me", "novelbin.net"],
       "status": "browser-only",
       "fetchMode": "browser",
-      "verified": "novelbin.xyz loads in a real browser. The JSON CDN (boxnovela.b-cdn.net) returns 403 to plain HTTP but works from inside the page. novelbin.com/.me return 503.",
+      "verified": "Verified 2026-11-22 through the in-app browser: discovery (1,432 chapters for LotM) and chapter downloads work. The JSON CDN returns 403 to plain HTTP but works from inside the page. novelbin.com/.me return 503.",
       "input": {
         "novelUrl": "^https?://(www\\.)?novelbin\\.[a-z]+/(novel|b|novel-book)/(?<slug>[a-z0-9-]+)/?$",
-        "chapterUrl": "^https?://(www\\.)?novelbin\\.[a-z]+/(read|b|novel-book)/(?<slug>[a-z0-9-]+)/chapter-(?<num>\\d+)"
+        "chapterUrl": "^https?://(www\\.)?novelbin\\.[a-z]+/(read|b|novel-book)/(?<slug>[a-z0-9-]+)/chapter-(?<num>\\d+)",
+        "novelFromChapter": "slug -> {origin}/novel/{slug}"
       },
       "novel": {
         "api": "https://boxnovela.b-cdn.net/novel/{slug}.json",
@@ -94,7 +95,7 @@
       "domains": ["royalroad.com"],
       "status": "browser-only",
       "fetchMode": "browser",
-      "verified": "Parsers verified on saved pages. curl gets 200, but Cloudflare serves 'Just a moment...' (403) to Go's HTTP client, so it uses the in-app browser.",
+      "verified": "Verified 2026-11-22 through the in-app browser (chapters 1-4 downloaded, decoy paragraphs removed). Cloudflare serves 'Just a moment...' (403) to Go's HTTP client.",
       "input": {
         "novelUrl": "^https?://(www\\.)?royalroad\\.com/fiction/(?<id>\\d+)(/[^/]+)?/?$",
         "chapterUrl": "^https?://(www\\.)?royalroad\\.com/fiction/(?<id>\\d+)/[^/]+/chapter/\\d+",
@@ -185,7 +186,7 @@
       "domains": ["novelfire.net", "novelphoenix.com", "readnovel.site"],
       "status": "partial",
       "fetchMode": "http+browser",
-      "verified": "Novel and TOC pages work over plain HTTP. Chapter pages send non-browsers to a JS 'Loading...' page (readnovel.site), which then redirects to the mirror novelphoenix.com. That works in a real browser.",
+      "verified": "Verified 2026-11-22: TOC over plain HTTP, chapters through the in-app browser. Chapter pages send non-browsers to a JS 'Loading...' page (readnovel.site), which then redirects to the mirror novelphoenix.com. That works in a real browser.",
       "input": {
         "novelUrl": "^https?://(www\\.)?novelfire\\.net/book/(?<slug>[a-z0-9-]+)/?$",
         "chapterUrl": "^https?://(www\\.)?(novelfire\\.net/book|novelphoenix\\.com/novel)/(?<slug>[a-z0-9-]+)/chapter-(?<num>\\d+)",
@@ -218,7 +219,7 @@
       "domains": ["webnovel.com"],
       "status": "browser-only",
       "fetchMode": "browser",
-      "verified": "Cloudflare serves 'Just a moment...' (403) to Go's HTTP client, so it uses the in-app browser. The book page has og: metadata. The catalog is at /book/{id}/catalog. Most later chapters are paid or locked, so only free chapters can be saved.",
+      "verified": "Verified 2026-11-22 through the in-app browser: catalog (1,274 chapters, 1,239 paid and skipped) and free chapters download. Cloudflare serves 'Just a moment...' (403) to Go's HTTP client. The catalog is at /book/{id}/catalog. Most later chapters are paid or locked, so only free chapters can be saved.",
       "input": {
         "novelUrl": "^https?://(www\\.)?webnovel\\.com/book/(?:[a-z0-9-]+_)?(?<id>\\d+)/?$",
         "chapterUrl": "^https?://(www\\.)?webnovel\\.com/book/(?:[a-z0-9-]+_)?(?<id>\\d+)/(?:[a-z0-9-]+_)?\\d+",
@@ -231,13 +232,13 @@
         "description": "meta[property='og:description']@content",
         "tags": "meta[property='og:tag']@content"
       },
-      "toc": { "strategy": "inline", "pageUrl": "{novelUrl}/catalog", "items": ".volume-item li a", "lockedMarker": "svg._icon_lock, .j_lock" },
+      "toc": { "strategy": "inline", "pageUrl": "{novelUrl}/catalog", "items": ".volume-item li a:has(i._num)", "lockedMarker": "svg._icon", "notes": "Volume 0 (auxiliary) entries have no number and are skipped. A lock icon marks paid chapters." },
       "chapter": {
         "title": ".cha-tit h1",
         "content": ".cha-words",
-        "remove": ["script", ".cha-bts"],
+        "remove": ["script", ".cha-bts", ".para-comment", "[class*='j_para_comment']", ".cha-paragraph .pr > :not(p)"],
         "next": "link[rel=next]@href",
-        "notes": "Selectors still need confirming in the browser; the catalog layout loads client-side. Locked chapters show a paywall, so detect it and mark them 'locked'."
+        "notes": "Verified 2026-11-22 through the in-app browser. Paid chapters are marked locked from the catalog and skipped."
       }
     },
     {

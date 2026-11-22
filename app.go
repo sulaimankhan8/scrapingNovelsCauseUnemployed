@@ -12,6 +12,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"novelarchiver/internal/archiver"
+	"novelarchiver/internal/browser"
 	"novelarchiver/internal/fetch"
 	"novelarchiver/internal/library"
 	"novelarchiver/internal/sites"
@@ -24,6 +25,7 @@ type App struct {
 	store   *library.Store
 	engine  *source.Engine
 	arch    *archiver.Archiver
+	browser *browser.Window
 	initErr error
 
 	mu       sync.Mutex
@@ -54,11 +56,47 @@ func NewApp() *App {
 	httpF := fetch.NewHTTP(fetch.Options{})
 	a.store = store
 	a.engine = &source.Engine{Registry: reg, HTTP: httpF}
+	// Real-browser fetcher for sites that refuse plain HTTP. Its cookies live
+	// next to the library so a passed human check is remembered.
+	if win, err := browser.New(browser.Options{
+		DataPath: filepath.Join(filepath.Dir(store.Root), "SiteBrowser"),
+		OnStatus: func(msg string) { a.emit("status", map[string]any{"message": msg}) },
+		OnChallenge: func(host string) {
+			a.emit("challenge", map[string]any{"host": host,
+				"message": "Please complete the 'Verify you are human' check in the NovelArchiver site browser window. The download continues automatically."})
+		},
+	}); err == nil {
+		a.browser = win
+		a.engine.Browser = win
+	}
 	a.arch = &archiver.Archiver{Engine: a.engine, Store: store, Files: httpF}
 	return a
 }
 
 func (a *App) startup(ctx context.Context) { a.ctx = ctx }
+
+func (a *App) shutdown(context.Context) {
+	a.mu.Lock()
+	if a.cancel != nil {
+		a.cancel()
+	}
+	a.mu.Unlock()
+	if a.browser != nil {
+		a.browser.Close()
+	}
+}
+
+// OpenSiteBrowser shows the site browser window at url, so the user can
+// complete a human check or sign in before downloading.
+func (a *App) OpenSiteBrowser(url string) error {
+	if a.browser == nil {
+		return browser.ErrUnsupported
+	}
+	if url != "" && !strings.HasPrefix(url, "https://") && !strings.HasPrefix(url, "http://") {
+		return errors.New("enter a full https:// link")
+	}
+	return a.browser.Show(url)
+}
 
 func (a *App) emit(event string, data any) {
 	if a.ctx != nil {
@@ -456,8 +494,12 @@ func (a *App) fail(ctx context.Context, err error) {
 // friendly turns engine errors into messages a reader understands.
 func friendly(err error) error {
 	switch {
-	case errors.Is(err, fetch.ErrNeedsBrowser):
-		return fmt.Errorf("%v. In-app browser mode isn't built yet; this site will work once it is", err)
+	case errors.Is(err, fetch.ErrNeedsBrowser), errors.Is(err, browser.ErrUnsupported):
+		return fmt.Errorf("%v. The site browser isn't available on this platform yet", err)
+	case errors.Is(err, browser.ErrChallengeTimeout):
+		return errors.New("the site's 'Verify you are human' check wasn't completed. Press Update to try again")
+	case errors.Is(err, browser.ErrClosed):
+		return errors.New("the site browser window was closed. Press Update to resume; it reopens automatically")
 	case errors.Is(err, fetch.ErrBlocked):
 		return errors.New("the site showed a bot check or refused access. Open it in your browser to confirm it works, then try again")
 	}

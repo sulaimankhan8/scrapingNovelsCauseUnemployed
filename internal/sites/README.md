@@ -34,19 +34,24 @@ The user can paste **either the novel description page or any chapter page**, in
 
 The app never tries to bypass a bot check. Sites marked `browser` / `human-check` open in a visible in-app browser window. The user ticks the checkbox themselves. The app then reads pages through that same browser session at a polite rate.
 
-## Verification log (2026-11-22)
+## Verification log (2026-11-22, live downloads)
 
-| Site | Novel page | Chapter page | TOC | Notes |
-|---|---|---|---|---|
-| NovelBin | browser | browser | JSON API | The JSON CDN gives 403 to plain HTTP but works in-page. `.com`/`.me` are down (503). |
-| NovelFull | ✅ http | ✅ http | 29 pages × 50 | Ad iframes inside the content. |
-| ReadNovelFull | ✅ http | ✅ http | ✅ 1 ajax call, 1,432 chapters | |
-| Royal Road | ✅ http | ✅ http | ✅ inline | Hidden decoy paragraphs, randomised classes. |
-| WuxiaWorld | ✅ http | ✅ http | next-link via embedded JSON | Paid chapters are locked. |
-| FreeWebNovel | ✅ http | ✅ http | sequential 1..N from og meta | |
-| NovelFire | ✅ http | browser (→ novelphoenix.com) | ✅ paginated ×100 | Mirror domain-hopping. |
-| Webnovel | ✅ http | to confirm | `/catalog` | Most chapters paid. |
-| EmpireNovel | human-check | human-check | to capture | Selectors TODO. |
-| ScribbleHub | human-check | human-check | ajax | Selectors from the known layout, need confirming. |
+| Site | How it's fetched | Result |
+|---|---|---|
+| NovelFull | plain HTTP | ✅ list (1,432) + chapters |
+| ReadNovelFull | plain HTTP | ✅ list (1,432, one ajax call) + chapters |
+| FreeWebNovel | plain HTTP | ✅ list (776, sequential) + chapters |
+| WuxiaWorld | plain HTTP | ✅ follows "next" links; paid chapters stop the crawl |
+| NovelBin | site browser (JSON CDN via in-page fetch) | ✅ list (1,432) + chapters, system boxes kept |
+| NovelFire | list over HTTP, chapters in site browser | ✅ |
+| Royal Road | site browser | ✅ list + chapters, decoy lines removed |
+| Webnovel | site browser | ✅ catalog (1,274; 1,239 paid skipped) + free chapters |
+| EmpireNovel | site browser | ⏳ Cloudflare checkbox; needs one manual tick, then selectors to confirm |
+| ScribbleHub | site browser | ⏳ same as EmpireNovel |
 
-Test URLs for each site are in the `urls` list in `PLAN.md` (§ Site parsers).
+To fix or add a site, save the page as the engine sees it and probe it:
+
+```
+go run ./cmd/na dump <url> > page.html
+go run ./cmd/na inspect <url>
+```

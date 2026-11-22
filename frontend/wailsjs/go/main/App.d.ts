@@ -26,6 +26,8 @@ export function OpenExternalURL(arg1:string):Promise<void>;
 
 export function OpenLibraryFolder():Promise<void>;
 
+export function OpenSiteBrowser(arg1:string):Promise<void>;
+
 export function RetryNovel(arg1:string):Promise<Record<string, any>>;
 
 export function StartScrape(arg1:main.ScrapeOptions):Promise<Record<string, any>>;

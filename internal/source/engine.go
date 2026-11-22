@@ -73,7 +73,7 @@ func (e *Engine) Discover(ctx context.Context, input string, status StatusFunc) 
 			n.Warnings = append(n.Warnings, p.Name+" chapters only load in a real browser. In-app browser mode is still being built, so chapter downloads from this site will fail for now.")
 		}
 		if p.Status == "human-check" {
-			n.Warnings = append(n.Warnings, p.Name+" shows a 'Verify you are human' check. You'll need to tick it once in the in-app browser.")
+			n.Warnings = append(n.Warnings, p.Name+" may show a 'Verify you are human' check. If it does, the site browser window pops up so you can tick it once; it's remembered after that.")
 		}
 	} else {
 		n.SiteID, n.SiteName = "generic", hostOf(m.URL)
@@ -170,7 +170,9 @@ func (e *Engine) novelFromChapter(ctx context.Context, p *sites.Profile, m *site
 	}
 	// "slug -> template" / "id -> template".
 	if i := strings.Index(rule, " -> "); i >= 0 {
-		return sites.Expand(strings.TrimSpace(rule[i+4:]), m.Captures), nil, nil
+		vars := copyVars(m.Captures)
+		vars["origin"] = m.Origin()
+		return sites.Expand(strings.TrimSpace(rule[i+4:]), vars), nil, nil
 	}
 	// Otherwise a selector on the chapter page (or generic breadcrumb guess).
 	f, err := e.fetcher(p, "chapter")

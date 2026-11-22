@@ -46,6 +46,7 @@ func main() {
 		},
 		BackgroundColour: &options.RGBA{R: 14, G: 18, B: 22, A: 255},
 		OnStartup:        app.startup,
+		OnShutdown:       app.shutdown,
 		Bind:             []interface{}{app},
 		Windows: &windows.Options{
 			WebviewUserDataPath: filepath.Join(os.Getenv("LOCALAPPDATA"), "NovelArchiver", "WebView2"),
