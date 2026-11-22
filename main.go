@@ -23,8 +23,8 @@ func main() {
 
 	// The offline reader is served in-process at /library/... — no ports.
 	var libHandler http.Handler = http.NotFoundHandler()
-	if app.store != nil {
-		libHandler = &reader.Handler{Store: app.store}
+	if st := app.svc.Store(); st != nil {
+		libHandler = &reader.Handler{Store: st}
 	}
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, "/library/") {

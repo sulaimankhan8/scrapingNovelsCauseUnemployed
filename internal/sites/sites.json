@@ -23,10 +23,11 @@
         "api": "https://boxnovela.b-cdn.net/novel/{slug}.json",
         "fields": {
           "id": "id",
-          "title": "name",
+          "title": "title|name",
           "author": "author",
           "cover": "cover",
-          "description": "description"
+          "description": "description",
+          "status": "status"
         }
       },
       "toc": {

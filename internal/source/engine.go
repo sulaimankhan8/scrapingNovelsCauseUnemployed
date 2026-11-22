@@ -217,9 +217,14 @@ func (e *Engine) readMetadata(ctx context.Context, p *sites.Profile, n *Novel) (
 			return nil, fmt.Errorf("novel API returned invalid JSON: %w", err)
 		}
 		fields, _ := sec["fields"].(map[string]any)
-		get := func(k string) string {
-			key, _ := fields[k].(string)
-			return jsonString(obj[key])
+		get := func(k string) string { // "title|name" tries keys in order
+			keys, _ := fields[k].(string)
+			for _, key := range strings.Split(keys, "|") {
+				if v := jsonString(obj[strings.TrimSpace(key)]); v != "" {
+					return v
+				}
+			}
+			return ""
 		}
 		n.Vars["id"] = get("id")
 		n.Title, n.Author, n.Cover, n.Description = get("title"), get("author"), get("cover"), get("description")

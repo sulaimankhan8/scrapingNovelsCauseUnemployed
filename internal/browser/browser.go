@@ -7,6 +7,7 @@ package browser
 
 import (
 	"errors"
+	"net/url"
 	"regexp"
 	"strings"
 )
@@ -55,4 +56,12 @@ func looksLikeLoader(body string) bool {
 	}
 	m := regexp.MustCompile(`(?is)<title>(.*?)</title>`).FindStringSubmatch(body)
 	return m != nil && isInterstitial(m[1])
+}
+
+func origin(u string) string {
+	p, err := url.Parse(u)
+	if err != nil {
+		return ""
+	}
+	return p.Scheme + "://" + p.Host
 }

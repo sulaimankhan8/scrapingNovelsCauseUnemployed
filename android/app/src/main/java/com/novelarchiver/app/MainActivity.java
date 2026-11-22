@@ -4,153 +4,208 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.webkit.WebViewAssetLoader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import com.novelarchiver.core.mobile.Core;
+import com.novelarchiver.core.mobile.Mobile;
+import com.novelarchiver.core.mobile.Response;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Hosts the shared frontend in a WebView. All app logic runs in the Go core
+ * (the same code as the desktop app): /library/... reader pages are rendered
+ * by core.serve(), and page calls go through NovelBridge to core.call().
+ */
 public class MainActivity extends AppCompatActivity {
+    static final String HOST = "appassets.androidplatform.net";
+    private static final String TAG = "NovelArchiver";
 
     private WebView webView;
-    private NovelBridge novelBridge;
-    private WebViewAssetLoader assetLoader;
+    private FrameLayout siteBrowserPanel;
+    private SiteBrowser siteBrowser;
+    private NovelBridge bridge;
+    private Core core;
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Ensure novels directory exists in internal storage
-        File novelsDir = new File(getFilesDir(), "novels");
-        if (!novelsDir.exists()) {
-            novelsDir.mkdirs();
-        }
-        if (novelsDir.list() == null || novelsDir.list().length == 0) {
-            copyAssetFolder("novels", novelsDir);
-        }
-
+        FrameLayout root = new FrameLayout(this);
         webView = new WebView(this);
-        setContentView(webView);
-
-        WebSettings settings = webView.getSettings();
-        settings.setJavaScriptEnabled(true);
-        settings.setDomStorageEnabled(true);
-        settings.setDatabaseEnabled(true);
-        settings.setAllowFileAccess(true);
-        settings.setAllowContentAccess(true);
-        settings.setLoadsImagesAutomatically(true);
-        settings.setMediaPlaybackRequiresUserGesture(false);
-
-        // Dark background matching bibliotheca theme
         webView.setBackgroundColor(0xFF0E1216);
+        root.addView(webView, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        // Configure modern in-process WebViewAssetLoader (Zero open ports, zero localhost)
-        assetLoader = new WebViewAssetLoader.Builder()
-                .setDomain("appassets.androidplatform.net")
-                .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
-                .addPathHandler("/novels/", new WebViewAssetLoader.InternalStoragePathHandler(this, novelsDir))
-                .build();
+        // Site browser overlay: hidden until a site needs the user (human check).
+        siteBrowserPanel = new FrameLayout(this);
+        siteBrowserPanel.setVisibility(View.GONE);
+        siteBrowserPanel.setBackgroundColor(0xFF121417);
+        LinearLayout column = new LinearLayout(this);
+        column.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout bar = new LinearLayout(this);
+        bar.setGravity(Gravity.CENTER_VERTICAL);
+        bar.setPadding(24, 12, 12, 12);
+        TextView label = new TextView(this);
+        label.setText("Site browser: complete any check, then tap Hide");
+        label.setTextColor(0xFFE7E2D9);
+        bar.addView(label, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        Button hide = new Button(this);
+        hide.setText("Hide");
+        hide.setOnClickListener(v -> siteBrowserPanel.setVisibility(View.GONE));
+        bar.addView(hide);
+        column.addView(bar);
+        WebView siteView = new WebView(this);
+        column.addView(siteView, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
+        siteBrowserPanel.addView(column);
+        root.addView(siteBrowserPanel, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        setContentView(root);
+        // Android 15+ draws edge-to-edge: keep content clear of the status
+        // and navigation bars.
+        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars()
+                    | WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.ime());
+            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
+
+        siteBrowser = new SiteBrowser(this, siteView, siteBrowserPanel);
+
+        WebSettings s = webView.getSettings();
+        s.setJavaScriptEnabled(true);
+        s.setDomStorageEnabled(true);
+        s.setAllowFileAccess(false);
+        s.setAllowContentAccess(false);
+
+        bridge = new NovelBridge(this, webView);
+        try {
+            File library = new File(getFilesDir(), "library");
+            core = Mobile.new_(library.getAbsolutePath(), bridge, siteBrowser);
+            bridge.setCore(core);
+        } catch (Exception e) {
+            Log.e(TAG, "core start failed", e);
+        }
+        webView.addJavascriptInterface(bridge, "NovelBridge");
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 Uri url = request.getUrl();
-                String path = url.getPath();
-
-                // Custom handler for /novels/... requests from relative reader links
-                if (path != null && path.startsWith("/novels/")) {
-                    File file = new File(novelsDir, path.substring("/novels/".length()));
-                    if (file.exists() && file.isFile()) {
-                        try {
-                            String mime = "text/html";
-                            if (path.endsWith(".css")) mime = "text/css";
-                            else if (path.endsWith(".js")) mime = "application/javascript";
-                            else if (path.endsWith(".json")) mime = "application/json";
-                            else if (path.endsWith(".png")) mime = "image/png";
-                            else if (path.endsWith(".jpg") || path.endsWith(".jpeg")) mime = "image/jpeg";
-                            return new WebResourceResponse(mime, "UTF-8", new FileInputStream(file));
-                        } catch (Exception ignored) {}
-                    }
+                if (!HOST.equals(url.getHost())) return null;
+                String path = url.getPath() == null ? "/" : url.getPath();
+                if (path.startsWith("/library/")) {
+                    return serveLibrary(path);
                 }
-
-                return assetLoader.shouldInterceptRequest(request.getUrl());
+                return serveAsset(path);
             }
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                String url = request.getUrl().toString();
-                if (url.startsWith("https://appassets.androidplatform.net/")) {
-                    return false; // Load inside WebView
-                }
-                // External links open in default browser
+                Uri url = request.getUrl();
+                if (HOST.equals(url.getHost())) return false;
                 try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    startActivity(intent);
-                } catch (Exception ignored) {}
+                    startActivity(new Intent(Intent.ACTION_VIEW, url));
+                } catch (Exception ignored) {
+                }
                 return true;
             }
         });
 
-        novelBridge = new NovelBridge(this, webView, novelsDir);
-        webView.addJavascriptInterface(novelBridge, "AndroidBridge");
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (siteBrowserPanel.getVisibility() == View.VISIBLE) {
+                    siteBrowserPanel.setVisibility(View.GONE);
+                } else if (webView.canGoBack()) {
+                    webView.goBack();
+                } else {
+                    finish();
+                }
+            }
+        });
 
-        // Load embedded responsive frontend
-        webView.loadUrl("https://appassets.androidplatform.net/assets/frontend/index.html");
+        webView.loadUrl("https://" + HOST + "/");
     }
 
-    @Override
-    public void onBackPressed() {
-        if (webView.canGoBack()) {
-            webView.goBack();
-        } else {
-            super.onBackPressed();
+    private WebResourceResponse serveLibrary(String path) {
+        if (core == null) return text(503, "The library could not start.");
+        try {
+            Response r = core.serve(path);
+            WebResourceResponse resp = new WebResourceResponse(r.getMimeType(), "UTF-8",
+                    new ByteArrayInputStream(r.getBody()));
+            resp.setStatusCodeAndReasonPhrase((int) r.getStatus(), r.getStatus() == 200 ? "OK" : "Error");
+            return resp;
+        } catch (Exception e) {
+            return text(500, e.toString());
         }
     }
 
-    private void copyAssetFolder(String assetSubDir, File targetDir) {
+    /** The shared frontend/ folder is packaged as the APK's asset root. */
+    private WebResourceResponse serveAsset(String path) {
+        String asset = path.equals("/") ? "index.html" : path.substring(1);
+        if (asset.contains("..")) return text(404, "Not found");
         try {
-            String[] files = getAssets().list(assetSubDir);
-            if (files != null && files.length > 0) {
-                targetDir.mkdirs();
-                for (String file : files) {
-                    String subPath = assetSubDir + "/" + file;
-                    File outFile = new File(targetDir, file);
-                    String[] subFiles = getAssets().list(subPath);
-                    if (subFiles != null && subFiles.length > 0) {
-                        copyAssetFolder(subPath, outFile);
-                    } else {
-                        try (InputStream in = getAssets().open(subPath);
-                             OutputStream out = new FileOutputStream(outFile)) {
-                            byte[] buffer = new byte[8192];
-                            int read;
-                            while ((read = in.read(buffer)) != -1) {
-                                out.write(buffer, 0, read);
-                            }
-                        } catch (Exception ignored) {}
-                    }
-                }
-            }
-        } catch (Exception ignored) {}
+            InputStream in = getAssets().open(asset);
+            return new WebResourceResponse(mimeFor(asset), "UTF-8", in);
+        } catch (Exception e) {
+            return text(404, "Not found");
+        }
+    }
+
+    private static final Map<String, String> MIME = new HashMap<>();
+    static {
+        MIME.put("html", "text/html");
+        MIME.put("js", "application/javascript");
+        MIME.put("css", "text/css");
+        MIME.put("json", "application/json");
+        MIME.put("svg", "image/svg+xml");
+    }
+
+    private static String mimeFor(String name) {
+        String ext = MimeTypeMap.getFileExtensionFromUrl(name);
+        String m = MIME.get(ext);
+        if (m == null) m = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
+        return m == null ? "application/octet-stream" : m;
+    }
+
+    private static WebResourceResponse text(int code, String msg) {
+        WebResourceResponse r = new WebResourceResponse("text/plain", "UTF-8",
+                new ByteArrayInputStream(msg.getBytes()));
+        r.setStatusCodeAndReasonPhrase(code, code == 404 ? "Not Found" : "Error");
+        return r;
     }
 
     @Override
     protected void onDestroy() {
-        if (novelBridge != null) {
-            novelBridge.cancelTask();
-        }
-        if (webView != null) {
-            webView.destroy();
-        }
+        if (core != null) core.shutdown();
+        if (bridge != null) bridge.close();
+        if (webView != null) webView.destroy();
         super.onDestroy();
     }
 }

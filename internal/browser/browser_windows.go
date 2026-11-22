@@ -6,7 +6,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"runtime"
 	"strconv"
 	"sync"
@@ -216,13 +215,6 @@ func (b *Window) polite(ctx context.Context) error {
 	}
 }
 
-func origin(u string) string {
-	p, err := url.Parse(u)
-	if err != nil {
-		return ""
-	}
-	return p.Scheme + "://" + p.Host
-}
 
 // Get implements fetch.Fetcher. If the window is already on the target's
 // origin (or the referer's, for cross-origin API calls) it uses the page's

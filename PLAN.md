@@ -210,6 +210,24 @@ For Cloudflare sites the window becomes visible so the **user** can tick "Verify
 
 All 10 sites now download (verified live 2026-11-22). EmpireNovel shows a Cloudflare check, which the user ticks once in the site browser window.
 
+**Android on the shared core (done 2026-11-22):**
+- `internal/service` holds the app logic. Desktop `app.go` and Android `mobile/` are thin wrappers around it.
+- `gomobile bind ./mobile` produces `android/app/libs/core.aar`.
+- The Android shell (about 400 lines of Java) does three things:
+  - Serves the shared `frontend/` and Go-rendered `/library/...` pages.
+  - Bridges page calls through `android-shim.js` to `Core.call()`.
+  - Implements the browser primitives on a WebView overlay (`SiteBrowser`); the strategy lives in Go (`internal/browser/driven.go`).
+- The old Java scraper is deleted.
+- Verified on an Android emulator (16 KB pages):
+  - FreeWebNovel download from a chapter link.
+  - NovelBin through the WebView site browser: 274 chapters, 0 failures.
+  - Reader with system boxes.
+  - Airplane-mode reading.
+- Royal Road showed the emulator a Cloudflare check, which waits for the user, as designed.
+
+Build: `.uild_apk.ps1` (needs the Android NDK; `sdkmanager ndk/29.0.14206865`).
+
 **Next:**
-1. Android on the shared core (phase 4). The Android WebView can be the browser fetcher there.
+1. Test on a real phone (Cloudflare usually lets real devices through).
 2. EPUB export.
+3. Release-signed APK.

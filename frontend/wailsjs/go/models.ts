@@ -1,4 +1,4 @@
-export namespace main {
+export namespace service {
 	
 	export class ChapterRow {
 	    number: number;
