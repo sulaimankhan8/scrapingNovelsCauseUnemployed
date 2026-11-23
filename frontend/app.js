@@ -131,12 +131,15 @@
   }, true);
 
   // ---------------------------------------------------------------- backend
-  async function bridge() {
+  // Wait for the bridge. Never resolve a promise with the App object itself:
+  // on Android it is a Proxy, and a value with a "then" looks like a promise.
+  async function bridgeReady() {
     for (let i = 0; i < 100 && !(window.go && window.go.main && window.go.main.App); i++) await sleep(30);
-    return window.go && window.go.main && window.go.main.App;
+    return !!(window.go && window.go.main && window.go.main.App);
   }
   async function api(name, ...args) {
-    const app = await bridge();
+    const ok = await bridgeReady();
+    const app = ok ? window.go.main.App : null;
     if (!app || typeof app[name] !== 'function') throw new Error('This action isn\'t available in this version of the app.');
     try {
       return await app[name](...args);
@@ -380,7 +383,7 @@
     const r = route();
     const key = r.name + (r.slug || '');
     const main = $('#main');
-    $('#settingsBtn').toggleAttribute('aria-current', r.name === 'settings');
+    const sb = $('#settingsBtn'); if (r.name === 'settings') sb.setAttribute('aria-current', 'page'); else sb.removeAttribute('aria-current');
     if (r.name === 'settings') renderSettings(main);
     else if (r.name === 'novel') renderNovelPage(main, r.slug);
     else renderLibraryPage(main);

@@ -138,7 +138,8 @@ p { margin: 0; }
   width: 44px; height: 44px; display: inline-grid; place-items: center; flex: none;
   border: 1px solid transparent; border-radius: var(--r); background: transparent; color: var(--ink);
 }
-.icon-btn:hover { background: var(--sunk-2); }
+@media (hover: hover) { .icon-btn:hover { background: var(--sunk-2); } }
+.top a.icon-btn, .top a.icon-btn:hover { color: var(--ink); }
 .icon-btn--line { border-color: var(--line-strong); background: var(--card); }
 .icon-btn--sm { width: 36px; height: 36px; border-radius: var(--r-sm); }
 
