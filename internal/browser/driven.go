@@ -166,7 +166,8 @@ func (b *Driven) inPageFetch(ctx context.Context, rawURL string) (*fetch.Page, e
 }
 
 // navigate loads a page, waits out loaders, and gives the user time to
-// complete a human check (never automated).
+// complete a human check (never automated). A page only counts as loaded
+// when neither its title nor its content is a human check.
 func (b *Driven) navigate(ctx context.Context, rawURL string, wantHTML bool) (*fetch.Page, error) {
 	raw, err := b.d.Load(rawURL)
 	if err != nil {
@@ -175,16 +176,49 @@ func (b *Driven) navigate(ctx context.Context, rawURL string, wantHTML bool) (*f
 	info := decode(raw)
 	deadline := time.Now().Add(20 * time.Second)
 	challenged := false
-	for isChallenge(info.Title) || isInterstitial(info.Title) {
-		if isChallenge(info.Title) && !challenged {
-			challenged = true
-			deadline = time.Now().Add(3 * time.Minute)
-			b.d.Show(true)
-			if b.opts.OnStatus != nil {
-				b.opts.OnStatus("This site wants you to confirm you're human. Complete the check in the site browser.")
-			}
-			if b.opts.OnChallenge != nil {
-				b.opts.OnChallenge(origin(rawURL))
+	challenge := func() {
+		if challenged {
+			return
+		}
+		challenged = true
+		deadline = time.Now().Add(3 * time.Minute)
+		b.d.Show(true)
+		if b.opts.OnStatus != nil {
+			b.opts.OnStatus("This site wants you to confirm you're human. Complete the check in the site browser.")
+		}
+		if b.opts.OnChallenge != nil {
+			b.opts.OnChallenge(origin(rawURL))
+		}
+	}
+	for {
+		switch {
+		case isChallenge(info.Title):
+			challenge()
+		case isInterstitial(info.Title):
+			// loader page that moves on by itself
+		default:
+			if raw, err := b.d.Capture(); err == nil {
+				p := decode(raw)
+				if challengeBody(p.Body) {
+					challenge()
+				} else if p.Body != "" {
+					if challenged {
+						b.d.Show(false)
+						if b.opts.OnStatus != nil {
+							b.opts.OnStatus("Check passed; continuing.")
+						}
+						time.Sleep(1500 * time.Millisecond) // let the real page finish after the check
+						if raw2, err := b.d.Capture(); err == nil {
+							if p2 := decode(raw2); p2.Body != "" && !challengeBody(p2.Body) {
+								p = p2
+							}
+						}
+					}
+					if !wantHTML {
+						return &fetch.Page{URL: p.URL, Status: 200}, nil
+					}
+					return &fetch.Page{URL: p.URL, Status: 200, Body: []byte(p.Body)}, nil
+				}
 			}
 		}
 		if time.Now().After(deadline) {
@@ -200,25 +234,4 @@ func (b *Driven) navigate(ctx context.Context, rawURL string, wantHTML bool) (*f
 		}
 		info = decode(b.d.Current())
 	}
-	if challenged {
-		b.d.Show(false)
-		time.Sleep(1500 * time.Millisecond) // let the real page finish after the check
-	}
-	if !wantHTML {
-		return &fetch.Page{URL: info.URL, Status: 200}, nil
-	}
-	var lastErr error
-	for attempt := 0; attempt < 3; attempt++ {
-		raw, err := b.d.Capture()
-		if err == nil {
-			p := decode(raw)
-			if p.Body != "" {
-				return &fetch.Page{URL: p.URL, Status: 200, Body: []byte(p.Body)}, nil
-			}
-			err = fmt.Errorf("empty page")
-		}
-		lastErr = err
-		time.Sleep(time.Second)
-	}
-	return nil, fmt.Errorf("couldn't read the page from the browser: %v", lastErr)
 }

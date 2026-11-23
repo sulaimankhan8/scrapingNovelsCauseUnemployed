@@ -502,7 +502,8 @@
     if (/404|doesn't exist/i.test(m)) return { title: 'That page doesn’t exist.', body: 'Check the link, or paste the novel’s main page or any of its chapters.' };
     if (/bot check|refused|blocked/i.test(m)) return { title: `${host} refused the request.`, body: 'Open the site in your browser to check it works, then try again.' };
     if (/no chapters|not a novel|list|couldn't find|could not find|no novel/i.test(m)) return { title: 'That doesn’t look like a novel page.', body: 'Open the novel you want and paste its page, or any of its chapters.' };
-    return { title: 'Couldn’t read that link.', body: m };
+    if (/browser fetch failed|failed to fetch/i.test(m)) return { title: `${host} didn’t answer.`, body: 'It may be down or blocking the app right now. Try again in a minute, or paste the link from a different mirror of the site.' };
+    return { title: 'Couldn’t read that link.', body: explainJobError(m, url) };
   }
   function cancelIntake() {
     state.intake.token++;
@@ -742,6 +743,19 @@
     return `<div class="card job" data-key="cur-${cur.id}" aria-live="polite">${jobHead(cur, pill)}${bar}${line}${notice}${log}<div class="job__foot">${foot}</div></div>`;
   }
   function cap(m) { m = String(m || ''); return m.charAt(0).toUpperCase() + m.slice(1); }
+  // Turn engine errors into something a reader can act on. Raw links are
+  // shortened so they never dominate the card.
+  function explainJobError(msg, url) {
+    const m = String(msg || '');
+    const site = hostOf(url) || (m.match(/https?:\/\/([^/\s)]+)/) || [])[1] || 'the site';
+    if (/no chapter text found/i.test(m)) {
+      const ch = (m.match(/chapter (\d+)/i) || [])[1];
+      return `Couldn’t find the text of ${ch ? 'chapter ' + num(+ch) : 'a chapter'} on ${site.replace(/^www\./, '')}. If it showed a “Verify you are human” check, finish it in the site window, then press Try again.`;
+    }
+    if (/browser fetch failed|failed to fetch/i.test(m)) return `${site.replace(/^www\./, '')} didn’t answer from inside the site window. Check your connection, then try again.`;
+    if (/verify you are human|check wasn't completed|challenge/i.test(m)) return `The “Verify you are human” check wasn’t finished in time. Press Try again and tick it in the site window.`;
+    return cap(m.replace(/https?:\/\/\S{60,}/g, (u) => u.slice(0, 48) + '…'));
+  }
   function trimMsg(m) { m = String(m || ''); return m.length > 140 ? m.slice(0, 137) + '…' : m; }
 
   function resultCard(r) {
@@ -754,15 +768,15 @@
       const head = jobHead(d, `<span class="pill pill--red"><span class="dot"></span>${upd ? 'Update failed' : 'Stopped'}</span>`);
       let saved = '';
       if (upd) saved = `<div class="job__line"><b>Couldn’t update</b><span>${d.total ? `${num(d.ok)} of ${plural(d.total, 'chapter')} are saved and readable` : ''}</span></div>`;
-      else if (d.ok != null) saved = `<div class="job__line"><b>Stopped${d.total ? ` at ${num(d.ok)} of ${num(d.total)}` : ''}</b><span>${d.ok ? plural(d.ok, 'chapter') + ' are saved' : ''}</span></div>`;
+      else if (d.total) saved = `<div class="job__line"><b>Stopped at ${num(d.ok || 0)} of ${num(d.total)}</b><span>${d.ok ? plural(d.ok, 'chapter') + ' are saved' : ''}</span></div>`;
       return `<div class="card job" data-key="r-${r.id}">${head}${d.total && !upd ? `<div class="bar bar--bad"><i style="--p:${(Math.round(((d.ok || 0) / d.total) * 100)) / 100}"></i></div>` : ''}${saved}
-        <div class="note note--red">${icon('alert', 16)}<span>${esc(cap(d.message))}</span></div>
+        <div class="note note--red">${icon('alert', 16)}<span>${esc(explainJobError(d.message, d.url))}</span></div>
         <div class="job__foot"><span class="spacer"></span>${dismiss}<button type="button" class="btn btn--primary btn--md" data-act="resume" data-rid="${r.id}">Try again</button></div></div>`;
     }
     if (r.type === 'stopped') {
       const head = jobHead(d, `<span class="pill"><span class="dot"></span>Paused</span>`);
       return `<div class="card job" data-key="r-${r.id}">${head}${d.total ? `<div class="bar bar--still"><i style="--p:${(Math.round(((d.ok || 0) / d.total) * 100)) / 100}"></i></div>` : ''}
-        <div class="job__line"><b>${d.total ? `Paused at ${num(d.ok)} of ${num(d.total)}` : 'Paused'}</b><span>Everything so far is saved and readable</span></div>
+        <div class="job__line"><b>${d.kind === 'update' ? 'Update paused' : d.total ? `Paused at ${num(d.ok)} of ${num(d.total)}` : 'Paused'}</b><span>${d.kind === 'update' && d.total ? `${num(d.ok)} of ${plural(d.total, 'chapter')} saved and readable` : 'Everything so far is saved and readable'}</span></div>
         <div class="job__foot"><span class="spacer"></span>${dismiss}<button type="button" class="btn btn--primary btn--md" data-act="resume" data-rid="${r.id}">Resume</button></div></div>`;
     }
     // done

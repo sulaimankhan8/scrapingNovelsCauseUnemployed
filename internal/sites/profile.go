@@ -25,6 +25,10 @@ type Profile struct {
 	Status    string   `json:"status"`
 	FetchMode string   `json:"fetchMode"`
 	Verified  string   `json:"verified,omitempty"`
+	// CanonicalHost, when set, replaces the host of any matching link
+	// (e.g. a mirror domain that is down or that the site's own servers
+	// refuse to serve).
+	CanonicalHost string `json:"canonicalHost,omitempty"`
 
 	Input struct {
 		NovelURL         string `json:"novelUrl"`
@@ -196,12 +200,12 @@ func (r *Registry) Match(raw string) (*Match, error) {
 
 	for _, p := range r.Profiles {
 		if caps := captures(p.chapterRe, u); caps != nil {
-			return &Match{Profile: p, Kind: KindChapter, URL: u, Captures: caps}, nil
+			return &Match{Profile: p, Kind: KindChapter, URL: canonical(p, parsed), Captures: caps}, nil
 		}
 	}
 	for _, p := range r.Profiles {
 		if caps := captures(p.novelRe, u); caps != nil {
-			return &Match{Profile: p, Kind: KindNovel, URL: u, Captures: caps}, nil
+			return &Match{Profile: p, Kind: KindNovel, URL: canonical(p, parsed), Captures: caps}, nil
 		}
 	}
 	// A known domain with an unrecognised path, or an unknown site.
@@ -214,6 +218,17 @@ func (r *Registry) Match(raw string) (*Match, error) {
 		}
 	}
 	return &Match{Kind: KindUnknown, URL: u, Captures: map[string]string{}}, nil
+}
+
+// canonical moves a link onto the profile's canonical host, if it has one.
+func canonical(p *Profile, u *url.URL) string {
+	if p.CanonicalHost == "" {
+		return u.String()
+	}
+	c := *u
+	c.Host = p.CanonicalHost
+	c.Scheme = "https"
+	return c.String()
 }
 
 func captures(re *regexp.Regexp, s string) map[string]string {

@@ -359,15 +359,34 @@ func (b *Window) navigate(ctx context.Context, v *view, rawURL string, wantHTML 
 			if isInterstitial(ev.title) {
 				continue // loader page that redirects by itself
 			}
+			time.Sleep(700 * time.Millisecond) // let client-side rendering finish
+			if !wantHTML {
+				if challenged {
+					b.minimize(v)
+					b.status("Check passed; continuing.")
+				}
+				return &fetch.Page{URL: ev.url, Status: 200}, nil
+			}
+			page, err := b.capture(ctx, v)
+			if err == nil && challengeBody(string(page.Body)) {
+				// Still the check (its title changed while verifying): wait
+				// for the next load.
+				if !challenged {
+					challenged = true
+					deadline = time.After(3 * time.Minute)
+					b.front(v)
+					b.status("This site wants you to confirm you're human. Complete the check in the NovelArchiver site browser window.")
+					if b.opts.OnChallenge != nil {
+						b.opts.OnChallenge(origin(rawURL))
+					}
+				}
+				continue
+			}
 			if challenged {
 				b.minimize(v)
 				b.status("Check passed; continuing.")
 			}
-			time.Sleep(700 * time.Millisecond) // let client-side rendering finish
-			if !wantHTML {
-				return &fetch.Page{URL: ev.url, Status: 200}, nil
-			}
-			return b.capture(ctx, v)
+			return page, err
 		case <-deadline:
 			if challenged {
 				return nil, ErrChallengeTimeout

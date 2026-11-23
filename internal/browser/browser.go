@@ -46,6 +46,24 @@ func isChallenge(title string) bool { return challengeTitle.MatchString(title) }
 // isInterstitial reports a JS redirect/loader page that will move on by itself.
 func isInterstitial(title string) bool { return interstitialTitle.MatchString(title) }
 
+// challengeBody reports whether rendered HTML is still a human-check page.
+// The title alone isn't enough: while Cloudflare's widget says
+// "Verifying...", the page can carry another title, and capturing it then
+// saved the check page as if it were the chapter.
+func challengeBody(body string) bool {
+	head := strings.ToLower(body[:min(len(body), 65536)])
+	for _, m := range []string{
+		"<title>just a moment", "<title>attention required", "challenge-platform",
+		"cf-turnstile", "cf_chl_opt", "performing security verification",
+		"verify you are human", "checking your browser", "ddos-guard",
+	} {
+		if strings.Contains(head, m) {
+			return true
+		}
+	}
+	return false
+}
+
 // looksBlocked inspects an in-page fetch() result.
 func looksBlocked(status int, body string) bool {
 	head := strings.ToLower(body[:min(len(body), 16384)])

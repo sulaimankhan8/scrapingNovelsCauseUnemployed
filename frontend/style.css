@@ -222,6 +222,7 @@ kbd {
 .note--red { background: var(--bad-tint); color: var(--bad-ink); }
 .note--green { background: var(--ok-tint); color: var(--ok-ink); }
 .note strong { font-weight: 600; }
+.note > span, .err-box span, .job__name, .job__line span { min-width: 0; overflow-wrap: anywhere; }
 
 .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); }
 
