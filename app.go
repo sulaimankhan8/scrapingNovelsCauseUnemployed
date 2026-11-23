@@ -128,7 +128,8 @@ func (a *App) GetSettings() service.Settings  { return a.svc.GetSettings() }
 func (a *App) SaveSettings(s service.Settings) (service.Settings, error) {
 	return a.svc.SaveSettings(s)
 }
-func (a *App) UpdateNovel(slug string) (map[string]any, error) { return a.svc.UpdateNovel(slug) }
+func (a *App) UpdateNovel(slug string) (map[string]any, error)  { return a.svc.UpdateNovel(slug) }
+func (a *App) RetryMissing(slug string) (map[string]any, error) { return a.svc.RetryMissing(slug) }
 func (a *App) RedownloadNovel(slug string) (map[string]any, error) {
 	return a.svc.RedownloadNovel(slug)
 }

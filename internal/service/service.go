@@ -445,6 +445,21 @@ func (a *Service) RetryNovel(slug string) (map[string]any, error) {
 	return a.enqueue(&job{Kind: "update", Slug: b.Slug, Title: b.Title, URL: b.URL, Cover: a.coverPath(b)})
 }
 
+// RetryMissing queues a quick job that downloads only the chapters whose
+// last download failed. Saved chapters aren't re-checked and chapters you
+// never chose (a range download) aren't added, so retrying three failed
+// chapters takes seconds, not a full pass over the novel.
+func (a *Service) RetryMissing(slug string) (map[string]any, error) {
+	if err := a.ready(); err != nil {
+		return nil, err
+	}
+	b, err := a.store.Load(slug)
+	if err != nil {
+		return nil, err
+	}
+	return a.enqueue(&job{Kind: "update", Quick: true, Slug: b.Slug, Title: b.Title, URL: b.URL, Cover: a.coverPath(b)})
+}
+
 // UpdateNovel is RetryNovel under the name the new UI uses.
 func (a *Service) UpdateNovel(slug string) (map[string]any, error) { return a.RetryNovel(slug) }
 

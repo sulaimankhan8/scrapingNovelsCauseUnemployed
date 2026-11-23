@@ -176,6 +176,8 @@ func (c *Core) Call(method string, argsJSON string) (string, error) {
 		out, err = c.svc.SaveSettings(st)
 	case "UpdateNovel":
 		out, err = c.svc.UpdateNovel(str(0))
+	case "RetryMissing":
+		out, err = c.svc.RetryMissing(str(0))
 	case "RedownloadNovel":
 		out, err = c.svc.RedownloadNovel(str(0))
 	case "UpdateAll":

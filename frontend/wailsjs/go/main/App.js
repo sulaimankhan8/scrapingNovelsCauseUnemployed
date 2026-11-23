@@ -98,6 +98,10 @@ export function RestoreBackup(arg1) {
   return window['go']['main']['App']['RestoreBackup'](arg1);
 }
 
+export function RetryMissing(arg1) {
+  return window['go']['main']['App']['RetryMissing'](arg1);
+}
+
 export function RetryNovel(arg1) {
   return window['go']['main']['App']['RetryNovel'](arg1);
 }

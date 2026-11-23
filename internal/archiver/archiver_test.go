@@ -59,3 +59,22 @@ func TestTextOfIgnoresMarkupAndImagePaths(t *testing.T) {
 		t.Fatal("changed text must differ")
 	}
 }
+
+func TestSelectChaptersOnlyFailed(t *testing.T) {
+	b := &library.Book{Chapters: []library.Chapter{
+		{Number: 1, State: library.StateOK},
+		{Number: 2, State: library.StateFailed},
+		{Number: 3},
+		{Number: 4, State: library.StateFailed},
+		{Number: 5, State: library.StateLocked},
+	}}
+	a := &Archiver{}
+	idx, cached := a.selectChapters(b, Options{OnlyFailed: true})
+	if len(idx) != 2 || b.Chapters[idx[0]].Number != 2 || b.Chapters[idx[1]].Number != 4 || cached != 0 {
+		t.Fatalf("retry picked %v (cached %d), want chapters 2 and 4", idx, cached)
+	}
+	idx, cached = a.selectChapters(b, Options{})
+	if len(idx) != 3 || cached != 1 {
+		t.Fatalf("update picked %v (cached %d), want 2, 3, 4 and 1 cached", idx, cached)
+	}
+}

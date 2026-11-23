@@ -50,6 +50,8 @@ export function RemoveQueued(arg1:number):Promise<void>;
 
 export function RestoreBackup(arg1:string):Promise<service.RestoreResult>;
 
+export function RetryMissing(arg1:string):Promise<Record<string, any>>;
+
 export function RetryNovel(arg1:string):Promise<Record<string, any>>;
 
 export function SaveSettings(arg1:service.Settings):Promise<service.Settings>;

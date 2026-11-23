@@ -31,7 +31,10 @@ type Options struct {
 	To          int  // last chapter number (0 = last)
 	Concurrency int  // parallel chapter downloads (capped by per-host limit)
 	Force       bool // re-download chapters already saved
-	SkipImages  bool
+	// OnlyFailed downloads just the chapters whose last download failed
+	// (Retry), not chapters that were never chosen (a range download).
+	OnlyFailed bool
+	SkipImages bool
 	// Revise re-reads chapters that are already saved and replaces those
 	// whose text changed on the site: 0 = off, -1 = every chapter,
 	// N > 0 = only the last N saved chapters.
@@ -193,6 +196,9 @@ func (a *Archiver) selectChapters(b *library.Book, opts Options) ([]int, int) {
 	cached := 0
 	for i, c := range b.Chapters {
 		if c.Number < from || c.Number > to || c.State == library.StateLocked {
+			continue
+		}
+		if opts.OnlyFailed && c.State != library.StateFailed {
 			continue
 		}
 		if c.State == library.StateOK && !opts.Force {

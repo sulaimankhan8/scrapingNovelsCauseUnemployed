@@ -25,6 +25,7 @@ type job struct {
 	Cover  string
 	Opts   ScrapeOptions
 	Auto   bool // started by "update all when the app opens"
+	Quick  bool // retry: only chapters that aren't saved; no revision check
 	Added  time.Time
 	Status string
 }
@@ -260,9 +261,13 @@ func (a *Service) runDownload(ctx context.Context, j *job, n *source.Novel, opts
 		From: from, To: opts.EndChapter, Concurrency: opts.Concurrency, Force: opts.Force,
 		SkipImages: opts.SkipImages, NoDone: true, Result: res, Gate: a.gate,
 	}
-	if update {
+	// Re-reading every saved chapter for edits is the slow part of an
+	// update. Only a full Update you start does it; a retry of missing
+	// chapters and the automatic update when the app opens don't.
+	if update && !j.Quick && !j.Auto {
 		ao.Revise = a.GetSettings().reviseCount()
 	}
+	ao.OnlyFailed = j.Quick
 	started := time.Now()
 	if err := a.arch.Run(ctx, b, n, ao, a.emit); err != nil {
 		a.fail(ctx, err, j)
@@ -402,6 +407,17 @@ func (a *Service) UpdateAll(auto bool) (map[string]any, error) {
 			if time.Since(b.CheckedAt) < 12*time.Hour || strings.EqualFold(b.Status, "completed") {
 				continue
 			}
+			// An automatic update that failed or was interrupted (the
+			// phone closed the app, say) waits 12 hours like a finished
+			// one, instead of starting over on every launch.
+			if t, err := time.Parse(time.RFC3339, b.Vars["autoTriedAt"]); err == nil && time.Since(t) < 12*time.Hour {
+				continue
+			}
+			if b.Vars == nil {
+				b.Vars = map[string]string{}
+			}
+			b.Vars["autoTriedAt"] = time.Now().Format(time.RFC3339)
+			_ = a.store.Save(b)
 		}
 		if _, err := a.enqueue(&job{Kind: "update", Slug: b.Slug, Title: b.Title, URL: b.URL, Cover: a.coverPath(b), Auto: auto}); err == nil {
 			n++
