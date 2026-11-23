@@ -41,7 +41,20 @@ font:.9rem/1.5 ui-monospace,"Cascadia Mono",Consolas,monospace}
 ol.steps{padding-left:1.2em;margin:0}
 ol.steps li{margin:0 0 10px}
 footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line)}
-code{font:.9em ui-monospace,Consolas,monospace;background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+code{font:.9em ui-monospace,Consolas,monospace;background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:1px 5px;overflow-wrap:anywhere}
+.install{display:grid;grid-template-columns:repeat(auto-fit,minmax(18rem,1fr));gap:18px}
+.install .card{padding:20px}
+.install h3{display:flex;align-items:center;gap:10px;margin:0 0 4px;font:600 1.15rem var(--serif)}
+.install .why{margin:0 0 14px;color:var(--muted);font-size:.95rem}
+.install ol{padding-left:1.3em;margin:0}
+.install li{margin:0 0 12px;font-size:.98rem}
+.install li small{display:block;color:var(--muted);font-size:.88rem;margin-top:2px}
+.ui{display:inline-block;padding:1px 8px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;background:var(--bg);font-weight:600;font-size:.92em;white-space:nowrap}
+.ui.blue{background:#0067c0;border-color:#0067c0;color:#fff}
+.say{font-style:italic}
+.trust{margin:18px 0 0;padding:16px 18px;border-radius:12px;background:var(--panel);border:1px dashed var(--line);font-size:.95rem;color:var(--muted)}
+.trust strong{color:var(--ink)}
+pre.cmd{margin:8px 0 0;padding:10px 12px;border-radius:8px;background:var(--bg);border:1px solid var(--line);font:.85rem/1.5 ui-monospace,Consolas,monospace;overflow-x:auto;white-space:pre}
 </style>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' aria-hidden='true'%3E%3Crect width='64' height='64' rx='15' fill='%231D1B18'/%3E%3Cpath d='M16 15a3 3 0 0 1 3-3h3v40h-3a3 3 0 0 1-3-3z' fill='%23CDBFA6'/%3E%3Cpath d='M22 12h20a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4H22z' fill='%23F7F3EC'/%3E%3Cpath d='M32 12h8v20l-4-3-4 3z' fill='%23A8431F'/%3E%3C/svg%3E">
 </head>
@@ -56,8 +69,36 @@ code{font:.9em ui-monospace,Consolas,monospace;background:var(--panel);border:1p
     <a class="btn" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/NovelArchiver-android-test.apk">Download for Android <small>test build .apk</small></a>
     <a class="btn" href="https://github.com/sulaimankhan8/novelarchiver">Source code</a>
   </div>
-  <p class="note">Windows 10/11 (uses the built-in WebView2). Android 7+. The Android download is a test build: a later signed release will need a reinstall.</p>
+  <p class="note">Windows 10/11 (uses the built-in WebView2). Android 7+. Windows and Android will warn you the first time, because the app isn’t from an app store: <a href="#install">here’s what to tap, and why</a>.</p>
 </header>
+
+<section id="install">
+  <h2>Installing: about the warnings</h2>
+  <p class="note" style="margin:0 0 18px;font-size:1rem">NovelArchiver is a free, open-source app. It isn’t sold through the Microsoft Store or Google Play, and it isn’t signed with a paid publisher certificate. So the first time you open it, Windows and Android warn about an “unknown publisher” or an “unknown app”. That’s expected. Here’s exactly what you’ll see.</p>
+  <div class="install">
+    <div class="card">
+      <h3><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5 10 4.5v7H3zm0 13 7 1v-7H3zM11 4.4 21 3v8.5H11zm0 15.2L21 21v-8.5H11z"/></svg>Windows</h3>
+      <p class="why">Microsoft Defender SmartScreen blocks apps it hasn’t seen many people run yet.</p>
+      <ol>
+        <li>Your browser may say <span class="say">“NovelArchiver.exe isn’t commonly downloaded”</span>. In Edge choose <span class="ui">⋯</span>, <span class="ui">Keep</span>, then <span class="ui">Keep anyway</span>.<small>In Chrome, choose <span class="ui">Keep</span> on the download.</small></li>
+        <li>Open <code>NovelArchiver.exe</code>. A blue box says <span class="say">“Windows protected your PC”</span>. Click <span class="ui">More info</span>, the small link under the text.</li>
+        <li>The publisher shows as <span class="say">“Unknown publisher”</span>. Click <span class="ui blue">Run anyway</span>.<small>Windows asks once for each new version.</small></li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.6 9.5 19.4 6.4a.4.4 0 1 0-.7-.4l-1.8 3.2A10.8 10.8 0 0 0 12 8.2c-1.8 0-3.5.4-4.9 1L5.3 6a.4.4 0 1 0-.7.4l1.8 3.1A9.5 9.5 0 0 0 1.5 17h21a9.5 9.5 0 0 0-4.9-7.5zM7 14.4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>Android</h3>
+      <p class="why">Android protects you from apps that don’t come from Google Play, so it asks you to allow this one.</p>
+      <ol>
+        <li>Chrome may say <span class="say">“File might be harmful”</span>. Tap <span class="ui">Download anyway</span>.</li>
+        <li>Open the downloaded <code>.apk</code>. If you see <span class="say">“not allowed to install unknown apps from this source”</span>, tap <span class="ui">Settings</span>, turn on <span class="ui">Allow from this source</span>, then go back.</li>
+        <li>Tap <span class="ui">Install</span>. If Google Play Protect warns about an <span class="say">“unsafe app”</span> or an <span class="say">“unknown developer”</span>, tap <span class="ui">More details</span>, then <span class="ui">Install anyway</span>.<small>If it offers to send the app for a scan, either choice is fine.</small></li>
+        <li>Updating? Install the new <code>.apk</code> over the old one. Your library stays.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="trust"><strong>Want to check you have the real file?</strong> Every release lists its SHA-256 fingerprints in <a href="https://github.com/sulaimankhan8/novelarchiver/releases/latest">SHA256SUMS.txt</a>, and all the source code is on GitHub. On Windows, compare with:
+<pre class="cmd">Get-FileHash $HOME\Downloads\NovelArchiver.exe</pre></div>
+</section>
 
 <section>
   <h2>Formatting stays intact</h2>
@@ -94,9 +135,9 @@ code{font:.9em ui-monospace,Consolas,monospace;background:var(--panel);border:1p
 <section>
   <h2>Getting started</h2>
   <ol class="steps">
-    <li>Download and open the app. On Android, allow "Install unknown apps" when asked.</li>
-    <li>Paste a link, for example <code>https://novelfull.com/some-novel.html</code>, and press <strong>Inspect</strong>.</li>
-    <li>Choose all chapters or a range, then <strong>Archive</strong>. Read from your library any time, online or not.</li>
+    <li>Download and open the app (the first time, see <a href="#install">the warnings above</a>).</li>
+    <li>Paste a novel page or any chapter link, for example <code>https://novelfull.com/some-novel.html</code>. The app looks it up straight away.</li>
+    <li>Pick all chapters or a range, then <strong>Download</strong>. Read from your library any time, online or not. <strong>Update</strong> brings in new chapters later.</li>
   </ol>
 </section>
 
