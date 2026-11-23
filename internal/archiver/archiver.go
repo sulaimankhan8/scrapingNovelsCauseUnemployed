@@ -34,6 +34,9 @@ type Options struct {
 	// OnlyFailed downloads just the chapters whose last download failed
 	// (Retry), not chapters that were never chosen (a range download).
 	OnlyFailed bool
+	// Only, when set, limits the download to chapters it returns true for
+	// (catch-up: chapters the site added since the last check).
+	Only       func(c library.Chapter) bool
 	SkipImages bool
 	// Revise re-reads chapters that are already saved and replaces those
 	// whose text changed on the site: 0 = off, -1 = every chapter,
@@ -199,6 +202,9 @@ func (a *Archiver) selectChapters(b *library.Book, opts Options) ([]int, int) {
 			continue
 		}
 		if opts.OnlyFailed && c.State != library.StateFailed {
+			continue
+		}
+		if opts.Only != nil && !opts.Only(c) {
 			continue
 		}
 		if c.State == library.StateOK && !opts.Force {

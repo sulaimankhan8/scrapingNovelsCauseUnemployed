@@ -11,6 +11,7 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -53,6 +54,70 @@ public class NovelBridge implements Events {
 
     void setCore(Core core) {
         this.core = core;
+        DownloadService.onPause = () -> {
+            try {
+                core.call("CancelTask", "[]");
+            } catch (Exception ignored) {
+            }
+        };
+    }
+
+    // ---- background service: follows the queue so downloads keep going
+    // with the app in the background or the screen off.
+    private volatile String jobTitle = "";
+    private volatile String jobKind = "download";
+    private volatile int queued = 0;
+    private long lastShown = 0;
+
+    private void track(String event, String json) {
+        try {
+            switch (event) {
+                case "queue": {
+                    JSONObject a = new JSONObject(json);
+                    JSONObject cur = a.optJSONObject("current");
+                    org.json.JSONArray q = a.optJSONArray("queue");
+                    queued = q == null ? 0 : q.length();
+                    if (cur == null && queued == 0) {
+                        DownloadService.stop(activity);
+                        return;
+                    }
+                    if (cur != null) {
+                        jobTitle = cur.optString("title", "");
+                        jobKind = cur.optString("kind", "download");
+                    }
+                    show("update".equals(jobKind) ? "Checking for new chapters…" : "Getting ready…", 0, 0, true);
+                    break;
+                }
+                case "started": {
+                    JSONObject d = new JSONObject(json);
+                    if (!d.optString("title").isEmpty()) jobTitle = d.optString("title");
+                    show("update".equals(jobKind) ? "Checking for new chapters…" : "Starting…", 0, 0, true);
+                    break;
+                }
+                case "progress": {
+                    JSONObject p = new JSONObject(json);
+                    int c = p.optInt("current"), t = p.optInt("total");
+                    String text = "revising".equals(p.optString("stage"))
+                            ? "Checking saved chapters · " + c + " of " + t
+                            : ("update".equals(jobKind) ? "Getting new chapters · " : "Downloading · ") + c + " of " + t;
+                    show(text, c, t, false);
+                    break;
+                }
+                case "challenge":
+                    show("Needs you: open the app and tick the check", 0, 0, true);
+                    break;
+                default:
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void show(String text, int current, int total, boolean force) {
+        long now = SystemClock.elapsedRealtime();
+        if (!force && now - lastShown < 1000) return;
+        lastShown = now;
+        String more = queued > 0 ? " · " + queued + " more in the queue" : "";
+        DownloadService.show(activity, jobTitle.isEmpty() ? "NovelArchiver" : jobTitle, text + more, current, total);
     }
 
     @JavascriptInterface
@@ -89,6 +154,7 @@ public class NovelBridge implements Events {
     /** Called by the Go core (any thread). */
     @Override
     public void emit(String event, String payloadJSON) {
+        track(event, payloadJSON);
         String js = "window.__naEmit && window.__naEmit(" + JSONObject.quote(event) + ","
                 + JSONObject.quote(payloadJSON) + ")";
         activity.runOnUiThread(() -> webView.evaluateJavascript(js, null));

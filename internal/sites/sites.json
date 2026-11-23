@@ -125,6 +125,46 @@
       }
     },
     {
+      "id": "novelping",
+      "name": "NovelPing",
+      "domains": [
+        "novelping.com"
+      ],
+      "status": "verified",
+      "fetchMode": "http",
+      "verified": "Verified 2026-11-23: novel page, full chapter list from /ajax/chapter-archive (126 of 126 for \"A Borrowed Soul\"), chapter text from #chr-content.",
+      "input": {
+        "novelUrl": "^https?://(www\\.)?novelping\\.com/book/(?<slug>[a-z0-9-]+)/?(?:[?#].*)?$",
+        "chapterUrl": "^https?://(www\\.)?novelping\\.com/book/(?<slug>[a-z0-9-]+)/chapter-[^/?#]+",
+        "novelFromChapter": "slug -> {origin}/book/{slug}"
+      },
+      "novel": {
+        "title": "h3.title, h1",
+        "author": "meta[property='og:novel:author']@content",
+        "cover": ".book img@src",
+        "description": "#novel-description-content",
+        "status": "meta[property='og:novel:status']@content",
+        "id": "[data-novel-id]@data-novel-id"
+      },
+      "toc": {
+        "strategy": "ajax",
+        "url": "{origin}/ajax/chapter-archive?novelId={id}",
+        "items": "li[data-chapter-item] a",
+        "notes": "Same chapter-archive endpoint as ReadNovelFull; the novel page itself only lists the first 30. Items sit inside a <template>."
+      },
+      "chapter": {
+        "title": "a.chr-title@title",
+        "content": "#chr-content",
+        "remove": [
+          "iframe",
+          "script",
+          "div[id^='pf-']",
+          ".ads"
+        ],
+        "next": "a[data-chapter-nav='next']@data-chapter-url"
+      }
+    },
+    {
       "id": "royalroad",
       "name": "Royal Road",
       "domains": [

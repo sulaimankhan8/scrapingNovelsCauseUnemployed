@@ -78,3 +78,16 @@ func TestSelectChaptersOnlyFailed(t *testing.T) {
 		t.Fatalf("update picked %v (cached %d), want 2, 3, 4 and 1 cached", idx, cached)
 	}
 }
+
+func TestSelectChaptersOnly(t *testing.T) {
+	b := &library.Book{Chapters: []library.Chapter{
+		{Number: 1, State: library.StateOK},
+		{Number: 2},
+		{Number: 3},
+	}}
+	a := &Archiver{}
+	idx, _ := a.selectChapters(b, Options{Only: func(c library.Chapter) bool { return c.Number == 3 }})
+	if len(idx) != 1 || b.Chapters[idx[0]].Number != 3 {
+		t.Fatalf("Only picked %v, want chapter 3", idx)
+	}
+}

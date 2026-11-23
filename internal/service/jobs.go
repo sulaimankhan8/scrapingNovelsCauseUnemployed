@@ -17,17 +17,21 @@ import (
 // downloads waits its turn instead of failing with "busy".
 
 type job struct {
-	ID     int
-	Kind   string // "download" or "update"
-	Slug   string
-	Title  string
-	URL    string
-	Cover  string
-	Opts   ScrapeOptions
-	Auto   bool // started by "update all when the app opens"
-	Quick  bool // retry: only chapters that aren't saved; no revision check
-	Added  time.Time
-	Status string
+	ID    int
+	Kind  string // "download" or "update"
+	Slug  string
+	Title string
+	URL   string
+	Cover string
+	Opts  ScrapeOptions
+	Auto  bool // started by "update all when the app opens"
+	Quick bool // retry: only chapters that aren't saved; no revision check
+	// CatchUp: only chapters the site added since the last check (and any
+	// that failed), no revision check. "Get new chapters" and the update
+	// when the app opens.
+	CatchUp bool
+	Added   time.Time
+	Status  string
 }
 
 // QueueItem is one job as the UI sees it.
@@ -264,10 +268,16 @@ func (a *Service) runDownload(ctx context.Context, j *job, n *source.Novel, opts
 	// Re-reading every saved chapter for edits is the slow part of an
 	// update. Only a full Update you start does it; a retry of missing
 	// chapters and the automatic update when the app opens don't.
-	if update && !j.Quick && !j.Auto {
+	if update && !j.Quick && !j.Auto && !j.CatchUp {
 		ao.Revise = a.GetSettings().reviseCount()
 	}
 	ao.OnlyFailed = j.Quick
+	if j.CatchUp && prev != nil {
+		ao.Only = func(c library.Chapter) bool {
+			st, had := snap.keys[chapterKey(c)]
+			return !had || st == library.StateFailed
+		}
+	}
 	started := time.Now()
 	if err := a.arch.Run(ctx, b, n, ao, a.emit); err != nil {
 		a.fail(ctx, err, j)
@@ -328,7 +338,7 @@ func (a *Service) runDownload(ctx context.Context, j *job, n *source.Novel, opts
 		"ok": ok, "failed": failed, "locked": locked, "total": len(b.Chapters),
 		"newChapters": newNums, "fixed": fixed, "added": added, "revised": res.Revised, "checked": res.Checked,
 		"coverChanged": res.CoverChanged && prev != nil, "details": details, "status": b.Status,
-		"removed": removed, "seconds": int(time.Since(started).Seconds()), "auto": j.Auto,
+		"removed": removed, "seconds": int(time.Since(started).Seconds()), "auto": j.Auto, "catchUp": j.CatchUp,
 		"sizeBytes": a.store.Size(b.Slug),
 	})
 }
@@ -419,11 +429,36 @@ func (a *Service) UpdateAll(auto bool) (map[string]any, error) {
 			b.Vars["autoTriedAt"] = time.Now().Format(time.RFC3339)
 			_ = a.store.Save(b)
 		}
-		if _, err := a.enqueue(&job{Kind: "update", Slug: b.Slug, Title: b.Title, URL: b.URL, Cover: a.coverPath(b), Auto: auto}); err == nil {
+		if _, err := a.enqueue(&job{Kind: "update", Slug: b.Slug, Title: b.Title, URL: b.URL, Cover: a.coverPath(b), Auto: auto, CatchUp: auto}); err == nil {
 			n++
 		}
 	}
 	return map[string]any{"queued": n}, nil
+}
+
+// CatchUp queues "get new chapters" for every novel that is still coming
+// out: the chapter list is checked and only chapters added since last time
+// (plus any that failed) are downloaded. Completed novels are skipped, and
+// saved chapters aren't re-read.
+func (a *Service) CatchUp() (map[string]any, error) {
+	if err := a.ready(); err != nil {
+		return nil, err
+	}
+	books, err := a.store.List()
+	if err != nil {
+		return nil, err
+	}
+	n, skipped := 0, 0
+	for _, b := range books {
+		if strings.Contains(strings.ToLower(b.Status), "complet") || (b.URL == "" && b.FirstChapterURL == "") {
+			skipped++
+			continue
+		}
+		if _, err := a.enqueue(&job{Kind: "update", Slug: b.Slug, Title: b.Title, URL: b.URL, Cover: a.coverPath(b), CatchUp: true}); err == nil {
+			n++
+		}
+	}
+	return map[string]any{"queued": n, "skipped": skipped}, nil
 }
 
 func (a *Service) coverPath(b *library.Book) string {

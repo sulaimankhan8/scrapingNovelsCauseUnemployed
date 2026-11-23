@@ -130,6 +130,7 @@ func (a *App) SaveSettings(s service.Settings) (service.Settings, error) {
 }
 func (a *App) UpdateNovel(slug string) (map[string]any, error)  { return a.svc.UpdateNovel(slug) }
 func (a *App) RetryMissing(slug string) (map[string]any, error) { return a.svc.RetryMissing(slug) }
+func (a *App) CatchUp() (map[string]any, error)                 { return a.svc.CatchUp() }
 func (a *App) RedownloadNovel(slug string) (map[string]any, error) {
 	return a.svc.RedownloadNovel(slug)
 }

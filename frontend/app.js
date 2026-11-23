@@ -549,7 +549,7 @@
           <input type="url" id="novelUrl" placeholder="Paste a novel or chapter link" aria-label="Novel or chapter link" autocomplete="off" spellcheck="false" value="${esc(it.url)}" ${looking ? 'readonly' : ''} ${it.phase === 'error' ? 'aria-invalid="true" aria-describedby="intakeErr"' : ''}>
         </label>${btn}
       </form>
-      ${panel || `<p class="hint" data-key="hint">Works with NovelBin, NovelFull, Royal Road, WuxiaWorld, ScribbleHub and 5 more. Other sites open in reader mode.</p>`}`);
+      ${panel || `<p class="hint" data-key="hint">Works with NovelBin, NovelFull, Royal Road, WuxiaWorld, ScribbleHub and 6 more. Other sites open in reader mode.</p>`}`);
     // Attributes don't move a field's live value once it's been typed in.
     const input = $('#novelUrl');
     if (input && input.value !== it.url) input.value = it.url;
@@ -598,6 +598,16 @@
     if (/browser fetch failed|failed to fetch/i.test(m)) return { title: `${host} didn’t answer.`, body: 'It may be down or blocking the app right now. Try again in a minute, or paste the link from a different mirror of the site.' };
     return { title: 'Couldn’t read that link.', body: explainJobError(m, url) };
   }
+  // Android's Back button asks the page first (MainActivity). Close the
+  // topmost thing that's open; say "handled" so the app doesn't go back a
+  // page or close.
+  window.__naBack = () => {
+    if (menuState) { closeMenu(); return 'handled'; }
+    if (overlayClose) { closeOverlay(); return 'handled'; }
+    if (route().name === 'library' && state.intake.phase !== 'idle') { cancelIntake(); return 'handled'; }
+    if (route().name !== 'library') { location.hash = '#/'; return 'handled'; }
+    return '';
+  };
   function cancelIntake() {
     state.intake.token++;
     Object.assign(state.intake, { phase: 'idle', url: '', data: null, err: '' });
@@ -618,6 +628,7 @@
     let sub = `${esc(d.author || 'Unknown author')}`;
     sub += crawl ? ' · chapter count unknown' : ` · ${plural(total, 'chapter')}`;
     const head = `<div class="found__head">
+        <button type="button" class="icon-btn icon-btn--sm found__x" data-act="intake-cancel" aria-label="Close">${icon('x', 16)}</button>
         <div class="found__cover">${coverHTML(poster, d.title, d.author, false)}</div>
         <div class="found__meta">
           <span style="font-size:12px;color:var(--muted)">${esc(site)}${d.status ? ` · ${esc(d.status)}` : ''}</span>
@@ -702,7 +713,8 @@
     if (el.id !== 'novelUrl') return;
     setTimeout(() => {
       state.intake.url = el.value;
-      if (/^\s*(https?:\/\/|www\.)/i.test(el.value) || /\.\w{2,}\//.test(el.value)) lookup(el.value);
+      if (state.intake.phase === 'idle') renderIntake();
+      focusUrl();
     }, 30);
   });
   document.addEventListener('submit', (e) => {
@@ -930,6 +942,7 @@
     return cap(parts.join(', '));
   }
   function addResult(type, data) {
+    if (type === 'done' && (data.catchUp || data.auto) && isEmptyUpdate(data)) return;
     const r = { id: Date.now() + Math.random().toString(36).slice(2, 6), type, data, at: new Date().toISOString() };
     state.results = [r].concat(state.results.filter((x) => !(x.data.slug && x.data.slug === data.slug))).slice(0, 6);
     store.set('na-results', state.results);
@@ -993,6 +1006,7 @@
       if (f === 'new' && r.started) return false;
       if (f === 'finished' && !r.finished) return false;
       if (f === 'attention' && !n.failedCount) return false;
+      if (f === 'fresh' && !isFresh(n)) return false;
       if (state.status !== 'any' && bookStatus(n) !== state.status) return false;
       if (q && !(`${n.title} ${n.author} ${n.site}`.toLowerCase().includes(q))) return false;
       return true;
@@ -1045,19 +1059,19 @@
         <button type="button" class="btn btn--primary" data-act="focus-url">Paste a link</button></div>`);
       return;
     }
-    const counts = { all: all.length, reading: 0, new: 0, finished: 0, attention: 0 };
+    const counts = { all: all.length, fresh: 0, reading: 0, new: 0, finished: 0, attention: 0 };
     let hasStatus = false;
     let bytes = 0;
-    all.forEach((n) => { const r = readInfo(n); if (r.reading) counts.reading++; if (!r.started) counts.new++; if (r.finished) counts.finished++; if (n.failedCount) counts.attention++; if (bookStatus(n)) hasStatus = true; bytes += n.sizeBytes || 0; });
-    const chips = [['all', 'All'], ['reading', 'Reading'], ['new', 'Not started'], ['finished', 'Finished'], ['attention', 'Needs attention']]
+    all.forEach((n) => { const r = readInfo(n); if (r.reading) counts.reading++; if (!r.started) counts.new++; if (r.finished) counts.finished++; if (n.failedCount) counts.attention++; if (isFresh(n)) counts.fresh++; if (bookStatus(n)) hasStatus = true; bytes += n.sizeBytes || 0; });
+    const chips = [['all', 'All'], ['fresh', 'New chapters'], ['reading', 'Reading'], ['new', 'Not started'], ['finished', 'Finished'], ['attention', 'Needs attention']]
       .filter(([k]) => k === 'all' || counts[k] > 0 || state.filter === k)
-      .map(([k, l]) => `<button type="button" class="chip" data-filter="${k}" aria-pressed="${state.filter === k}">${k === 'attention' ? '<span class="dot"></span>' : ''}${l} <span class="n">${counts[k]}</span></button>`).join('');
+      .map(([k, l]) => `<button type="button" class="chip" data-filter="${k}" aria-pressed="${state.filter === k}">${k === 'attention' ? '<span class="dot"></span>' : k === 'fresh' ? '<span class="dot dot--ok"></span>' : ''}${l} <span class="n">${counts[k]}</span></button>`).join('');
     const list = filteredBooks();
     const grid = list.length ? `<div class="grid">${list.map((n, i) => bookCard(n, i)).join('')}</div>`
       : `<div class="empty" style="padding:32px"><h3 style="font-size:22px">No novels match</h3><p>${state.query ? `Nothing in your library matches “${esc(state.query)}”.` : 'Nothing in this view yet.'}</p><button type="button" class="btn" data-act="clear-filters">Show all novels</button></div>`;
     morph(box, `<div class="lib-head">
         <div class="titles"><h2 id="libH">Library</h2><p>${plural(all.length, 'novel')} · ${mb(bytes)} on this device</p></div>
-        <button type="button" class="btn btn--md" data-act="update-all">${icon('refresh', 15)} Update all</button>
+        <button type="button" class="btn btn--md" data-act="catch-up" title="Check every ongoing novel and download only the chapters that came out since last time">${icon('refresh', 15)} Get new chapters</button>
         <div class="lib-head__sel">${hasStatus ? `<label>Status <select class="select" id="statusSel">${[['any', 'Any'], ['ongoing', 'Ongoing'], ['completed', 'Completed'], ['hiatus', 'On hiatus']].map(([v, l]) => `<option value="${v}" ${state.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>` : ''}
         <label>Sort <select class="select" id="sortSel">${[['read', 'Last read'], ['added', 'Recently added'], ['title', 'Title'], ['chapters', 'Most chapters']].map(([v, l]) => `<option value="${v}" ${state.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label></div>
       </div>
@@ -1109,6 +1123,40 @@
       else if (r && r.status === 'running') toast(`${n ? niceTitle(n.title) : 'It'} is already downloading.`);
       loadActivity();
     } catch (e) { toast(e.message, { tone: 'bad' }); }
+  }
+  // "Get new chapters": every ongoing novel is checked, and only chapters
+  // that came out since last time are downloaded. One summary at the end
+  // instead of a card and a notification per novel.
+  const catchState = { checked: 0, novels: 0, chapters: 0 };
+  async function catchUp() {
+    try {
+      const r = await api('CatchUp');
+      const n = (r && r.queued) || 0;
+      if (!n) toast(r && r.skipped ? 'All your novels are completed, so there’s nothing to check.' : 'Everything is already being checked.');
+      else toast(`Checking ${plural(n, 'ongoing novel')} for new chapters.`);
+      loadActivity();
+    } catch (e) {
+      // Older core: fall back to the full update.
+      if (/isn't available/.test(e.message)) updateAll(); else toast(e.message, { tone: 'bad' });
+    }
+  }
+  function catchUpDone(d) {
+    const nw = (d.newChapters || []).length;
+    catchState.checked++;
+    if (nw) { catchState.novels++; catchState.chapters += nw; }
+  }
+  function catchUpSummary() {
+    if (!catchState.checked) return;
+    const { checked, novels, chapters } = catchState;
+    catchState.checked = catchState.novels = catchState.chapters = 0;
+    if (novels) {
+      const msg = `${plural(chapters, 'new chapter')} in ${plural(novels, 'novel')}`;
+      notify(msg, 'Ready to read offline.');
+      chime();
+      toast(msg, { tone: 'ok', timeout: 12000, action: { label: 'Show them', fn: () => { state.filter = 'fresh'; store.set('na-filter', 'fresh'); if (route().name !== 'library') location.hash = '#/'; else renderShelf(); } } });
+    } else {
+      toast(`No new chapters in ${plural(checked, 'novel')}. You’re caught up.`);
+    }
   }
   async function updateAll() {
     try {
@@ -1423,7 +1471,7 @@
   });
 
   // ================================================================ SETTINGS
-  const SITES = ['NovelBin', 'NovelFull', 'ReadNovelFull', 'Royal Road', 'WuxiaWorld', 'FreeWebNovel', 'NovelFire', 'Webnovel', 'ScribbleHub', 'EmpireNovel', 'Any site in reader mode'];
+  const SITES = ['NovelBin', 'NovelFull', 'ReadNovelFull', 'NovelPing', 'Royal Road', 'WuxiaWorld', 'FreeWebNovel', 'NovelFire', 'Webnovel', 'ScribbleHub', 'EmpireNovel', 'Any site in reader mode'];
   async function renderSettings(main) {
     try { state.stats = await api('GetSystemStats'); } catch (e) {}
     try { const s = await api('GetSettings'); if (s) { state.settings = Object.assign({}, state.settings, s); store.set('na-settings', state.settings); } } catch (e) {}
@@ -1452,7 +1500,7 @@
         </div></section>
         <section class="set-group" id="updates" aria-labelledby="sU"><h2 class="section-h" id="sU">Updates</h2><div class="card">
           ${row('Check saved chapters for revisions', 'Every chapter is the full check, and the slowest: about 10–15 minutes for 2,000 chapters.', seg('revise', [['all', 'Every chapter'], ['recent', 'Last 100'], ['off', 'Off']], 'Revision check'))}
-          ${row('Update all novels when the app opens', 'New and missing chapters only, skipping novels checked in the last 12 hours and completed novels. Saved chapters are re-checked for edits when you press Update.', sw('updateOnOpen', 'Update all when the app opens'))}
+          ${row('Update all novels when the app opens', 'Gets new chapters for your ongoing novels, like Get new chapters, skipping any checked in the last 12 hours. Saved chapters are re-checked for edits only when you press Update on a novel.', sw('updateOnOpen', 'Update all when the app opens'))}
         </div></section>
         <section class="set-group" id="storage" aria-labelledby="sS"><h2 class="section-h" id="sS">Storage</h2><div class="card">
           ${desktop && st.libraryPath ? row('Library folder', esc(st.libraryPath), `<button type="button" class="btn btn--md" data-act="open-library">Open folder</button>`) : ''}
@@ -1534,7 +1582,8 @@
     const next = THEMES[(THEMES.indexOf(state.settings.theme) + 1) % THEMES.length];
     const actions = [
       { title: 'Add a novel', key: '/', run: () => goAdd() },
-      { title: 'Update all novels', run: updateAll },
+      { title: 'Get new chapters for every ongoing novel', run: catchUp },
+      { title: 'Full update of every novel (re-checks saved chapters, slow)', run: updateAll },
       { title: `Theme: switch to ${THEME_LABEL[next]}`, key: 'T', run: cycleTheme },
       { title: 'Settings', run: () => { location.hash = '#/settings'; } },
       { title: 'Back up library', run: backup },
@@ -1593,7 +1642,7 @@
     const slug = t.dataset.slug;
     switch (act) {
       case 'paste':
-        try { const v = await navigator.clipboard.readText(); if (v) { state.intake.url = v.trim(); lookup(v); } else focusUrl(); } catch (er) { focusUrl(); toast(state.platform === 'android' ? 'Long-press the field and choose Paste.' : 'Press Ctrl+V to paste the link.'); }
+        try { const v = await navigator.clipboard.readText(); if (v) { state.intake.url = v.trim(); if (state.intake.phase === 'error') state.intake.phase = 'idle'; renderIntake(); const i = $('#novelUrl'); if (i) i.value = state.intake.url; focusUrl(); } else focusUrl(); } catch (er) { focusUrl(); toast(state.platform === 'android' ? 'Long-press the field and choose Paste.' : 'Press Ctrl+V to paste the link.'); }
         break;
       case 'intake-clear': case 'intake-cancel': e.preventDefault(); cancelIntake(); break;
       case 'intake-start': startIntake(); break;
@@ -1619,6 +1668,7 @@
       case 'update': updateNovel(slug); break;
       case 'retry': retryMissing(slug); break;
       case 'update-all': updateAll(); break;
+      case 'catch-up': catchUp(); break;
       case 'epub': exportEpub(slug); break;
       case 'book-menu': e.preventDefault(); bookMenu(t, slug); break;
       case 'novel-menu': novelMenu(t); break;
@@ -1685,6 +1735,7 @@
     const prevSlug = state.activity.current && state.activity.current.slug;
     state.activity = { current: a.current || null, queue: a.queue || [], waiting: a.waiting || '' };
     scheduleJobs();
+    if (!a.current && !(a.queue || []).length) catchUpSummary();
     if (prevSlug && !(a.current && a.current.slug === prevSlug)) setTimeout(loadLibrary, 200);
   });
   on('started', (d) => {
@@ -1724,6 +1775,7 @@
     addResult('done', d);
     scheduleJobs();
     loadLibrary();
+    if (d.catchUp) { catchUpDone(d); return; }
     if (d.kind === 'update') {
       const nw = (d.newChapters || []).length;
       if (!d.auto || nw) notify(nw ? `${d.title}: ${plural(nw, 'new chapter')}` : `${d.title} is up to date`, nw ? 'Ready to read offline.' : 'Nothing changed on the site.');

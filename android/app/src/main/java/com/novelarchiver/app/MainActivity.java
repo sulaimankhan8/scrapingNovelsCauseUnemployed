@@ -191,11 +191,17 @@ public class MainActivity extends AppCompatActivity {
             public void handleOnBackPressed() {
                 if (siteBrowserPanel.getVisibility() == View.VISIBLE) {
                     siteBrowserPanel.setVisibility(View.GONE);
-                } else if (webView.canGoBack()) {
-                    webView.goBack();
-                } else {
-                    finish();
+                    return;
                 }
+                // The page closes its own sheet, dialog or menu first.
+                webView.evaluateJavascript("(window.__naBack && window.__naBack()) || ''", v -> {
+                    if ("\"handled\"".equals(v)) return;
+                    if (webView.canGoBack()) {
+                        webView.goBack();
+                    } else {
+                        finish();
+                    }
+                });
             }
         });
 
@@ -252,6 +258,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        DownloadService.stop(this);
         if (core != null) core.shutdown();
         if (bridge != null) bridge.close();
         if (webView != null) webView.destroy();

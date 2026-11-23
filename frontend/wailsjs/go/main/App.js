@@ -18,6 +18,10 @@ export function CancelTask() {
   return window['go']['main']['App']['CancelTask']();
 }
 
+export function CatchUp() {
+  return window['go']['main']['App']['CatchUp']();
+}
+
 export function ChooseBackup() {
   return window['go']['main']['App']['ChooseBackup']();
 }

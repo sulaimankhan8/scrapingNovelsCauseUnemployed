@@ -10,6 +10,8 @@ export function CancelAll():Promise<void>;
 
 export function CancelTask():Promise<void>;
 
+export function CatchUp():Promise<Record<string, any>>;
+
 export function ChooseBackup():Promise<service.BackupInfo>;
 
 export function CleanNovel(arg1:string):Promise<Record<string, any>>;
