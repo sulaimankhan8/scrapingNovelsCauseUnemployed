@@ -326,7 +326,14 @@ func (e *Engine) readTOC(ctx context.Context, p *sites.Profile, n *Novel, novelD
 				return err
 			}
 		}
-		collect(doc)
+		// Prefer a chapter array the page embeds in a script: unlike the
+		// table, it isn't cut down by the page's own pagination script.
+		if name := sites.Str(sec, "scriptJson"); name != "" {
+			refs = scriptJSONChapters(doc, name, sites.Str(sec, "jsonLocked"))
+		}
+		if len(refs) == 0 {
+			collect(doc)
+		}
 
 	case "paginated":
 		pageURL := sites.Str(sec, "pageUrl")
@@ -687,4 +694,42 @@ func descriptionText(doc *goquery.Document, sel *sites.Selector, fallback string
 // IsBlocked reports whether err came from a bot check / needs browser.
 func IsBlocked(err error) bool {
 	return errors.Is(err, fetch.ErrBlocked) || errors.Is(err, fetch.ErrNeedsBrowser)
+}
+
+// scriptJSONChapters reads a chapter array assigned in an inline script,
+// e.g. Royal Road's `window.chapters = [{"title":..., "url":...}, ...];`.
+// lockedField, when set, names a boolean that is false for paid chapters
+// (Royal Road: "isUnlocked").
+func scriptJSONChapters(doc *goquery.Document, name, lockedField string) []ChapterRef {
+	if doc == nil {
+		return nil
+	}
+	re := regexp.MustCompile(regexp.QuoteMeta(name) + `\s*=\s*(\[[\s\S]*?\])\s*;`)
+	var refs []ChapterRef
+	doc.Find("script").EachWithBreak(func(_ int, s *goquery.Selection) bool {
+		m := re.FindStringSubmatch(s.Text())
+		if m == nil {
+			return true
+		}
+		var items []map[string]any
+		if json.Unmarshal([]byte(m[1]), &items) != nil {
+			return true
+		}
+		for _, it := range items {
+			href, _ := it["url"].(string)
+			if href == "" {
+				continue
+			}
+			title, _ := it["title"].(string)
+			locked := false
+			if lockedField != "" {
+				if v, ok := it[lockedField].(bool); ok && !v {
+					locked = true
+				}
+			}
+			refs = append(refs, ChapterRef{Title: strings.TrimSpace(title), URL: resolve(doc.Url, href), Locked: locked})
+		}
+		return len(refs) == 0
+	})
+	return refs
 }

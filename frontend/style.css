@@ -587,6 +587,7 @@ main.view { padding: 36px 0 96px; }
   .keys { grid-template-columns: 1fr; }
   .scrim--top { padding-top: 16px; }
   .set-row { padding: 14px 16px; }
+  .settings nav { display: none; }
   .set-row .seg { width: 100%; }
   .set-row .seg button { flex: 1; }
 }

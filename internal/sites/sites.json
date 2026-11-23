@@ -86,7 +86,7 @@
     },
     {
       "id": "readnovelfull",
-      "name": "ReadNovelFull (also AllNovelFull)",
+      "name": "ReadNovelFull",
       "domains": [
         "readnovelfull.com",
         "allnovelfull.net",
@@ -147,7 +147,9 @@
       "toc": {
         "strategy": "inline",
         "items": "table#chapters tr.chapter-row td:first-child a",
-        "notes": "The whole TOC is on the fiction page."
+        "scriptJson": "window.chapters",
+        "jsonLocked": "isUnlocked",
+        "notes": "The whole TOC is on the fiction page, also as window.chapters in a script. Prefer the script: the page's DataTables script cuts the visible table to 10 rows once it runs."
       },
       "chapter": {
         "title": "h1.font-white",
@@ -237,7 +239,7 @@
     },
     {
       "id": "novelfire",
-      "name": "NovelFire (formerly LightNovelPub/LightNovelWorld)",
+      "name": "NovelFire",
       "domains": [
         "novelfire.net",
         "novelphoenix.com",
@@ -279,7 +281,7 @@
     },
     {
       "id": "webnovel",
-      "name": "Webnovel (Qidian International)",
+      "name": "Webnovel",
       "domains": [
         "webnovel.com"
       ],

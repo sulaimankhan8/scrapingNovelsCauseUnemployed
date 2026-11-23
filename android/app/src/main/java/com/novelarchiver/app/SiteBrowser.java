@@ -51,7 +51,12 @@ public class SiteBrowser implements BrowserDriver {
         WebSettings s = view.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);
-        s.setLoadsImagesAutomatically(false); // text only; saves data
+        // Images stay on: Cloudflare's "Verify you are human" check loads
+        // image requests as part of verifying, and with images blocked it
+        // spins on "Verifying..." forever. Chapter text is read with fetch()
+        // or from the DOM either way.
+        s.setLoadsImagesAutomatically(true);
+        s.setBlockNetworkImage(false);
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(view, true);
         view.addJavascriptInterface(new Object() {
@@ -169,7 +174,7 @@ public class SiteBrowser implements BrowserDriver {
         CountDownLatch l = new CountDownLatch(1);
         AtomicReference<String> r = new AtomicReference<>();
         activity.runOnUiThread(() -> view.evaluateJavascript(
-                "JSON.stringify({url:location.href,body:document.documentElement.outerHTML})",
+                "JSON.stringify({url:location.href,body:document.documentElement.outerHTML,ready:document.readyState})",
                 value -> {
                     r.set(value);
                     l.countDown();

@@ -788,8 +788,10 @@
       if ((d.revised || []).length) rows.push(['REVISED', 'var(--accent)', `${plural(d.revised.length, 'chapter')} · ${listNums(d.revised)}`, `<a class="btn btn--link" href="#/novel/${encodeURIComponent(d.slug)}">Show</a>`]);
       if (d.coverChanged) rows.push(['POSTER', 'var(--ink-3)', 'New poster from the site', '']);
       if ((d.details || []).length) rows.push(['DETAILS', 'var(--ink-3)', detailText(d), '']);
+      if (d.added) rows.push(['ADDED', 'var(--ok)', `${plural(d.added, 'chapter')} that ${d.added === 1 ? 'wasn’t' : 'weren’t'} saved yet`, '']);
       if (d.fixed) rows.push(['FIXED', 'var(--ink-3)', `${plural(d.fixed, 'chapter')} that failed last time`, '']);
       if (d.failed) rows.push(['FAILED', 'var(--bad)', `${plural(d.failed, 'chapter')} didn’t download`, `<button type="button" class="btn btn--link" data-act="update" data-slug="${esc(d.slug)}">Retry</button>`]);
+      if (rows.length && d.checked && !(d.revised || []).length) rows.push(['CHECKED', 'var(--ink-3)', `${plural(d.checked, 'saved chapter')}, none changed on the site`, '']);
       if (!rows.length) {
         const checked = d.checked ? `all ${num(d.checked)} saved chapters` : `the chapter list`;
         return `<div class="card job" data-key="r-${r.id}"><div class="job__head"><div class="job__thumb">${coverHTML((n && n.cover) || '', d.title, n && n.author, true)}</div>
@@ -822,7 +824,7 @@
     const clean = type === 'done' && !(data.failed || data.locked) && (data.kind !== 'update' || isEmptyUpdate(data));
     if (clean) setTimeout(() => dismissResult(r.id), 10000);
   }
-  function isEmptyUpdate(d) { return !(d.newChapters || []).length && !(d.revised || []).length && !d.coverChanged && !(d.details || []).length && !d.fixed && !d.failed; }
+  function isEmptyUpdate(d) { return !(d.newChapters || []).length && !(d.revised || []).length && !d.coverChanged && !(d.details || []).length && !d.fixed && !d.added && !d.failed; }
   function dismissResult(id) {
     const before = state.results.length;
     state.results = state.results.filter((r) => r.id !== id);
@@ -1126,7 +1128,7 @@
       const cur = last && c.number === last;
       const read = ok && last && c.number < last;
       let s = '';
-      if (cur) s = `<span class="s s--here"><svg width="10" height="13" viewBox="0 0 12 16" aria-hidden="true"><path d="M1 0h10v15l-5-4-5 4z" fill="currentColor"/></svg>You’re here</span>`;
+      if (cur) s = `<span class="s s--here"><svg width="10" height="13" viewBox="0 0 12 16" aria-hidden="true"><path d="M1 0h10v15l-5-4-5 4z" fill="currentColor"/></svg>You’re here${ok ? '' : ' · not saved'}</span>`;
       else if (c.removed) s = `<span class="s">Removed from site · kept</span>`;
       else if (c.revised && ok) s = `<span class="s s--ok">${icon('pencil', 12, 2.2)} Revised ${esc(shortDate(c.revised))}</span>`;
       else if (c.state === 'failed') s = `<span class="s s--bad" title="${esc(c.error || '')}">Didn’t download</span><button type="button" class="btn btn--sm" data-act="update" data-slug="${esc(d.slug)}">Retry</button>`;

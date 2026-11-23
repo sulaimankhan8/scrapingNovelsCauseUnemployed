@@ -271,14 +271,16 @@ func (a *Service) runDownload(ctx context.Context, j *job, n *source.Novel, opts
 
 	// Summary: what changed compared with before this job.
 	var newNums []int
-	fixed := 0
+	fixed, added := 0, 0
 	for _, c := range b.Chapters {
 		st, had := snap.keys[chapterKey(c)]
 		switch {
 		case !had && c.State == library.StateOK:
 			newNums = append(newNums, c.Number)
+		case had && st == library.StateFailed && c.State == library.StateOK:
+			fixed++ // failed last time
 		case had && st != library.StateOK && c.State == library.StateOK:
-			fixed++
+			added++ // listed before but never saved (a range, or deleted to save space)
 		}
 	}
 	sort.Ints(newNums)
@@ -319,7 +321,7 @@ func (a *Service) runDownload(ctx context.Context, j *job, n *source.Novel, opts
 	a.emit("done", map[string]any{
 		"kind": j.Kind, "slug": b.Slug, "title": b.Title, "catalogUrl": "/library/" + b.Slug + "/",
 		"ok": ok, "failed": failed, "locked": locked, "total": len(b.Chapters),
-		"newChapters": newNums, "fixed": fixed, "revised": res.Revised, "checked": res.Checked,
+		"newChapters": newNums, "fixed": fixed, "added": added, "revised": res.Revised, "checked": res.Checked,
 		"coverChanged": res.CoverChanged && prev != nil, "details": details, "status": b.Status,
 		"removed": removed, "seconds": int(time.Since(started).Seconds()), "auto": j.Auto,
 		"sizeBytes": a.store.Size(b.Slug),

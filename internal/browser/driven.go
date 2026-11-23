@@ -54,6 +54,9 @@ type pageInfo struct {
 	Body        string `json:"body"`
 	ContentType string `json:"contentType"`
 	B64         bool   `json:"b64"`
+	// Ready is document.readyState at capture ("loading", "interactive",
+	// "complete"); empty from older shells.
+	Ready string `json:"ready"`
 }
 
 func decode(s string) pageInfo {
@@ -174,7 +177,7 @@ func (b *Driven) navigate(ctx context.Context, rawURL string, wantHTML bool) (*f
 		return nil, err
 	}
 	info := decode(raw)
-	deadline := time.Now().Add(20 * time.Second)
+	deadline := time.Now().Add(45 * time.Second) // same as the shell's own page-load limit
 	challenged := false
 	challenge := func() {
 		if challenged {
@@ -199,9 +202,12 @@ func (b *Driven) navigate(ctx context.Context, rawURL string, wantHTML bool) (*f
 		default:
 			if raw, err := b.d.Capture(); err == nil {
 				p := decode(raw)
+				// "loading" means the HTML is still arriving; reading it now
+				// would cut the page short (e.g. half a chapter list).
+				loading := p.Ready == "loading"
 				if challengeBody(p.Body) {
 					challenge()
-				} else if p.Body != "" {
+				} else if p.Body != "" && !loading {
 					if challenged {
 						b.d.Show(false)
 						if b.opts.OnStatus != nil {
@@ -209,7 +215,7 @@ func (b *Driven) navigate(ctx context.Context, rawURL string, wantHTML bool) (*f
 						}
 						time.Sleep(1500 * time.Millisecond) // let the real page finish after the check
 						if raw2, err := b.d.Capture(); err == nil {
-							if p2 := decode(raw2); p2.Body != "" && !challengeBody(p2.Body) {
+							if p2 := decode(raw2); p2.Body != "" && p2.Ready != "loading" && !challengeBody(p2.Body) {
 								p = p2
 							}
 						}

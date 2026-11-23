@@ -215,7 +215,7 @@ func (s *Store) Save(b *Book) error {
 		return err
 	}
 	tmp := filepath.Join(dir, "book.json.tmp")
-	if err := os.WriteFile(tmp, data, 0o644); err != nil {
+	if err := writeSynced(tmp, data); err != nil {
 		return err
 	}
 	return os.Rename(tmp, filepath.Join(dir, "book.json"))
@@ -381,7 +381,7 @@ func (s *Store) SetReading(slug string, chapter int) error {
 	}
 	data, _ := json.Marshal(Reading{Chapter: chapter, At: time.Now()})
 	tmp := filepath.Join(s.dir(slug), "reading.json.tmp")
-	if err := os.WriteFile(tmp, data, 0o644); err != nil {
+	if err := writeSynced(tmp, data); err != nil {
 		return err
 	}
 	return os.Rename(tmp, filepath.Join(s.dir(slug), "reading.json"))
@@ -399,4 +399,22 @@ func (s *Store) ImageBytes(slug string) int64 {
 		return nil
 	})
 	return total
+}
+
+// writeSynced writes a file and flushes it to disk before it is renamed
+// into place, so a crash or power loss never leaves an empty book.json.
+func writeSynced(path string, data []byte) error {
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
+	if err != nil {
+		return err
+	}
+	if _, err := f.Write(data); err != nil {
+		f.Close()
+		return err
+	}
+	if err := f.Sync(); err != nil {
+		f.Close()
+		return err
+	}
+	return f.Close()
 }
