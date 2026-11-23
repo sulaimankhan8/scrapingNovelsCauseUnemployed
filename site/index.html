@@ -3,169 +3,363 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NovelArchiver: read web novels offline</title>
-<meta name="description" content="Save web novels to your PC or phone and read them offline, without ads. Keeps formatting and system boxes; exports EPUB.">
+<title>NovelArchiver: read web novels offline, without the ads</title>
+<meta name="description" content="Save the web novels you follow to your Windows PC or Android phone and read them on the commute, offline, with no ads or pop-ups. Free and open source.">
+<meta name="theme-color" content="#f6f2ea" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121417" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' aria-hidden='true'%3E%3Crect width='64' height='64' rx='15' fill='%231D1B18'/%3E%3Cpath d='M16 15a3 3 0 0 1 3-3h3v40h-3a3 3 0 0 1-3-3z' fill='%23CDBFA6'/%3E%3Cpath d='M22 12h20a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4H22z' fill='%23F7F3EC'/%3E%3Cpath d='M32 12h8v20l-4-3-4 3z' fill='%23A8431F'/%3E%3C/svg%3E">
 <style>
-:root{--bg:#f6f2ea;--panel:#fffdf8;--ink:#1d1b18;--muted:#625b51;--line:#e2d9c9;--accent:#b5461f;--accent-ink:#fff;
---sys-bg:#eef3f8;--sys-line:#7d9bb8;--sys-ink:#1f3347;--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
---sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-@media (prefers-color-scheme:dark){:root{--bg:#121417;--panel:#191c20;--ink:#ebe6dd;--muted:#a19b91;--line:#2b3036;--accent:#e0794f;--accent-ink:#1a0f0a;
---sys-bg:#16222e;--sys-line:#3f6a92;--sys-ink:#cfe2f5}}
+:root{
+  --paper:#f6f2ea;--card:#fffdf8;--sunk:#ede6d9;--ink:#1d1b18;--ink-2:#3d3830;--muted:#6b645a;--line:#e2d9c9;
+  --accent:#a8431f;--accent-ink:#fff;--accent-soft:#f3e3d6;--ok:#2f6b3f;
+  --sys-bg:#eef3f8;--sys-line:#7d9bb8;--sys-ink:#1f3347;
+  --serif:"Newsreader","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --shadow:0 1px 2px rgba(29,27,24,.08),0 24px 48px -24px rgba(29,27,24,.35);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#121417;--card:#191c20;--sunk:#1f2328;--ink:#ebe6dd;--ink-2:#cfc8bc;--muted:#a19b91;--line:#2b3036;
+  --accent:#e0794f;--accent-ink:#1a0f0a;--accent-soft:#2a1d16;--ok:#7fb08c;
+  --sys-bg:#16222e;--sys-line:#3f6a92;--sys-ink:#cfe2f5;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 24px 48px -24px rgba(0,0,0,.8);color-scheme:dark}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--sans)}
-a{color:var(--accent)}
-.wrap{max-width:62rem;margin:0 auto;padding:0 16px}
-header{padding:56px 0 32px}
-.brand{display:flex;align-items:center;gap:10px;font:600 15px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.brand svg{width:32px;height:32px;flex:none}
-h1{font:600 clamp(2rem,5vw,3.2rem)/1.12 var(--serif);margin:.3em 0 .4em;max-width:18ch}
-.lede{font-size:1.15rem;color:var(--muted);max-width:40rem;margin:0 0 28px}
-.downloads{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px}
-.btn{display:inline-flex;align-items:center;gap:10px;padding:13px 20px;border-radius:10px;text-decoration:none;font-weight:600;
-border:1px solid var(--line);color:var(--ink);background:var(--panel);min-height:48px}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn small{font-weight:400;opacity:.8}
-.note{font-size:.9rem;color:var(--muted);margin:6px 0 0}
-section{padding:36px 0;border-top:1px solid var(--line)}
-h2{font:600 1.5rem var(--serif);margin:0 0 18px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:18px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
-.card h3{margin:0 0 6px;font-size:1.02rem}
-.card p{margin:0;color:var(--muted);font-size:.95rem}
-.demo{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px;font:1.05rem/1.7 var(--serif);max-width:40rem}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 var(--sans)}
+img{display:block;max-width:100%;height:auto}
+a{color:var(--accent);text-underline-offset:2px}
+.wrap{max-width:72rem;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--serif);font-weight:500;letter-spacing:-.015em;margin:0}
+h2{font-size:clamp(1.8rem,3.6vw,2.6rem);line-height:1.12}
+h3{font-size:1.3rem;line-height:1.25}
+p{margin:0}
+.muted{color:var(--muted)}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:saturate(1.2) blur(10px);-webkit-backdrop-filter:saturate(1.2) blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:20px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font:600 20px/1 var(--serif);letter-spacing:-.01em;margin-right:auto}
+.brand svg{width:30px;height:30px;flex:none}
+.nav a.l{color:var(--ink-2);text-decoration:none;font-size:15px}
+.nav a.l:hover{color:var(--ink)}
+.nav .btn{min-height:38px;padding:0 14px;font-size:14px}
+@media (max-width:760px){.nav a.l{display:none}}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 22px;border-radius:12px;text-decoration:none;font-weight:600;font-size:16px;border:1px solid var(--line);color:var(--ink);background:var(--card);transition:background-color .15s,border-color .15s,transform .15s}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.btn small{font-weight:400;opacity:.75;font-size:13px}
+.btn svg{width:18px;height:18px;flex:none}
+@media (hover:hover){.btn:hover{border-color:var(--muted)}.btn.primary:hover{background:var(--ink-2)}}
+
+/* hero */
+.hero{padding:64px 0 40px;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:48px;align-items:center}
+.hero h1{font-size:clamp(2.5rem,5.6vw,4.4rem);line-height:1.02;letter-spacing:-.025em}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.lede{font-size:1.15rem;color:var(--ink-2);margin:22px 0 28px;max-width:34rem}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+.meta{margin-top:16px;font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center}
+.meta .v{display:inline-flex;align-items:center;gap:7px;color:var(--ink-2);font-weight:500}
+.meta .v i{width:7px;height:7px;border-radius:4px;background:var(--ok)}
+
+/* device frames */
+.stage{position:relative;padding:0 0 40px 0}
+.win{border-radius:12px;background:#202226;box-shadow:var(--shadow);overflow:hidden;border:1px solid rgba(0,0,0,.35)}
+.win .bar{display:flex;align-items:center;gap:8px;height:32px;padding:0 0 0 12px;color:#cfc8bc;font:12px var(--sans)}
+.win .bar svg{width:14px;height:14px}
+.win .bar .ctl{margin-left:auto;display:flex;height:100%}
+.win .bar .ctl span{width:44px;display:grid;place-items:center;color:#9a958c;font-size:14px;line-height:1}
+.phone{width:min(38%,250px);border-radius:34px;padding:9px;background:#141518;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.4)}
+.phone img{border-radius:26px}
+.stage .phone{position:absolute;right:-10px;bottom:0}
+@media (max-width:900px){.hero .wrap{grid-template-columns:1fr;gap:36px}.hero{padding-top:40px}.stage .phone{right:6px}}
+@media (max-width:520px){.stage{padding-bottom:28px}.stage .phone{width:42%;border-radius:24px;padding:6px}.stage .phone img{border-radius:19px}.win .bar{height:24px}.win .bar .ctl span{width:30px}}
+
+/* sections */
+section{padding:88px 0;border-top:1px solid var(--line)}
+@media (max-width:640px){section{padding:64px 0}}
+.head{max-width:44rem;margin:0 0 44px}
+.head p{margin-top:14px;font-size:1.08rem;color:var(--ink-2)}
+
+/* moments */
+.moments{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;margin-top:8px}
+.moments div{border-top:2px solid var(--ink);padding-top:16px}
+.moments b{display:block;font:500 1.25rem/1.25 var(--serif);margin-bottom:6px}
+.moments p{color:var(--ink-2);font-size:.98rem}
+@media (max-width:760px){.moments{grid-template-columns:1fr;gap:24px}}
+
+/* tour */
+.tour{display:grid;gap:96px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;align-items:center}
+.row.flip .txt{order:2}
+.row .txt p{color:var(--ink-2);margin-top:12px;font-size:1.05rem}
+.row ul{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+.row li{display:flex;gap:10px;font-size:.98rem;color:var(--ink-2)}
+.row li::before{content:"";flex:none;width:6px;height:6px;border-radius:3px;background:var(--accent);margin-top:.6em}
+.pics{display:flex;justify-content:center;gap:20px;align-items:flex-start}
+.pics .phone{width:min(46%,270px)}
+.pics .phone + .phone{margin-top:48px}
+@media (max-width:860px){.row{grid-template-columns:1fr;gap:32px}.row.flip .txt{order:0}.tour{gap:72px}}
+
+/* reading demo */
+.demo{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;font:1.08rem/1.75 var(--serif);max-width:38rem;margin-top:22px}
 .demo p{margin:0 0 .8em}
-.sys{background:var(--sys-bg);color:var(--sys-ink);border-left:3px solid var(--sys-line);padding:.5em .8em;margin:0 0 .8em;
-font:.9rem/1.5 ui-monospace,"Cascadia Mono",Consolas,monospace}
-.sites{display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:0;list-style:none}
-.sites li{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:.92rem;background:var(--panel)}
-ol.steps{padding-left:1.2em;margin:0}
-ol.steps li{margin:0 0 10px}
-footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line)}
-code{font:.9em ui-monospace,Consolas,monospace;background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:1px 5px;overflow-wrap:anywhere}
-.install{display:grid;grid-template-columns:repeat(auto-fit,minmax(18rem,1fr));gap:18px}
-.install .card{padding:20px}
-.install h3{display:flex;align-items:center;gap:10px;margin:0 0 4px;font:600 1.15rem var(--serif)}
-.install .why{margin:0 0 14px;color:var(--muted);font-size:.95rem}
-.install ol{padding-left:1.3em;margin:0}
-.install li{margin:0 0 12px;font-size:.98rem}
-.install li small{display:block;color:var(--muted);font-size:.88rem;margin-top:2px}
-.ui{display:inline-block;padding:1px 8px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;background:var(--bg);font-weight:600;font-size:.92em;white-space:nowrap}
+.demo p:last-child{margin:0}
+.sys{background:var(--sys-bg);color:var(--sys-ink);border-left:3px solid var(--sys-line);padding:.5em .8em;margin:0 0 .8em;font:.88rem/1.55 ui-monospace,"Cascadia Mono",Consolas,monospace}
+
+/* authors */
+.authors{background:var(--ink);color:var(--paper);border-top:0}
+.authors .head p{color:color-mix(in srgb,var(--paper) 82%,transparent)}
+.authors h2 em{font-style:italic;color:#f0a27e}
+@media (prefers-color-scheme:dark){.authors{background:#1d1a17;color:var(--ink)}.authors .head p{color:var(--ink-2)}}
+.give{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1px;background:color-mix(in srgb,currentColor 18%,transparent);border-radius:14px;overflow:hidden}
+.give div{background:var(--ink);padding:22px}
+@media (prefers-color-scheme:dark){.give div{background:#1d1a17}}
+.give b{display:block;font:500 1.15rem/1.3 var(--serif);margin-bottom:6px}
+.give p{font-size:.95rem;opacity:.8}
+.never{margin-top:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:24px}
+.never h3{font-size:1.1rem;margin-bottom:6px}
+.never p{font-size:.95rem;opacity:.8}
+.never h3::before{content:"✕ ";color:#f0a27e;font-family:var(--sans);font-size:.9em}
+
+/* install */
+.install{display:grid;grid-template-columns:repeat(auto-fit,minmax(19rem,1fr));gap:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
+.card h3{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.card h3 svg{width:22px;height:22px;flex:none}
+.card .why{color:var(--muted);font-size:.95rem;margin-bottom:16px}
+.steps{list-style:none;padding:0;margin:0;counter-reset:s;display:grid;gap:14px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:28px 1fr;gap:12px;font-size:.98rem}
+.steps li::before{content:counter(s);width:28px;height:28px;border-radius:14px;background:var(--sunk);display:grid;place-items:center;font-weight:600;font-size:13px}
+.steps small{display:block;color:var(--muted);font-size:.88rem;margin-top:2px}
+.ui{display:inline-block;padding:0 8px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;background:var(--paper);font-weight:600;font-size:.9em;white-space:nowrap}
 .ui.blue{background:#0067c0;border-color:#0067c0;color:#fff}
 .say{font-style:italic}
-.ver{display:inline-flex;align-items:center;gap:8px;margin:0 0 14px;padding:4px 12px;border:1px solid var(--line);border-radius:999px;background:var(--panel);font-size:.9rem;color:var(--muted)}
-.ver b{color:var(--ink);font-weight:600}
-.ver i{width:7px;height:7px;border-radius:4px;background:#2f6b3f}
-ul.new{list-style:none;padding:0;margin:0;display:grid;gap:10px}
-ul.new li{display:flex;gap:12px;align-items:baseline;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:.98rem}
-ul.new li b{flex:none;min-width:5.5rem;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
-.trust{margin:18px 0 0;padding:16px 18px;border-radius:12px;background:var(--panel);border:1px dashed var(--line);font-size:.95rem;color:var(--muted)}
-.trust strong{color:var(--ink)}
-pre.cmd{margin:8px 0 0;padding:10px 12px;border-radius:8px;background:var(--bg);border:1px solid var(--line);font:.85rem/1.5 ui-monospace,Consolas,monospace;overflow-x:auto;white-space:pre}
+code{font:.88em ui-monospace,Consolas,monospace;background:var(--sunk);border-radius:5px;padding:1px 5px;overflow-wrap:anywhere}
+.check{margin-top:20px;padding:18px 20px;border-radius:14px;border:1px dashed var(--line);font-size:.95rem;color:var(--ink-2)}
+pre.cmd{margin:10px 0 0;padding:10px 12px;border-radius:8px;background:var(--sunk);font:.85rem/1.5 ui-monospace,Consolas,monospace;overflow-x:auto}
+
+/* sites + new */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px}
+@media (max-width:860px){.split{grid-template-columns:1fr;gap:48px}}
+.sites{display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:18px 0 0;list-style:none}
+.sites li{border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:.93rem;background:var(--card)}
+.new{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:14px}
+.new li{display:grid;grid-template-columns:6.5rem 1fr;gap:12px;font-size:.97rem;color:var(--ink-2)}
+.new b{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);padding-top:3px}
+@media (max-width:420px){.new li{grid-template-columns:1fr;gap:2px}}
+
+/* faq */
+.faq{max-width:48rem}
+.faq details{border-bottom:1px solid var(--line);padding:18px 0}
+.faq summary{cursor:pointer;font:500 1.15rem/1.35 var(--serif);list-style:none;display:flex;justify-content:space-between;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-family:var(--sans);color:var(--muted);font-size:1.3rem;line-height:1}
+.faq details[open] summary::after{content:"–"}
+.faq details p{margin-top:10px;color:var(--ink-2)}
+
+/* final cta + footer */
+.final{text-align:center}
+.final h2{max-width:20ch;margin:0 auto}
+.final .cta{justify-content:center;margin-top:28px}
+footer{border-top:1px solid var(--line);padding:32px 0 48px;color:var(--muted);font-size:.9rem}
+footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
 </style>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' aria-hidden='true'%3E%3Crect width='64' height='64' rx='15' fill='%231D1B18'/%3E%3Cpath d='M16 15a3 3 0 0 1 3-3h3v40h-3a3 3 0 0 1-3-3z' fill='%23CDBFA6'/%3E%3Cpath d='M22 12h20a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4H22z' fill='%23F7F3EC'/%3E%3Cpath d='M32 12h8v20l-4-3-4 3z' fill='%23A8431F'/%3E%3C/svg%3E">
 </head>
 <body>
-<div class="wrap">
-<header>
-  <div class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#1D1B18"/><path d="M16 15a3 3 0 0 1 3-3h3v40h-3a3 3 0 0 1-3-3z" fill="#CDBFA6"/><path d="M22 12h20a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4H22z" fill="#F7F3EC"/><path d="M32 12h8v20l-4-3-4 3z" fill="#A8431F"/></svg>NovelArchiver</div>
-  <h1>Read web novels offline, without the ads.</h1>
-  <p class="lede">Paste a novel page or any chapter link. NovelArchiver saves the chapters to your Windows PC or Android phone, keeps their formatting and system boxes, and gives you a calm library and reader that work on a plane. When the author posts more, one tap on Update brings it in.</p>
-  <p class="ver"><i aria-hidden="true"></i><b>Version 2.1.5</b> · free and open source · <a href="https://github.com/sulaimankhan8/novelarchiver/releases/latest">release notes</a></p>
-  <div class="downloads">
-    <a class="btn primary" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/NovelArchiver.exe">Download for Windows <small>.exe</small></a>
-    <a class="btn" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/NovelArchiver-android-test.apk">Download for Android <small>test build .apk</small></a>
-    <a class="btn" href="https://github.com/sulaimankhan8/novelarchiver">Source code</a>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="NovelArchiver home"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#1D1B18"/><path d="M16 15a3 3 0 0 1 3-3h3v40h-3a3 3 0 0 1-3-3z" fill="#CDBFA6"/><path d="M22 12h20a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4H22z" fill="#F7F3EC"/><path d="M32 12h8v20l-4-3-4 3z" fill="#A8431F"/></svg>NovelArchiver</a>
+    <a class="l" href="#tour">How it works</a>
+    <a class="l" href="#authors">Supporting authors</a>
+    <a class="l" href="#install">Installing</a>
+    <a class="l" href="#faq">FAQ</a>
+    <a class="btn primary" href="#download">Download</a>
   </div>
-  <p class="note">Windows 10/11 (uses the built-in WebView2). Android 7+. Windows and Android will warn you the first time, because the app isn’t from an app store: <a href="#install">here’s what to tap, and why</a>.</p>
 </header>
 
+<main id="top">
+<div class="hero" id="download">
+  <div class="wrap">
+    <div>
+      <h1>The next chapter, <em>on the train</em>.</h1>
+      <p class="lede">NovelArchiver saves the web novels you follow to your PC or phone, so you can read on the commute, at lunch, or wherever the signal drops. No ads in the middle of a chapter, no pop-ups, no waiting for pages to load.</p>
+      <div class="cta">
+        <a class="btn primary" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/NovelArchiver.exe"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5 10 4.5v7H3zm0 13 7 1v-7H3zM11 4.4 21 3v8.5H11zm0 15.2L21 21v-8.5H11z"/></svg>Windows <small>.exe</small></a>
+        <a class="btn" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/NovelArchiver-android-test.apk"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.6 9.5 19.4 6.4a.4.4 0 1 0-.7-.4l-1.8 3.2A10.8 10.8 0 0 0 12 8.2c-1.8 0-3.5.4-4.9 1L5.3 6a.4.4 0 1 0-.7.4l1.8 3.1A9.5 9.5 0 0 0 1.5 17h21a9.5 9.5 0 0 0-4.9-7.5zM7 14.4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>Android <small>.apk</small></a>
+      </div>
+      <p class="meta"><span class="v"><i aria-hidden="true"></i>Version 2.1.6</span><span>Free and open source</span><a href="#install">First install? Read this</a></p>
+    </div>
+    <div class="stage">
+      <div class="win" aria-hidden="true">
+        <div class="bar"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M22 12h20a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4H22z" fill="#F7F3EC"/><path d="M32 12h8v20l-4-3-4 3z" fill="#A8431F"/></svg>NovelArchiver<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div>
+        <img src="img/desk-library-grid-dark.webp" width="2560" height="1600" alt="NovelArchiver on Windows: a library of saved novels with their posters.">
+      </div>
+      <div class="phone"><img src="img/phone-reader.webp" width="1170" height="2532" alt="Reading a chapter on an Android phone."></div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="head"><h2>Made for the gaps in your day</h2><p>Web novel sites are built to be read online, one page load and one ad at a time. That’s fine at a desk. It’s miserable in a tunnel.</p></div>
+    <div class="moments">
+      <div><b>The commute</b><p>Chapters are on your phone before you leave. Underground, in a dead zone, on a flight: the next page is already there.</p></div>
+      <div><b>Lunch at the office</b><p>No autoplay video, no full-screen pop-ups, no “continue in our app”. Just the chapter, in a quiet reader you can set the way you like.</p></div>
+      <div><b>Stories that keep going</b><p>Following ten ongoing novels? One tap on Get new chapters brings in everything that came out since yesterday, and shows you which ones have something new.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="tour">
+  <div class="wrap tour">
+    <div class="row">
+      <div class="txt">
+        <h2>Paste a link. See what you’ll get first.</h2>
+        <p>Paste a novel page or any chapter link. NovelArchiver looks it up and shows the poster, how many chapters there are, and anything worth knowing, before a single chapter downloads.</p>
+        <ul><li>Everything, a range, or from the chapter you’re on</li><li>Choose the speed, and whether to keep chapter images</li><li>Paid or locked chapters are skipped and stay locked</li></ul>
+      </div>
+      <div class="pics"><div class="phone"><img src="img/phone-lookup.webp" width="1170" height="2532" loading="lazy" alt="The lookup sheet on a phone: poster, chapter count and download options."></div></div>
+    </div>
+    <div class="row flip">
+      <div class="txt">
+        <h2>Downloads that don’t get in the way</h2>
+        <p>Add more novels while one is downloading; they wait their turn. Switch to another app or turn the screen off and it keeps going, with its progress in a notification. When your novels get new chapters, Get new chapters catches them all up at once.</p>
+        <ul><li>Get new chapters: only what came out since last time, for every ongoing novel</li><li>Keeps downloading in the background, with a Pause button in the notification</li><li>Retry fetches only the chapters that failed; “Only on Wi-Fi” if you like</li></ul>
+      </div>
+      <div class="pics"><div class="phone"><img src="img/phone-download-dark.webp" width="1170" height="2532" loading="lazy" alt="A download in progress on a phone in dark mode."></div><div class="phone"><img src="img/phone-library.webp" width="1170" height="2532" loading="lazy" alt="The library on a phone with posters and reading progress."></div></div>
+    </div>
+    <div class="row">
+      <div class="txt">
+        <h2>A reader that stays out of the way</h2>
+        <p>Light, sepia or dark. Serif or sans. The text size, spacing and width you like, set once for every novel. Formatting comes through intact, including the “system” status boxes LitRPG stories live on.</p>
+        <div class="demo" aria-label="Example of a saved chapter">
+          <p>The ninth lantern caught on the first try. Yuhe hooked it onto the iron arm above the water and waited.</p>
+          <div class="sys">[Lantern Ledger updated]<br>Lanterns lit tonight: 9<br>Lanterns recorded: 8</div>
+          <p>He read the words twice. The ledger had never spoken to him before.</p>
+        </div>
+      </div>
+      <div class="pics"><div class="phone"><img src="img/phone-reader-aa-dark.webp" width="1170" height="2532" loading="lazy" alt="Reading settings open over a chapter in dark mode: theme, font, size, spacing, alignment."></div></div>
+    </div>
+    <div class="row flip">
+      <div class="txt">
+        <h2>The same library on your PC</h2>
+        <p>On Windows you get the same library and reader in a desktop window, with room for the full chapter list, 100 chapters a page. Export any novel as an EPUB for Kindle, Play Books, Apple Books or KOReader, and back up the whole library to one file.</p>
+      </div>
+      <div class="win" aria-hidden="true"><div class="bar"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M22 12h20a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4H22z" fill="#F7F3EC"/><path d="M32 12h8v20l-4-3-4 3z" fill="#A8431F"/></svg>NovelArchiver<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div><img src="img/desk-novel.webp" width="2560" height="1600" loading="lazy" alt="A novel's page on Windows with its chapter list."></div>
+    </div>
+  </div>
+</section>
+
+<section class="authors" id="authors">
+  <div class="wrap">
+    <div class="head"><h2>A convenience, <em>not a replacement</em>.</h2><p>Web novels exist because authors and translators spend years writing them, and the sites that host them pay for every page you load. NovelArchiver takes the ads and pop-ups out of reading on a train. It doesn’t make the work free to make. If a story keeps you coming back, give something back.</p></div>
+    <div class="give">
+      <div><b>Follow it where it lives</b><p>Favourite, follow and rate the novel on its own site. Rankings are how new readers find it.</p></div>
+      <div><b>Say something</b><p>Leave a comment or a review. Authors read them, and they keep a lot of stories going.</p></div>
+      <div><b>Support them directly</b><p>Patreon, Ko-fi, the site’s own coins or tips: even a small monthly pledge matters more than you’d think.</p></div>
+      <div><b>Buy the official release</b><p>When a story gets an e-book, print or licensed translation, that’s the copy to own.</p></div>
+    </div>
+    <div class="never">
+      <div><h3>No paid chapters</h3><p>Locked and paid chapters are skipped and stay locked. Unlock them on the site, the way the author intended.</p></div>
+      <div><h3>No getting around checks</h3><p>When a site asks if you’re human, you tick the box yourself in a site window. The app never automates it.</p></div>
+      <div><h3>No sharing</h3><p>Your copies stay on your own devices, for your own reading. Please don’t re-upload or redistribute them.</p></div>
+    </div>
+  </div>
+</section>
+
 <section id="install">
-  <h2>Installing: about the warnings</h2>
-  <p class="note" style="margin:0 0 18px;font-size:1rem">NovelArchiver is a free, open-source app. It isn’t sold through the Microsoft Store or Google Play, and it isn’t signed with a paid publisher certificate. So the first time you open it, Windows and Android warn about an “unknown publisher” or an “unknown app”. That’s expected. Here’s exactly what you’ll see.</p>
-  <div class="install">
-    <div class="card">
-      <h3><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5 10 4.5v7H3zm0 13 7 1v-7H3zM11 4.4 21 3v8.5H11zm0 15.2L21 21v-8.5H11z"/></svg>Windows</h3>
-      <p class="why">Microsoft Defender SmartScreen blocks apps it hasn’t seen many people run yet.</p>
-      <ol>
-        <li>Your browser may say <span class="say">“NovelArchiver.exe isn’t commonly downloaded”</span>. In Edge choose <span class="ui">⋯</span>, <span class="ui">Keep</span>, then <span class="ui">Keep anyway</span>.<small>In Chrome, choose <span class="ui">Keep</span> on the download.</small></li>
-        <li>Open <code>NovelArchiver.exe</code>. A blue box says <span class="say">“Windows protected your PC”</span>. Click <span class="ui">More info</span>, the small link under the text.</li>
-        <li>The publisher shows as <span class="say">“Unknown publisher”</span>. Click <span class="ui blue">Run anyway</span>.<small>Windows asks once for each new version.</small></li>
-      </ol>
+  <div class="wrap">
+    <div class="head"><h2>Installing: about the warnings</h2><p>NovelArchiver is free and isn’t sold through the Microsoft Store or Google Play, so it isn’t signed with a paid publisher certificate. The first time you open it, Windows or Android will warn about an unknown app. That’s expected; here’s exactly what to tap.</p></div>
+    <div class="install">
+      <div class="card">
+        <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5 10 4.5v7H3zm0 13 7 1v-7H3zM11 4.4 21 3v8.5H11zm0 15.2L21 21v-8.5H11z"/></svg>Windows 10 and 11</h3>
+        <p class="why">Microsoft Defender SmartScreen blocks apps it hasn’t seen many people run yet.</p>
+        <ol class="steps">
+          <li><span>Your browser may say <span class="say">“NovelArchiver.exe isn’t commonly downloaded”</span>. In Edge choose <span class="ui">⋯</span>, <span class="ui">Keep</span>, then <span class="ui">Keep anyway</span>.<small>In Chrome, choose <span class="ui">Keep</span> on the download.</small></span></li>
+          <li><span>Open <code>NovelArchiver.exe</code>. A blue box says <span class="say">“Windows protected your PC”</span>. Click <span class="ui">More info</span>, the small link under the text.</span></li>
+          <li><span>The publisher shows as <span class="say">“Unknown publisher”</span>. Click <span class="ui blue">Run anyway</span>.<small>Windows asks once for each new version.</small></span></li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.6 9.5 19.4 6.4a.4.4 0 1 0-.7-.4l-1.8 3.2A10.8 10.8 0 0 0 12 8.2c-1.8 0-3.5.4-4.9 1L5.3 6a.4.4 0 1 0-.7.4l1.8 3.1A9.5 9.5 0 0 0 1.5 17h21a9.5 9.5 0 0 0-4.9-7.5zM7 14.4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>Android 7 and newer</h3>
+        <p class="why">Android protects you from apps that don’t come from Google Play, so it asks you to allow this one.</p>
+        <ol class="steps">
+          <li><span>Chrome may say <span class="say">“File might be harmful”</span>. Tap <span class="ui">Download anyway</span>.</span></li>
+          <li><span>Open the downloaded <code>.apk</code>. If you see <span class="say">“not allowed to install unknown apps from this source”</span>, tap <span class="ui">Settings</span>, turn on <span class="ui">Allow from this source</span>, then go back.</span></li>
+          <li><span>Tap <span class="ui">Install</span>. If Play Protect warns about an <span class="say">“unknown developer”</span>, tap <span class="ui">More details</span>, then <span class="ui">Install anyway</span>.<small>If it offers to scan the app, either choice is fine.</small></span></li>
+          <li><span>Updating later? Install the new <code>.apk</code> over the old one. Your library stays.</span></li>
+        </ol>
+      </div>
     </div>
-    <div class="card">
-      <h3><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.6 9.5 19.4 6.4a.4.4 0 1 0-.7-.4l-1.8 3.2A10.8 10.8 0 0 0 12 8.2c-1.8 0-3.5.4-4.9 1L5.3 6a.4.4 0 1 0-.7.4l1.8 3.1A9.5 9.5 0 0 0 1.5 17h21a9.5 9.5 0 0 0-4.9-7.5zM7 14.4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>Android</h3>
-      <p class="why">Android protects you from apps that don’t come from Google Play, so it asks you to allow this one.</p>
-      <ol>
-        <li>Chrome may say <span class="say">“File might be harmful”</span>. Tap <span class="ui">Download anyway</span>.</li>
-        <li>Open the downloaded <code>.apk</code>. If you see <span class="say">“not allowed to install unknown apps from this source”</span>, tap <span class="ui">Settings</span>, turn on <span class="ui">Allow from this source</span>, then go back.</li>
-        <li>Tap <span class="ui">Install</span>. If Google Play Protect warns about an <span class="say">“unsafe app”</span> or an <span class="say">“unknown developer”</span>, tap <span class="ui">More details</span>, then <span class="ui">Install anyway</span>.<small>If it offers to send the app for a scan, either choice is fine.</small></li>
-        <li>Updating? Install the new <code>.apk</code> over the old one. Your library stays.</li>
-      </ol>
-    </div>
-  </div>
-  <div class="trust"><strong>Want to check you have the real file?</strong> Every release lists its SHA-256 fingerprints in <a href="https://github.com/sulaimankhan8/novelarchiver/releases/latest">SHA256SUMS.txt</a>, and all the source code is on GitHub. On Windows, compare with:
+    <div class="check"><strong>Want to check you have the real file?</strong> Every release lists its SHA-256 fingerprints in <a href="https://github.com/sulaimankhan8/novelarchiver/releases/latest">SHA256SUMS.txt</a>, and all the source code is <a href="https://github.com/sulaimankhan8/novelarchiver">on GitHub</a>. On Windows, compare with:
 <pre class="cmd">Get-FileHash $HOME\Downloads\NovelArchiver.exe</pre></div>
-</section>
-
-<section>
-  <h2>What’s new in 2.1</h2>
-  <ul class="new">
-    <li><b>New look</b><span>A redesigned library and new logo. Your novels show their own posters; ones without a poster get a clean cloth-bound cover until one appears.</span></li>
-    <li><b>Queue</b><span>Add novels while one is downloading. They run one at a time; pause, resume, or take one out of the queue.</span></li>
-    <li><b>Full update</b><span>Update refreshes the description, status and poster, downloads new and missing chapters, re-checks saved chapters for edits on the site, and keeps chapters the site removed. Then it tells you what changed.</span></li>
-    <li><b>Reading</b><span>Pick the reader’s font, text size, line spacing, width and theme (on the novel page, in Settings, or with Aa while reading). Long chapter lists show 100 at a time.</span></li>
-    <li><b>Backup</b><span>Save the whole library, reading places and settings to one file, and restore it on a new PC or phone. Restoring merges; it never deletes.</span></li>
-    <li><b>Android</b><span>Notifications when a download finishes or a site needs you, an “Only on Wi-Fi” switch, and human checks (such as EmpireNovel’s) that now pass inside the app.</span></li>
-  </ul>
-</section>
-
-<section>
-  <h2>Formatting stays intact</h2>
-  <div class="demo" aria-label="Example of a saved chapter">
-    <p><strong><em>Click. Click.</em></strong></p>
-    <p>The rhythmic sound of the keyboard echoed in the otherwise quiet office.</p>
-    <p class="sys"><strong>[Would you like to quit the game?]</strong></p>
-    <p class="sys">[▶ Yes] [▷ No]</p>
-    <p>I didn't hesitate.</p>
   </div>
 </section>
 
 <section>
-  <h2>What it does</h2>
-  <div class="grid">
-    <div class="card"><h3>Paste any link</h3><p>A novel page or any chapter. The app looks it up straight away and shows the poster, chapter count and any warnings before anything downloads. From a chapter you can save the whole novel or just from there on.</p></div>
-    <div class="card"><h3>Your choice of chapters</h3><p>Everything, a range, or from the chapter you’re on. Pick the speed and whether to keep chapter images.</p></div>
-    <div class="card"><h3>A queue that keeps going</h3><p>Add more novels while one downloads. Pause any time; everything saved so far is readable, and Resume carries on where it stopped.</p></div>
-    <div class="card"><h3>Update brings it all in</h3><p>New chapters, chapters the author revised, a new poster, a changed description. Update one novel or the whole library, or let it run when the app opens.</p></div>
-    <div class="card"><h3>Clean, offline reader</h3><p>Light, dark and sepia themes; serif or sans text in the size and spacing you like; and it remembers where you stopped, shown as Continue in your library.</p></div>
-    <div class="card"><h3>Your storage, your call</h3><p>See each novel’s size, delete chapters you’ve read or drop images, and back up the whole library to one file.</p></div>
-    <div class="card"><h3>EPUB export</h3><p>One file for Play Books, Apple Books, Moon+ Reader, KOReader or Send to Kindle.</p></div>
-    <div class="card"><h3>Polite by design</h3><p>A few requests at a time per site. When a site asks you to verify you’re human, you tick it yourself in a built-in browser window; the app never gets around checks.</p></div>
+  <div class="wrap split">
+    <div>
+      <h2>Works with the sites you read</h2>
+      <ul class="sites">
+        <li>NovelBin</li><li>NovelFull</li><li>ReadNovelFull</li><li>NovelPing</li><li>Royal Road</li><li>WuxiaWorld</li><li>ScribbleHub</li><li>FreeWebNovel</li><li>NovelFire</li><li>EmpireNovel</li><li>Webnovel <span class="muted">(free chapters)</span></li>
+      </ul>
+      <p class="muted" style="margin-top:16px;font-size:.95rem">Other sites open in a general reader mode. Site layouts change; when one breaks, its rules can be fixed without a new release.</p>
+    </div>
+    <div>
+      <h2>What’s new in 2.1</h2>
+      <ul class="new">
+        <li><b>Catch up</b><span>Get new chapters checks every ongoing novel and downloads only what came out since last time. A New chapters filter shows which ones have something to read.</span></li>
+        <li><b>Background</b><span>On Android, downloads keep going when you switch apps or turn the screen off, with progress in a notification.</span></li>
+        <li><b>Reading</b><span>Font, size, spacing, width and theme, on the novel page, in Settings, or with Aa while you read.</span></li>
+        <li><b>Update</b><span>A novel’s new chapters, edited chapters and new poster in one go, with a summary of what changed. Retry fetches only what failed.</span></li>
+        <li><b>Queue</b><span>Add novels while one downloads. Pause, resume, or take one out.</span></li>
+        <li><b>Backup</b><span>The whole library, reading places and settings in one file. Restoring merges; it never deletes.</span></li>
+        <li><b>Android</b><span>Notifications, “Only on Wi-Fi”, and human checks that pass inside the app.</span></li>
+      </ul>
+      <p style="margin-top:16px;font-size:.95rem"><a href="https://github.com/sulaimankhan8/novelarchiver/releases/latest">Full release notes</a></p>
+    </div>
   </div>
 </section>
 
-<section>
-  <h2>Supported sites</h2>
-  <ul class="sites">
-    <li>NovelBin</li><li>NovelFull</li><li>ReadNovelFull</li><li>Royal Road</li><li>WuxiaWorld</li>
-    <li>FreeWebNovel</li><li>NovelFire</li><li>Webnovel (free chapters)</li><li>ScribbleHub</li><li>EmpireNovel</li>
-  </ul>
-  <p class="note">Tested on Windows and Android in 2.1.3. Other sites fall back to a generic reader-mode parser. Site layouts change; parser rules live in a JSON file and can be fixed without a rebuild. Webnovel downloads free chapters only; paid chapters on any site are skipped and stay locked.</p>
+<section id="faq">
+  <div class="wrap">
+    <div class="head"><h2>Questions</h2></div>
+    <div class="faq">
+      <details><summary>Is it free?</summary><p>Yes, and open source. There are no accounts, no subscriptions and no ads in the app.</p></details>
+      <details><summary>Does it work without internet?</summary><p>Reading does. You need a connection to download chapters and to get new ones; after that everything opens offline.</p></details>
+      <details><summary>Can I use other apps while it downloads?</summary><p>Yes. On Android a notification shows the progress and the download carries on in the background, even with the screen off. Some phones (Xiaomi, Oppo, Realme, Vivo) stop background apps aggressively; if yours does, set NovelArchiver’s battery use to “Unrestricted”.</p></details>
+      <details><summary>Will it download paid or locked chapters?</summary><p>No. Paid chapters are skipped and stay locked on the site. NovelArchiver only saves what the site already shows you for free.</p></details>
+      <details><summary>A site asked me to verify I’m human. Now what?</summary><p>The download pauses and a site window opens. Tick the check yourself and the download carries on. The app never solves or skips these checks for you.</p></details>
+      <details><summary>Does it send my library anywhere?</summary><p>No. Chapters are saved on your device and read from there. Backups are a file you keep wherever you like.</p></details>
+      <details><summary>Can I move my library to a new phone or PC?</summary><p>Yes. Settings → Back up saves everything to one file; Restore on the new device merges it in.</p></details>
+    </div>
+  </div>
 </section>
 
-<section>
-  <h2>Getting started</h2>
-  <ol class="steps">
-    <li>Download and open the app (the first time, see <a href="#install">the warnings above</a>).</li>
-    <li>Paste a novel page or any chapter link, for example <code>https://novelfull.com/some-novel.html</code>. The app looks it up straight away.</li>
-    <li>Pick all chapters or a range, then <strong>Download</strong>. Read from your library any time, online or not. <strong>Update</strong> brings in new chapters later.</li>
-  </ol>
+<section class="final">
+  <div class="wrap">
+    <h2>Download tonight’s chapters before you leave.</h2>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/NovelArchiver.exe">Download for Windows</a>
+      <a class="btn" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/NovelArchiver-android-test.apk">Download for Android</a>
+    </div>
+  </div>
 </section>
+</main>
 
 <footer>
-  For keeping a personal offline copy of stories you read. Please don't redistribute downloaded chapters, and support authors and translators where you can.
-  · <a href="https://github.com/sulaimankhan8/novelarchiver">GitHub</a>
+  <div class="wrap">
+    <span>NovelArchiver · for personal, offline reading. Please support the authors you read.</span>
+    <span><a href="https://github.com/sulaimankhan8/novelarchiver">Source code</a> · <a href="https://github.com/sulaimankhan8/novelarchiver/releases">All releases</a></span>
+  </div>
 </footer>
-</div>
 </body>
 </html>
