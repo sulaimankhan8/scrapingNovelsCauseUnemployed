@@ -187,7 +187,7 @@ box-shadow:0 12px 24px -16px rgba(0,0,0,.35)}
 .aa-row>b{font-weight:500}
 .aa-seg{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
 .aa-seg button,.aa-step button{font:inherit;color:var(--ink);background:none;border:0;border-radius:7px;padding:7px 12px;min-height:36px;cursor:pointer}
-.aa-seg button[aria-checked=true]{background:var(--panel);box-shadow:0 1px 2px rgba(0,0,0,.18);font-weight:600}
+.aa-seg button[aria-checked=true]{background:var(--ink);color:var(--bg);font-weight:600}
 .aa-step{display:inline-flex;align-items:center;gap:6px}
 .aa-step button{border:1px solid var(--line);background:var(--bg);min-width:48px}
 .aa-step button:disabled{opacity:.4;cursor:default}

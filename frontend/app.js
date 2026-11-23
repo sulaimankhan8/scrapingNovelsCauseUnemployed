@@ -19,8 +19,22 @@
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   // Some sites shout titles in capitals; show them in title case.
   const SMALL = new Set(['a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'in', 'into', 'nor', 'of', 'on', 'or', 'the', 'to', 'vs', 'with']);
+  // A download that fails before the site gives its title carries the link
+  // as its title. Name it from the link instead ("lord-of-the-mysteries.html"
+  // -> "Lord of the Mysteries"), never "https://…" with an "H" cover.
+  const SKIP_SEG = /^(novels?|books?|series|fiction|read|chapters?|ch|c|book-info|info)$|^(chapter|chap|ch|c)[-_]?\d+|^\d+$/i;
+  function titleFromUrl(u) {
+    let url;
+    try { url = new URL(u); } catch (e) { return ''; }
+    const segs = url.pathname.split('/').map((x) => decodeURIComponent(x).replace(/\.(html?|php|aspx?)$/i, '')).filter((x) => x && !SKIP_SEG.test(x));
+    const words = (segs.pop() || '').split(/[-_+\s]+/).filter(Boolean);
+    while (words.length > 1 && /^\d+$/.test(words[words.length - 1])) words.pop();
+    if (!words.length) return `Novel on ${url.hostname.replace(/^www\./, '')}`;
+    return words.map((w, i) => (i > 0 && SMALL.has(w.toLowerCase()) ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())).join(' ');
+  }
   function niceTitle(t) {
     t = String(t || '');
+    if (/^https?:\/\//i.test(t.trim())) return titleFromUrl(t.trim());
     if (!/[A-Z]{2}/.test(t) || /[a-z]/.test(t) || t.replace(/[^A-Z]/g, '').length < 8) return t;
     return t.toLowerCase().replace(/[\p{L}\p{N}'’]+/gu, (w, i) => (i > 0 && SMALL.has(w) && !/[:\-–—]\s*$/.test(t.slice(0, i)) ? w : w.charAt(0).toUpperCase() + w.slice(1)));
   }
@@ -71,7 +85,7 @@
 
   function mb(bytes) {
     const b = Number(bytes) || 0;
-    if (b >= 1 << 30) return (b / (1 << 30)).toFixed(1) + ' GB';
+    if (b >= 1000 * (1 << 20)) return (b / (1 << 30)).toFixed(1) + ' GB';
     if (b >= 1 << 20) return (b / (1 << 20)).toFixed(1) + ' MB';
     if (b > 0) return Math.max(1, Math.round(b / 1024)) + ' KB';
     return '0 MB';
@@ -163,6 +177,7 @@
     return TONE_LIST[h % TONE_LIST.length];
   }
   function fallbackCover(title, author, compact) {
+    title = niceTitle(title);
     const initial = (String(title || 'N').replace(/^(the|a|an)\s+/i, '').trim()[0] || 'N').toUpperCase();
     const inner = compact
       ? `<div class="cover__mono">${esc(initial)}</div>`
@@ -170,9 +185,9 @@
     return `<div class="cover cover--fb${compact ? ' cover--sm' : ''}" style="background:${toneOf(title)}"><div class="cover__spine"></div><div class="cover__hinge"></div>${inner}</div>`;
   }
   const badCovers = new Set();
-  function coverHTML(src, title, author, compact) {
+  function coverHTML(src, title, author, compact, eager) {
     if (!src || badCovers.has(src)) return fallbackCover(title, author, compact);
-    return `<div class="cover${compact ? ' cover--sm' : ''}" data-fb-title="${esc(title)}" data-fb-author="${esc(author || '')}" data-fb-compact="${compact ? 1 : ''}"><img src="${esc(src)}" alt="" loading="lazy" decoding="async"></div>`;
+    return `<div class="cover${compact ? ' cover--sm' : ''}" data-fb-title="${esc(title)}" data-fb-author="${esc(author || '')}" data-fb-compact="${compact ? 1 : ''}"><img src="${esc(src)}" alt="" loading="${eager ? 'eager' : 'lazy'}" decoding="async"></div>`;
   }
   // A poster that fails to load becomes a fallback cover.
   document.addEventListener('error', (e) => {
@@ -240,14 +255,31 @@
     synopsisOpen: false,
   };
   const speedWorkers = { gentle: 2, balanced: 4, fast: 8 };
+  // Chapters in flight per speed. The fetcher still caps each site at 3
+  // requests at once and spaces them out, so the hints describe the effect.
+  const SPEED_HINT = {
+    gentle: 'Slowest, and easiest on the site.',
+    balanced: 'Quick without pushing the site. Right for most novels.',
+    fast: 'Quickest. Some sites start refusing if you use it for long.',
+  };
 
   // ---------------------------------------------------------------- theme
   const THEMES = ['light', 'sepia', 'dark', 'system'];
   const THEME_LABEL = { light: 'Light', sepia: 'Sepia', dark: 'Dark', system: 'Match system' };
   const THEME_ICON = { light: 'sun', sepia: 'sepia', dark: 'moon', system: 'monitor' };
+  // Swap the theme with every transition off for one frame, so colours flip
+  // at once instead of each control fading on its own.
   function applyTheme(t) {
     if (!THEMES.includes(t)) t = 'system';
-    document.documentElement.dataset.theme = t;
+    const root = document.documentElement;
+    if (root.dataset.theme !== t) {
+      const off = document.createElement('style');
+      off.textContent = '*,*::before,*::after{transition:none!important}';
+      document.head.appendChild(off);
+      root.dataset.theme = t;
+      void document.body.offsetHeight;
+      requestAnimationFrame(() => requestAnimationFrame(() => off.remove()));
+    }
     store.raw('na-theme', t);
     const next = THEMES[(THEMES.indexOf(t) + 1) % THEMES.length];
     const b = $('#themeBtn');
@@ -487,14 +519,16 @@
     const hasText = it.url.trim().length > 0;
     const canPaste = !!(navigator.clipboard && navigator.clipboard.readText);
     let btn;
-    if (looking) btn = `<button type="button" class="btn btn--ghost" data-act="intake-clear" aria-label="Clear link">${icon('x', 16)}</button>`;
+    // Once a novel is found (or while looking), the field's button clears it;
+    // the card below holds the main action.
+    if (looking || (it.phase === 'found' && d)) btn = `<button type="button" class="btn btn--ghost" data-act="intake-clear" aria-label="${looking ? 'Stop looking' : 'Clear link'}" title="${looking ? 'Stop looking' : 'Clear link'}">${icon('x', 16)}</button>`;
     else if (it.phase === 'error') btn = `<button type="submit" class="btn">Try again</button>`;
     else if (hasText || !canPaste) btn = `<button type="submit" class="btn btn--primary">Find<span class="wide"> novel</span> ${icon('arrow', 16)}</button>`;
     else btn = `<button type="button" class="btn" data-act="paste">Paste</button>`;
 
     let panel = '';
     if (looking) {
-      panel = `<div class="card skeleton" aria-live="polite">
+      panel = `<div class="card skeleton" data-key="sk-${it.token}" aria-live="polite">
         <div class="sk" style="width:88px;height:132px;flex:none;border-radius:6px"></div>
         <div style="flex:1;display:flex;flex-direction:column;gap:10px;padding-top:4px">
           <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)">${spinner(16)} Reading ${esc(hostOf(normaliseUrl(it.url)) || 'the site')}…</div>
@@ -502,31 +536,26 @@
           <div class="sk sk--soft" style="height:12px;width:92%;margin-top:8px"></div><div class="sk sk--soft" style="height:12px;width:70%"></div>
         </div></div>`;
     } else if (it.phase === 'error') {
-      panel = `<div class="err-box" id="intakeErr" role="alert"><b>${esc(it.err.title)}</b><span>${esc(it.err.body)}</span></div>`;
+      panel = `<div class="err-box" data-key="err" id="intakeErr" role="alert"><b>${esc(it.err.title)}</b><span>${esc(it.err.body)}</span></div>`;
     } else if (it.phase === 'found' && d) {
       panel = foundCard(d, it);
     }
-    box.innerHTML = `
+    // Patched in place: option taps don't rebuild the card, so its entrance
+    // plays once and the phone sheet keeps its scroll position.
+    morph(box, `
       <h1 class="page-h" id="addH">Add a novel</h1>
       <form class="linkbox${it.phase === 'error' ? ' is-error' : ''}" id="intakeForm" novalidate>
         <label>${icon(it.phase === 'error' ? 'alert' : 'link', 18)}
           <input type="url" id="novelUrl" placeholder="Paste a novel or chapter link" aria-label="Novel or chapter link" autocomplete="off" spellcheck="false" value="${esc(it.url)}" ${looking ? 'readonly' : ''} ${it.phase === 'error' ? 'aria-invalid="true" aria-describedby="intakeErr"' : ''}>
         </label>${btn}
       </form>
-      ${panel || `<p class="hint">Works with NovelBin, NovelFull, Royal Road, WuxiaWorld, ScribbleHub and 5 more. Other sites open in reader mode.</p>`}`;
+      ${panel || `<p class="hint" data-key="hint">Works with NovelBin, NovelFull, Royal Road, WuxiaWorld, ScribbleHub and 5 more. Other sites open in reader mode.</p>`}`);
+    // Attributes don't move a field's live value once it's been typed in.
     const input = $('#novelUrl');
-    input.addEventListener('input', () => {
-      const was = state.intake.url.trim().length > 0;
-      state.intake.url = input.value;
-      if (state.intake.phase === 'error') { state.intake.phase = 'idle'; renderIntake(); focusUrl(); return; }
-      if (was !== (input.value.trim().length > 0) && state.intake.phase === 'idle') { renderIntake(); focusUrl(); }
-    });
-    input.addEventListener('paste', () => setTimeout(() => {
-      state.intake.url = input.value;
-      if (/^\s*(https?:\/\/|www\.)/i.test(input.value) || /\.\w{2,}\//.test(input.value)) lookup(input.value);
-    }, 30));
-    $('#intakeForm').addEventListener('submit', (e) => { e.preventDefault(); if (state.intake.url.trim()) lookup(state.intake.url); });
-    bindFound(box);
+    if (input && input.value !== it.url) input.value = it.url;
+    const img = $('#optImages', box); if (img) img.checked = it.images !== false;
+    $$('input[name="scope"]', box).forEach((r) => { r.checked = r.value === it.scope; });
+    [['rFrom', it.from || 1], ['rTo', it.to || (d && d.totalChapters) || '']].forEach(([id, v]) => { const el = $('#' + id, box); if (el && document.activeElement !== el && el.value !== String(v)) el.value = v; });
   }
   function focusUrl() { const i = $('#novelUrl'); if (i) { i.focus(); const v = i.value; i.setSelectionRange(v.length, v.length); } }
   function normaliseUrl(u) {
@@ -582,7 +611,7 @@
     const verify = warnings.some((w) => /verify you are human|human check|real browser/i.test(w));
     const notes = warnings.map((w) => {
       if (/paid|locked/i.test(w)) return `<div class="note note--amber">${icon('lock', 16)}<span>${esc(w)}</span></div>`;
-      if (/verify you are human|human/i.test(w)) return `<div class="note note--amber">${icon('shield', 16)}<span>${esc(w.replace(/the site browser window pops up so you can tick it once; it's remembered after that/i, 'a site window opens so you can tick it once. It’s remembered after that'))}</span></div>`;
+      if (/verify you are human|human/i.test(w)) return `<div class="note note--amber">${icon('shield', 16)}<span>${esc(w.replace(/the site browser window pops up so you can tick it once; it's remembered after that/i, 'A site window opens so you can tick it once. It’s remembered after that'))}</span></div>`;
       return `<div class="note">${icon('info', 16)}<span>${esc(w)}</span></div>`;
     });
     const poster = d.coverData || d.cover;
@@ -599,7 +628,7 @@
 
     // Already in the library: open it or update it.
     if (d.existingSlug) {
-      return `<div class="sheet-scrim" data-act="intake-cancel"></div><div class="card found" role="dialog" aria-labelledby="foundT">${head}
+      return `<div class="sheet-scrim" data-key="scrim" data-act="intake-cancel"></div><div class="card found" data-key="found-${it.token}" role="dialog" aria-labelledby="foundT">${head}
         <div class="found__notes"><div class="note note--green">${icon('check', 16, 2.5)}<span><strong>You have this one.</strong> ${num(d.downloaded)} of ${plural(total, 'chapter')} are saved.</span></div>${notes.join('')}</div>
         <div class="found__foot"><button type="button" class="btn btn--ghost" data-act="intake-cancel">Cancel</button>
           <a class="btn" href="#/novel/${encodeURIComponent(d.existingSlug)}" data-act="intake-open">Open novel</a>
@@ -637,13 +666,13 @@
       <div class="opt-row"><span class="lbl">Speed</span><div>
         <div class="seg" role="radiogroup" aria-label="Download speed">
           ${['gentle', 'balanced', 'fast'].map((s) => `<button type="button" role="radio" aria-checked="${speed === s}" data-speed="${s}">${s[0].toUpperCase() + s.slice(1)}</button>`).join('')}
-        </div><div class="sub">${speedWorkers[speed]} at a time. A site never gets more than 3 requests at once.</div></div></div>
-      <label class="opt-row" style="align-items:center"><span class="lbl" style="padding-top:0">Images</span>
-        <input type="checkbox" class="check" id="optImages" ${it.images !== false ? 'checked' : ''}>
-        <span style="font-size:14px">Keep chapter images <span class="muted">(text and [System] boxes are always kept)</span></span></label>
+        </div><div class="sub">${SPEED_HINT[speed] || ''}</div></div></div>
+      <div class="opt-row"><span class="lbl" id="imgL">Images</span>
+        <label class="opt-check"><input type="checkbox" class="check" id="optImages" aria-describedby="imgL" ${it.images !== false ? 'checked' : ''}>
+        <span>Keep chapter images <span class="muted">(text and [System] boxes are always kept)</span></span></label></div>
     </div>`;
     const label = crawl ? 'Start downloading' : count > 0 ? `Download ${plural(count, 'chapter')}` : 'Nothing to download';
-    return `<div class="sheet-scrim" data-act="intake-cancel"></div><div class="card found" role="dialog" aria-labelledby="foundT">${head}
+    return `<div class="sheet-scrim" data-key="scrim" data-act="intake-cancel"></div><div class="card found" data-key="found-${it.token}" role="dialog" aria-labelledby="foundT">${head}
       ${notes.length ? `<div class="found__notes">${notes.join('')}</div>` : ''}
       ${opts}
       <div class="found__foot">
@@ -652,23 +681,48 @@
         <button type="button" class="btn btn--primary" data-act="intake-start" ${!crawl && count === 0 ? 'disabled' : ''}>${icon('download', 16)} ${label}</button>
       </div></div>`;
   }
-  function bindFound(box) {
-    $$('[data-scope]', box).forEach((b) => b.addEventListener('click', () => { state.intake.scope = b.dataset.scope; renderIntake(); if (b.dataset.scope === 'range') { const f = $('#rFrom'); if (f) f.focus(); } }));
-    $$('input[name="scope"]', box).forEach((r) => r.addEventListener('change', () => { state.intake.scope = r.value; renderIntake(); }));
-    $$('[data-speed]', box).forEach((b) => b.addEventListener('click', () => { state.intake.speed = b.dataset.speed; renderIntake(); }));
-    const img = $('#optImages', box); if (img) img.addEventListener('change', () => { state.intake.images = img.checked; });
-    const desc = $('.found__desc', box); if (desc) desc.addEventListener('click', () => { state.intake.descOpen = !state.intake.descOpen; desc.classList.toggle('is-open'); });
-    ['rFrom', 'rTo'].forEach((id) => {
-      const el = $('#' + id, box);
-      if (!el) return;
-      el.addEventListener('input', () => {
-        state.intake[id === 'rFrom' ? 'from' : 'to'] = el.value;
-        const n = intakeCount(state.intake.data, state.intake);
-        const t = $('#rTally'); if (t) t.textContent = `${plural(n, 'chapter')} · get the rest later with Update`;
-        const b = $('[data-act="intake-start"]'); if (b) { b.disabled = n === 0; b.lastChild.textContent = ' ' + (n > 0 ? `Download ${plural(n, 'chapter')}` : 'Nothing to download'); }
-      });
-    });
-  }
+  // The intake card is patched in place, so its controls are wired once here.
+  document.addEventListener('input', (e) => {
+    const el = e.target;
+    if (el.id === 'novelUrl') {
+      const it = state.intake;
+      const was = it.url.trim().length > 0;
+      it.url = el.value;
+      if (it.phase === 'error') { it.phase = 'idle'; renderIntake(); return; }
+      if (was !== (el.value.trim().length > 0) && it.phase === 'idle') renderIntake();
+    } else if ((el.id === 'rFrom' || el.id === 'rTo') && state.intake.data) {
+      state.intake[el.id === 'rFrom' ? 'from' : 'to'] = el.value;
+      const n = intakeCount(state.intake.data, state.intake);
+      const t = $('#rTally'); if (t) t.textContent = `${plural(n, 'chapter')} · get the rest later with Update`;
+      const b = $('[data-act="intake-start"]'); if (b) { b.disabled = n === 0; b.lastChild.textContent = ' ' + (n > 0 ? `Download ${plural(n, 'chapter')}` : 'Nothing to download'); }
+    }
+  });
+  document.addEventListener('paste', (e) => {
+    const el = e.target;
+    if (el.id !== 'novelUrl') return;
+    setTimeout(() => {
+      state.intake.url = el.value;
+      if (/^\s*(https?:\/\/|www\.)/i.test(el.value) || /\.\w{2,}\//.test(el.value)) lookup(el.value);
+    }, 30);
+  });
+  document.addEventListener('submit', (e) => {
+    if (e.target.id !== 'intakeForm') return;
+    e.preventDefault();
+    if (state.intake.url.trim()) lookup(state.intake.url);
+  });
+  document.addEventListener('change', (e) => {
+    const el = e.target;
+    if (el.name === 'scope' && el.closest('#intake')) { state.intake.scope = el.value; renderIntake(); }
+    if (el.id === 'optImages') state.intake.images = el.checked;
+  });
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#intake')) return;
+    const sc = e.target.closest('[data-scope]');
+    if (sc) { state.intake.scope = sc.dataset.scope; renderIntake(); if (sc.dataset.scope === 'range') { const f = $('#rFrom'); if (f) f.focus(); } return; }
+    const sp = e.target.closest('[data-speed]');
+    if (sp) { state.intake.speed = sp.dataset.speed; renderIntake(); return; }
+    if (e.target.closest('.found__desc')) { state.intake.descOpen = !state.intake.descOpen; renderIntake(); }
+  });
   async function startIntake() {
     const it = state.intake, d = it.data;
     if (!d) return;
@@ -677,7 +731,7 @@
     if (it.scope === 'range') { opts.startChapter = parseInt(it.from, 10) || 1; opts.endChapter = parseInt(it.to, 10) || 0; if (opts.endChapter && opts.endChapter < opts.startChapter) { toast('The last chapter is before the first one.', { tone: 'bad' }); return; } }
     try {
       const r = await api('StartScrape', opts);
-      const title = d.title;
+      const title = niceTitle(d.title);
       cancelIntake();
       if (r && r.status === 'queued') toast(`${title} is queued. It starts after the current download.`);
       else if (r && r.status === 'running') toast(`${title} is already downloading.`);
@@ -715,12 +769,12 @@
     else if (onlySlug && q.length) html += `<div class="card job" data-key="q-${q[0].id}"><div class="job__head"><span class="pill">${icon('clock', 12)} Queued</span><span class="muted" style="font-size:13px">Starts after the current download.</span><span class="spacer" style="margin-left:auto"></span><button type="button" class="btn btn--md" data-act="unqueue" data-id="${q[0].id}">Remove from queue</button></div></div>`;
     html += results.map(resultCard).join('');
     if (!onlySlug && queue.length) {
-      html += `<div class="upnext"><b>Up next · ${queue.length}</b><span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${queue.slice(0, 3).map((j) => esc(j.title) + (j.kind === 'update' ? ' · update' : '')).join(' · ')}</span>
+      html += `<div class="upnext"><b>Up next · ${queue.length}</b><span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${queue.slice(0, 3).map((j) => esc(niceTitle(j.title)) + (j.kind === 'update' ? ' · update' : '')).join(' · ')}</span>
         <button type="button" class="btn btn--link" data-act="toggle-queue" aria-expanded="${state.showQueue}">${state.showQueue ? 'Hide queue' : 'Manage queue'}</button></div>`;
       if (state.showQueue) {
         html += `<div class="card queue"><ul>${queue.map((j, i) => `<li><div style="width:28px;flex:none">${coverHTML(j.cover, j.title, '', true)}</div>
-          <span class="q-title"><b>${esc(j.title)}</b><span>${i === 0 ? 'Next' : 'Then'} · ${j.kind === 'update' ? 'update' : 'download'}</span></span>
-          <button type="button" class="icon-btn icon-btn--sm" data-act="unqueue" data-id="${j.id}" aria-label="Remove ${esc(j.title)} from the queue">${icon('x', 15)}</button></li>`).join('')}</ul>
+          <span class="q-title"><b>${esc(niceTitle(j.title))}</b><span>${i === 0 ? 'Next' : 'Then'} · ${j.kind === 'update' ? 'update' : 'download'}</span></span>
+          <button type="button" class="icon-btn icon-btn--sm" data-act="unqueue" data-id="${j.id}" aria-label="Remove ${esc(niceTitle(j.title))} from the queue">${icon('x', 15)}</button></li>`).join('')}</ul>
           <div style="display:flex;justify-content:flex-end;padding:10px 14px;border-top:1px solid var(--line-2)"><button type="button" class="btn btn--md" data-act="stop-all">Stop all</button></div></div>`;
       }
     }
@@ -809,6 +863,8 @@
     }
     if (/browser fetch failed|failed to fetch/i.test(m)) return `${site.replace(/^www\./, '')} didn’t answer from inside the site window. Check your connection, then try again.`;
     if (/verify you are human|check wasn't completed|challenge/i.test(m)) return `The “Verify you are human” check wasn’t finished in time. Press Try again and tick it in the site window.`;
+    if (/deadline exceeded|timeout|timed out/i.test(m)) return `${site.replace(/^www\./, '')} took too long to answer. It may be busy; try again in a minute.`;
+    if (/no such host|dial tcp|connection refused|network is unreachable/i.test(m)) return `Couldn’t reach ${site.replace(/^www\./, '')}. Check your internet connection, then try again.`;
     return cap(m.replace(/https?:\/\/\S{60,}/g, (u) => u.slice(0, 48) + '…'));
   }
   function trimMsg(m) { m = String(m || ''); return m.length > 140 ? m.slice(0, 137) + '…' : m; }
@@ -823,7 +879,7 @@
       const head = jobHead(d, `<span class="pill pill--red"><span class="dot"></span>${upd ? 'Update failed' : 'Stopped'}</span>`);
       let saved = '';
       if (upd) saved = `<div class="job__line"><b>Couldn’t update</b><span>${d.total ? `${num(d.ok)} of ${plural(d.total, 'chapter')} are saved and readable` : ''}</span></div>`;
-      else if (d.total) saved = `<div class="job__line"><b>Stopped at ${num(d.ok || 0)} of ${num(d.total)}</b><span>${d.ok ? plural(d.ok, 'chapter') + ' are saved' : ''}</span></div>`;
+      else if (d.total) saved = `<div class="job__line"><b>Stopped at ${num(d.ok || 0)} of ${num(d.total)}</b><span>${d.ok ? `${plural(d.ok, 'chapter')} ${d.ok === 1 ? 'is' : 'are'} saved` : ''}</span></div>`;
       return `<div class="card job" data-key="r-${r.id}">${head}${d.total && !upd ? `<div class="bar bar--bad"><i style="--p:${(Math.round(((d.ok || 0) / d.total) * 100)) / 100}"></i></div>` : ''}${saved}
         <div class="note note--red">${icon('alert', 16)}<span>${esc(explainJobError(d.message, d.url))}</span></div>
         <div class="job__foot"><span class="spacer"></span>${dismiss}<button type="button" class="btn btn--primary btn--md" data-act="resume" data-rid="${r.id}">Try again</button></div></div>`;
@@ -839,8 +895,9 @@
     if (d.kind === 'update') {
       const rows = [];
       const nw = d.newChapters || [];
-      if (nw.length) rows.push(['NEW', 'var(--ok)', `${plural(nw.length, 'chapter')} · ${listNums(nw)}`, `<a class="btn btn--link" href="${readHref(nw[0])}">Read</a>`]);
-      if ((d.revised || []).length) rows.push(['REVISED', 'var(--accent)', `${plural(d.revised.length, 'chapter')} · ${listNums(d.revised)}`, `<a class="btn btn--link" href="#/novel/${encodeURIComponent(d.slug)}">Show</a>`]);
+      const chList = (ns) => (ns.length === 1 ? `Chapter ${num(ns[0])}` : `${plural(ns.length, 'chapter')} · ${listNums(ns)}`);
+      if (nw.length) rows.push(['NEW', 'var(--ok)', chList(nw), `<a class="btn btn--link" href="${readHref(nw[0])}">Read</a>`]);
+      if ((d.revised || []).length) rows.push(['REVISED', 'var(--accent)', chList(d.revised), `<a class="btn btn--link" href="#/novel/${encodeURIComponent(d.slug)}">Show</a>`]);
       if (d.coverChanged) rows.push(['POSTER', 'var(--ink-3)', 'New poster from the site', '']);
       if ((d.details || []).length) rows.push(['DETAILS', 'var(--ink-3)', detailText(d), '']);
       if (d.added) rows.push(['ADDED', 'var(--ok)', `${plural(d.added, 'chapter')} that ${d.added === 1 ? 'wasn’t' : 'weren’t'} saved yet`, '']);
@@ -850,7 +907,7 @@
       if (!rows.length) {
         const checked = d.checked ? `all ${num(d.checked)} saved chapters` : `the chapter list`;
         return `<div class="card job" data-key="r-${r.id}"><div class="job__head"><div class="job__thumb">${coverHTML((n && n.cover) || '', d.title, n && n.author, true)}</div>
-          <div class="job__name"><b>Nothing new for ${esc(d.title)}</b><span>Checked details, poster and ${checked} · just now</span></div>
+          <div class="job__name"><b>Nothing new for ${esc(niceTitle(d.title))}</b><span>Checked details, poster and ${checked} · just now</span></div>
           <button type="button" class="icon-btn icon-btn--sm" data-act="dismiss" data-rid="${r.id}" aria-label="Dismiss">${icon('x', 15)}</button></div></div>`;
       }
       const pill = `<span class="pill pill--green"><span class="dot"></span>Updated</span>`;
@@ -944,30 +1001,35 @@
     const sorts = {
       read: (a, b) => (t(b.lastReadAt) || t(b.updatedAt) / 1e3) - (t(a.lastReadAt) || t(a.updatedAt) / 1e3),
       added: (a, b) => t(b.addedAt) - t(a.addedAt),
-      title: (a, b) => a.title.localeCompare(b.title),
+      title: (a, b) => niceTitle(a.title).localeCompare(niceTitle(b.title), undefined, { numeric: true, sensitivity: 'base' }),
       chapters: (a, b) => (b.totalChapters || 0) - (a.totalChapters || 0),
     };
     list.sort(sorts[state.sort] || sorts.read);
     return list;
   }
-  function bookCard(n) {
+  function bookCard(n, i) {
     const r = readInfo(n);
     const href = `#/novel/${encodeURIComponent(n.slug)}`;
-    const st = STATUS_LABEL[bookStatus(n)] || '';
+    const title = niceTitle(n.title);
     let meta;
     if (r.finished) meta = `Finished · ${num(r.total)} ch.`;
     else if (r.started) meta = `Ch. ${num(r.last)} of ${num(r.total)}`;
     else meta = n.totalChapters ? `${plural(n.totalChapters, 'chapter')} · not started` : 'Not started';
-    if (st) meta += ` · ${st}`;
+    // Status gets its own line, and only when it tells you something:
+    // most web novels are ongoing, and a finished read says it already.
+    const bs = bookStatus(n);
+    const st = !r.finished && (bs === 'completed' || bs === 'hiatus') ? STATUS_LABEL[bs] : '';
     const cont = r.started && !r.finished ? `/library/${encodeURIComponent(n.slug)}/${r.last}` : `/library/${encodeURIComponent(n.slug)}/`;
     const contLabel = r.started && !r.finished ? `Continue · Ch. ${num(r.last)}` : r.finished ? 'Read again' : 'Start reading';
     const badge = badgeFor(n);
     return `<article class="book" data-slug="${esc(n.slug)}" data-key="b-${esc(n.slug)}">
-      <a class="book__cover" href="${href}" aria-label="Open ${esc(n.title)}">${coverHTML(n.cover, n.title, n.author, false)}<span class="book__badge-slot" data-h="${esc(badge)}">${badge}</span></a>
-      <div class="book__hover" aria-hidden="true"><a href="${cont}" tabindex="-1">${icon('book', 14)} ${contLabel}</a></div>
-      <button type="button" class="book__more" data-act="book-menu" data-slug="${esc(n.slug)}" aria-label="More actions for ${esc(n.title)}" aria-haspopup="menu" aria-expanded="false">${icon('more', 16, 2.4)}</button>
-      <div class="book__info"><a class="book__title" href="${href}">${esc(niceTitle(n.title))}</a><span class="book__author">${esc(n.author || n.site || '')}</span></div>
-      <div class="stack" style="gap:6px"><div class="bar bar--thin" aria-hidden="true"><i style="--p:${(r.pct) / 100}"></i></div><span class="book__meta">${esc(meta)}</span></div>
+      <div class="book__art">
+        <a class="book__cover" href="${href}" aria-label="Open ${esc(title)}">${coverHTML(n.cover, n.title, n.author, false, i < 12)}<span class="book__badge-slot" data-h="${esc(badge)}">${badge}</span></a>
+        <div class="book__hover" aria-hidden="true"><a href="${cont}" tabindex="-1">${icon('book', 14)} ${contLabel}</a></div>
+        <button type="button" class="book__more" data-act="book-menu" data-slug="${esc(n.slug)}" aria-label="More actions for ${esc(title)}" aria-haspopup="menu" aria-expanded="false">${icon('more', 16, 2.4)}</button>
+      </div>
+      <div class="book__info"><a class="book__title" href="${href}">${esc(title)}</a><span class="book__author">${esc(n.author || n.site || '')}</span></div>
+      <div class="book__progress"><div class="bar bar--thin${r.started ? '' : ' bar--none'}" aria-hidden="true"><i style="--p:${(r.pct) / 100}"></i></div><span class="book__meta">${esc(meta)}</span>${st ? `<span class="book__meta">${esc(st)}</span>` : ''}</div>
     </article>`;
   }
   function renderShelf() {
@@ -991,13 +1053,13 @@
       .filter(([k]) => k === 'all' || counts[k] > 0 || state.filter === k)
       .map(([k, l]) => `<button type="button" class="chip" data-filter="${k}" aria-pressed="${state.filter === k}">${k === 'attention' ? '<span class="dot"></span>' : ''}${l} <span class="n">${counts[k]}</span></button>`).join('');
     const list = filteredBooks();
-    const grid = list.length ? `<div class="grid">${list.map(bookCard).join('')}</div>`
+    const grid = list.length ? `<div class="grid">${list.map((n, i) => bookCard(n, i)).join('')}</div>`
       : `<div class="empty" style="padding:32px"><h3 style="font-size:22px">No novels match</h3><p>${state.query ? `Nothing in your library matches “${esc(state.query)}”.` : 'Nothing in this view yet.'}</p><button type="button" class="btn" data-act="clear-filters">Show all novels</button></div>`;
     morph(box, `<div class="lib-head">
         <div class="titles"><h2 id="libH">Library</h2><p>${plural(all.length, 'novel')} · ${mb(bytes)} on this device</p></div>
         <button type="button" class="btn btn--md" data-act="update-all">${icon('refresh', 15)} Update all</button>
-        ${hasStatus ? `<label>Status <select class="select" id="statusSel">${[['any', 'Any'], ['ongoing', 'Ongoing'], ['completed', 'Completed'], ['hiatus', 'On hiatus']].map(([v, l]) => `<option value="${v}" ${state.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>` : ''}
-        <label>Sort <select class="select" id="sortSel">${[['read', 'Last read'], ['added', 'Recently added'], ['title', 'Title'], ['chapters', 'Most chapters']].map(([v, l]) => `<option value="${v}" ${state.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+        <div class="lib-head__sel">${hasStatus ? `<label>Status <select class="select" id="statusSel">${[['any', 'Any'], ['ongoing', 'Ongoing'], ['completed', 'Completed'], ['hiatus', 'On hiatus']].map(([v, l]) => `<option value="${v}" ${state.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>` : ''}
+        <label>Sort <select class="select" id="sortSel">${[['read', 'Last read'], ['added', 'Recently added'], ['title', 'Title'], ['chapters', 'Most chapters']].map(([v, l]) => `<option value="${v}" ${state.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label></div>
       </div>
       <div class="chips" role="group" aria-label="Filter library">${chips}</div>${grid}`);
   }
@@ -1033,8 +1095,8 @@
     try {
       const r = await api('UpdateNovel', slug).catch(() => api('RetryNovel', slug));
       const n = novelBySlug(slug);
-      if (r && r.status === 'queued') toast(`${n ? n.title : 'Update'} is queued.`);
-      else if (r && r.status === 'running') toast(`${n ? n.title : 'It'} is already updating.`);
+      if (r && r.status === 'queued') toast(`${n ? niceTitle(n.title) : 'Update'} is queued.`);
+      else if (r && r.status === 'running') toast(`${n ? niceTitle(n.title) : 'It'} is already updating.`);
       loadActivity();
     } catch (e) { toast(e.message, { tone: 'bad' }); }
   }
@@ -1043,8 +1105,8 @@
     try {
       const r = await api('RetryMissing', slug).catch(() => api('UpdateNovel', slug));
       const n = novelBySlug(slug);
-      if (r && r.status === 'queued') toast(`${n ? n.title : 'Retry'} is queued.`);
-      else if (r && r.status === 'running') toast(`${n ? n.title : 'It'} is already downloading.`);
+      if (r && r.status === 'queued') toast(`${n ? niceTitle(n.title) : 'Retry'} is queued.`);
+      else if (r && r.status === 'running') toast(`${n ? niceTitle(n.title) : 'It'} is already downloading.`);
       loadActivity();
     } catch (e) { toast(e.message, { tone: 'bad' }); }
   }
@@ -1060,7 +1122,7 @@
     if (exporting) return;
     exporting = true;
     const n = novelBySlug(slug) || (state.novel && state.novel.slug === slug ? state.novel : null);
-    const close = toast(`Building the EPUB${n ? ' for ' + n.title : ''}…`, { timeout: 0 });
+    const close = toast(`Building the EPUB${n ? ' for ' + niceTitle(n.title) : ''}…`, { timeout: 0 });
     try {
       const r = await api('ExportEPUB', slug);
       close();
@@ -1074,7 +1136,7 @@
     const n = novelBySlug(slug) || state.novel;
     if (!n) return;
     const res = await confirmDialog({
-      title: `Remove ${n.title}?`,
+      title: `Remove ${niceTitle(n.title)}?`,
       body: `Deletes ${plural(n.cleanCount || 0, 'saved chapter')} and their images (${esc(n.sizeMb || mb(n.sizeBytes))}) from this device. Your reading place is lost too. This can’t be undone.`,
       ok: 'Remove novel', cancel: 'Keep it', danger: true,
       cover: coverHTML(n.cover, n.title, n.author, true),
@@ -1084,7 +1146,7 @@
     if (res.epub) { await exportEpub(slug); }
     try {
       await api('DeleteNovel', slug);
-      toast(`Removed ${n.title}.`);
+      toast(`Removed ${niceTitle(n.title)}.`);
       state.results = state.results.filter((r) => r.data.slug !== slug); store.set('na-results', state.results);
       if (route().name === 'novel') location.hash = '#/';
       loadLibrary();
@@ -1092,7 +1154,7 @@
   }
   async function redownload(slug) {
     const n = novelBySlug(slug) || state.novel;
-    const ok = await confirmDialog({ title: 'Download everything again?', body: `Every saved chapter of ${esc(n ? n.title : 'this novel')} is downloaded fresh and replaces your copy. Use this if chapters look broken. It can take a while.`, ok: 'Download again' });
+    const ok = await confirmDialog({ title: 'Download everything again?', body: `Every saved chapter of ${esc(n ? niceTitle(n.title) : 'this novel')} is downloaded fresh and replaces your copy. Use this if chapters look broken. It can take a while.`, ok: 'Download again' });
     if (!ok) return;
     try { await api('RedownloadNovel', slug); loadActivity(); } catch (e) { toast(e.message, { tone: 'bad' }); }
   }
@@ -1130,7 +1192,7 @@
     const firstOk = okChapters[0];
     const st = bookStatus(d);
     const readHref = r.started && !r.finished ? `/library/${encodeURIComponent(d.slug)}/${r.last}` : `/library/${encodeURIComponent(d.slug)}/${firstOk ? firstOk.number : 1}`;
-    const readLabel = r.started && !r.finished ? `Continue · Ch. ${num(r.last)}` : r.finished ? 'Read again' : 'Start reading';
+    const readLabel = !okChapters.length ? 'Nothing saved yet' : r.started && !r.finished ? `Continue · Ch. ${num(r.last)}` : r.finished ? 'Read again' : 'Start reading';
     const missing = (d.failedCount || 0) + (d.pendingCount || 0);
     const notes = [];
     if (d.failedCount) notes.push(`<div class="note note--red" style="align-items:center;flex-wrap:wrap">${icon('alert', 18)}<span style="flex:1 1 260px"><strong>${plural(d.failedCount, 'chapter')} didn’t download.</strong>${d.lockedCount ? ` ${plural(d.lockedCount, 'paid chapter')} ${d.lockedCount === 1 ? 'was' : 'were'} skipped; ${d.lockedCount === 1 ? 'it stays' : 'they stay'} locked on the site.` : ''}</span><button type="button" class="btn btn--danger btn--sm" data-act="retry" data-slug="${esc(d.slug)}">Retry ${num(d.failedCount)}</button></div>`);
@@ -1138,13 +1200,13 @@
     if (d.removedCount) notes.push(`<div class="note">${icon('info', 16)}<span>${plural(d.removedCount, 'chapter')} ${d.removedCount === 1 ? 'is' : 'are'} no longer on the site. Your ${d.removedCount === 1 ? 'copy is' : 'copies are'} kept.</span></div>`);
     const imgBytes = d.imageBytes || 0, total = d.sizeBytes || 0, text = Math.max(0, total - imgBytes);
     const imgPct = total ? Math.round((imgBytes / total) * 100) : 0;
-    const delTo = Math.max(0, (r.last || 0) - 1);
+    const textPct = total ? 100 - imgPct : 0;
     morph(page, `<a class="back" href="#/">${icon('back', 16)} Library</a>
       <div id="novelJobs" class="jobs" data-morph="keep" hidden></div>
       <section class="novel-hero">
         <div class="novel-hero__cover">${coverHTML(d.cover, d.title, d.author, false)}${d.cover ? '' : `<p>No poster on ${esc(d.site || 'the site')} yet. Update swaps in the real one when it appears.</p>`}</div>
         <div class="novel-hero__head">
-          <div class="novel-hero__src">${st ? `<span class="status-chip ${st === 'ongoing' ? 'status-chip--ongoing' : ''}">${esc(STATUS_LABEL[st] || d.status)}</span>` : ''}<span>${esc(d.site || '')}</span>${d.url ? `<span aria-hidden="true">·</span><a href="#" data-act="open-source">${esc(hostOf(d.url))}</a>` : ''}</div>
+          <div class="novel-hero__src">${st ? `<span class="status-chip ${st === 'ongoing' ? 'status-chip--ongoing' : ''}">${esc(String(d.status || '').trim() || STATUS_LABEL[st])}</span>` : ''}<span>${esc(d.site || '')}</span>${d.url ? `<span aria-hidden="true">·</span><a href="#" data-act="open-source">${esc(hostOf(d.url))}</a>` : ''}</div>
           <h1>${esc(niceTitle(d.title))}</h1>
           ${d.author ? `<span class="by">by ${esc(d.author)}</span>` : ''}
         </div>
@@ -1169,6 +1231,7 @@
         <section class="main" aria-labelledby="chH">
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
             <h2 class="h2-serif" id="chH" style="margin-right:auto">Chapters</h2>
+            ${r.started ? `<button type="button" class="btn btn--link" data-act="jump">Jump to where you are</button>` : ''}
             <label class="field" style="width:240px;max-width:100%;height:40px">${icon('search', 15)}<input type="search" id="tocQ" placeholder="Number or title" aria-label="Find a chapter" value="${esc(state.tocQuery)}"></label>
           </div>
           ${notes.join('')}
@@ -1177,7 +1240,6 @@
             <button type="button" class="chip" data-toc="unread" aria-pressed="${state.tocFilter === 'unread'}">Unread <span class="n">${num(Math.max(0, d.totalChapters - (r.last || 0)))}</span></button>
             ${missing || d.lockedCount ? `<button type="button" class="chip" data-toc="missing" aria-pressed="${state.tocFilter === 'missing'}">Missing <span class="n">${num(missing + (d.lockedCount || 0))}</span></button>` : ''}
             ${d.revisedCount ? `<button type="button" class="chip" data-toc="revised" aria-pressed="${state.tocFilter === 'revised'}">Revised <span class="n">${num(d.revisedCount)}</span></button>` : ''}
-            ${r.started ? `<button type="button" class="btn btn--link" data-act="jump" style="margin-left:auto">Jump to where you are</button>` : ''}
           </div>
           <nav class="pager" id="tocPagerTop" data-morph="keep" aria-label="Chapter pages" hidden></nav>
           <ol class="card toc" id="toc" data-morph="keep"></ol>
@@ -1187,15 +1249,10 @@
           <h2 class="h2-serif" id="stH">Storage</h2>
           <div class="card storage">
             <div class="storage__big"><b>${esc(mb(total))}</b><span class="muted" style="font-size:13px">${plural(d.cleanCount || 0, 'chapter')}</span></div>
-            <div class="split" aria-hidden="true"><i style="width:${100 - imgPct}%;background:var(--ink)"></i><i style="width:${imgPct}%;background:#D4A58E"></i></div>
+            <div class="split" aria-hidden="true"><i style="width:${textPct}%;background:var(--ink)"></i><i style="width:${imgPct}%;background:#D4A58E"></i></div>
             <div class="legend"><span><i style="background:var(--ink)"></i>Text ${esc(mb(text))}</span><span><i style="background:#D4A58E"></i>Images ${esc(mb(imgBytes))}</span></div>
             <button type="button" class="btn" data-act="del-images" ${imgBytes ? '' : 'disabled'}>${icon('image', 16)} ${imgBytes ? `Delete images · frees ${esc(mb(imgBytes))}` : 'No images saved'}</button>
-          </div>
-          <div class="card storage">
-            <h3 style="font-size:15px;font-weight:600">Free up chapters you’ve read</h3>
-            <div class="pair"><label>From<input class="num" type="number" min="1" id="delFrom" value="1"></label><label>To<input class="num" type="number" min="1" id="delTo" value="${delTo || ''}" placeholder="${num(d.totalChapters)}"></label></div>
-            <button type="button" class="btn" data-act="del-range">Delete these chapters</button>
-            <p class="muted" style="font-size:12px;line-height:1.5">They stay in the list. Update downloads them again if you want them back.</p>
+            ${okChapters.length ? `<button type="button" class="btn btn--link storage__more" data-act="del-range">Free up chapters you’ve read…</button>` : ''}
           </div>
         </aside>
       </div>`);
@@ -1233,6 +1290,8 @@
         <button type="button" class="btn btn--md" data-act="toc-page" data-page="${page + 1}" ${page >= pages - 1 ? 'disabled' : ''} aria-label="Next 100 chapters"><span class="wide">Next</span><span class="flip">${icon('back', 15)}</span></button>`;
     }
     $$('#tocPagerTop, #tocPager').forEach((el) => { el.hidden = !pagerHTML; morph(el, pagerHTML); });
+    // The number column fits the widest number on this page ("2,301").
+    ol.style.setProperty('--nw', shown.reduce((w, c) => Math.max(w, num(c.number).length), 2));
     if (!rows.length) { morph(ol, `<li><span class="t is-dim">No chapters match.</span></li>`); return; }
     morph(ol, shown.map((c) => {
       const ok = c.state === 'ok';
@@ -1242,12 +1301,13 @@
       if (cur) s = `<span class="s s--here"><svg width="10" height="13" viewBox="0 0 12 16" aria-hidden="true"><path d="M1 0h10v15l-5-4-5 4z" fill="currentColor"/></svg>You’re here${ok ? '' : ' · not saved'}</span>`;
       else if (c.removed) s = `<span class="s">Removed from site · kept</span>`;
       else if (c.revised && ok) s = `<span class="s s--ok">${icon('pencil', 12, 2.2)} Revised ${esc(shortDate(c.revised))}</span>`;
-      else if (c.state === 'failed') s = `<span class="s s--bad" title="${esc(c.error || '')}">Didn’t download</span><button type="button" class="btn btn--sm" data-act="retry" data-slug="${esc(d.slug)}">Retry</button>`;
+      else if (c.state === 'failed') s = `<span class="s s--bad" title="${esc(c.error || '')}">Didn’t download</span><button type="button" class="btn btn--sm" data-act="retry" data-slug="${esc(d.slug)}" title="Retries every missing chapter">Retry</button>`;
       else if (c.state === 'locked') s = `<span class="s">${icon('lock', 13)} Paid on site</span>`;
       else if (!ok) s = `<span class="s">Not saved</span>`;
       else if (read) s = `<span class="s">Read</span>`;
       const title = esc(c.title || `Chapter ${c.number}`);
-      const t = ok ? `<a class="t" href="${esc(c.readerUrl)}">${title}</a>` : `<span class="t is-dim">${title}</span>`;
+      const tip = (c.title || '').length > 48 ? ` title="${title}"` : '';
+      const t = ok ? `<a class="t" href="${esc(c.readerUrl)}"${tip}>${title}</a>` : `<span class="t is-dim"${tip}>${title}</span>`;
       return `<li class="${cur ? 'is-current' : ''}${read ? ' is-read' : ''}" data-n="${c.number}" data-key="c${c.number}"><span class="n">${num(c.number)}</span>${t}${s}</li>`;
     }).join(''));
   }
@@ -1266,6 +1326,7 @@
     if (first) items.push({ label: 'Read from chapter 1', fn: () => { location.href = `/library/${encodeURIComponent(d.slug)}/${first.number}`; } });
     if (d.url) items.push({ label: 'Download a range…', sub: 'Pick chapters, speed and images.', fn: () => { location.hash = '#/'; setTimeout(() => { lookup(d.url).then(() => { state.intake.scope = 'range'; renderIntake(); }); }, 30); } });
     items.push({ label: 'Download everything again…', sub: 'Replaces every saved copy. Use if chapters look broken.', fn: () => redownload(d.slug) });
+    if (first) items.push({ label: 'Free up chapters you’ve read…', sub: 'Delete saved chapters. Update gets them back.', fn: () => deleteRange() });
     if (d.url) items.push({ label: 'Open original page', fn: () => openExternal(d.url) });
     if (state.platform === 'desktop') items.push({ label: 'Show files in folder', fn: () => api('ShowNovelFolder', d.slug).catch((e) => toast(e.message, { tone: 'bad' })) });
     items.push('sep', { label: 'Remove from library…', danger: true, fn: () => removeNovel(d.slug) });
@@ -1277,20 +1338,43 @@
     if (!ok) return;
     try { await api('DeleteImages', d.slug); toast(`Deleted images · freed ${mb(d.imageBytes)}`); loadNovel(d.slug); loadLibrary(); } catch (e) { toast(e.message, { tone: 'bad' }); }
   }
-  async function deleteRange() {
+  // "Free up chapters you've read": a dialog from the ⋯ menu or the storage
+  // card, never a form sitting on the page.
+  function deleteRange() {
     const d = state.novel; if (!d) return;
-    const f = parseInt($('#delFrom').value, 10), t = parseInt($('#delTo').value, 10);
-    if (!f || !t || t < f) { toast('Enter the first and last chapter to delete.', { tone: 'bad' }); return; }
-    const count = (d.chapters || []).filter((c) => c.state === 'ok' && c.number >= f && c.number <= t).length;
-    if (!count) { toast('None of those chapters are saved.'); return; }
-    const ok = await confirmDialog({ title: `Delete chapters ${num(f)}–${num(t)}?`, body: `Removes ${plural(count, 'saved chapter')} from this device. ${f <= (d.lastRead || 0) && t >= (d.lastRead || 0) ? '<strong>This includes the chapter you’re on.</strong> ' : ''}They stay in the list, and Update can download them again.`, ok: 'Delete chapters', danger: true });
-    if (!ok) return;
-    const before = d.sizeBytes || 0;
-    try {
-      const r = await api('DeleteChapters', d.slug, f, t);
-      toast(`Deleted ${plural(r.deleted || 0, 'chapter')} · freed ${mb(Math.max(0, before - (r.sizeBytes || 0)))}`);
-      loadNovel(d.slug); loadLibrary();
-    } catch (e) { toast(e.message, { tone: 'bad' }); }
+    const saved = (d.chapters || []).filter((c) => c.state === 'ok');
+    if (!saved.length) { toast('No chapters are saved yet.'); return; }
+    const last = d.lastRead || 0;
+    const dlg = openOverlay(`<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="frT" aria-describedby="frB">
+      <h2 id="frT">Free up chapters you’ve read</h2>
+      <p id="frB">Deletes these chapters’ text and images from this device. They stay in the list, and Update downloads them again if you want them back.</p>
+      <div class="pair"><label>From<input class="num" type="number" min="1" inputmode="numeric" id="delFrom" value="${saved[0].number}"></label><label>To<input class="num" type="number" min="1" inputmode="numeric" id="delTo" value="${last > saved[0].number ? last - 1 : ''}" placeholder="${d.totalChapters || ''}"></label></div>
+      <p class="tally" id="delTally" aria-live="polite"></p>
+      <div class="dialog__foot"><button type="button" class="btn" data-act="close-overlay">Cancel</button><button type="button" class="btn btn--danger" id="delGo">Delete chapters</button></div></div>`);
+    const from = $('#delFrom', dlg), to = $('#delTo', dlg), tally = $('#delTally', dlg), go = $('#delGo', dlg);
+    const range = () => [parseInt(from.value, 10), parseInt(to.value, 10)];
+    const paint = () => {
+      const [f, t] = range();
+      const n = f && t && t >= f ? saved.filter((c) => c.number >= f && c.number <= t).length : 0;
+      go.disabled = !n;
+      if (!f || !t) tally.textContent = 'Enter the first and last chapter to delete.';
+      else if (t < f) tally.textContent = 'The last chapter is before the first one.';
+      else if (!n) tally.textContent = 'None of those chapters are saved.';
+      else tally.innerHTML = `${plural(n, 'saved chapter')} · frees about ${esc(mb(((d.sizeBytes || 0) / saved.length) * n))}${last && f <= last && t >= last ? '. <strong>Includes the chapter you’re on.</strong>' : ''}`;
+    };
+    from.addEventListener('input', paint); to.addEventListener('input', paint);
+    paint();
+    go.addEventListener('click', async () => {
+      const [f, t] = range();
+      const before = d.sizeBytes || 0;
+      go.disabled = true;
+      try {
+        const r = await api('DeleteChapters', d.slug, f, t);
+        closeOverlay();
+        toast(`Deleted ${plural((r && r.deleted) || 0, 'chapter')} · freed ${mb(Math.max(0, before - ((r && r.sizeBytes) || 0)))}`);
+        loadNovel(d.slug); loadLibrary();
+      } catch (e) { go.disabled = false; toast(e.message, { tone: 'bad' }); }
+    });
   }
 
   // ================================================================ READING
@@ -1310,7 +1394,8 @@
     const p = readPrefs();
     const seg = (key, opts, label) => `<div class="seg" role="radiogroup" aria-label="${esc(label)}">${opts.map(([v, l]) => `<button type="button" role="radio" aria-checked="${String(p[key]) === String(v)}" data-rd="${key}" data-val="${v}">${l}</button>`).join('')}</div>`;
     const row = (label, control, cls = '') => `<div class="rd-row${cls}"><span>${label}</span>${control}</div>`;
-    const appTheme = document.documentElement.dataset.theme || 'light';
+    let appTheme = document.documentElement.dataset.theme || 'light';
+    if (appTheme === 'system') appTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     const t = p.theme || appTheme;
     return `${row('Theme', seg('theme', [['', 'App'], ['light', 'Light'], ['sepia', 'Sepia'], ['dark', 'Dark']], 'Reader theme'))}
       ${row('Font', seg('font', [['serif', 'Serif'], ['sans', 'Sans']], 'Reader font'))}
@@ -1361,7 +1446,7 @@
         </div></section>
         <section class="set-group" id="reading" aria-labelledby="sR"><h2 class="section-h" id="sR">Reading</h2><div class="card" style="padding:6px 18px 18px">${readingPanel()}</div></section>
         <section class="set-group" id="downloads" aria-labelledby="sD"><h2 class="section-h" id="sD">Downloads</h2><div class="card">
-          ${row('Default speed', 'Gentle 2, Balanced 4, Fast 8 at a time. A site never gets more than 3 requests at once.', seg('speed', [['gentle', 'Gentle'], ['balanced', 'Balanced'], ['fast', 'Fast']], 'Default speed'))}
+          ${row('Default speed', 'Gentle is easiest on the site, Fast finishes soonest. Requests to any one site are always limited and spaced out.', seg('speed', [['gentle', 'Gentle'], ['balanced', 'Balanced'], ['fast', 'Fast']], 'Default speed'))}
           ${row('Keep chapter images', 'The default for new novels. You can change it each time you add one.', sw('keepImages', 'Keep chapter images'))}
           ${state.platform === 'android' ? row('Only on Wi-Fi', 'Pause on mobile data, carry on when you’re back on Wi-Fi.', sw('wifiOnly', 'Only on Wi-Fi')) : ''}
         </div></section>
@@ -1375,7 +1460,7 @@
           ${row('Back up library', 'One file with every novel, poster, reading place and these settings. Restore it on a new PC or phone.', `<div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="btn btn--md" data-act="backup">Back up…</button><button type="button" class="btn btn--ghost btn--md" data-act="restore">Restore…</button></div>`)}
         </div></section>
         <section class="set-group" id="about" aria-labelledby="sAb"><h2 class="section-h" id="sAb">About</h2><div class="card storage">
-          <div style="display:flex;align-items:center;gap:12px">${LOGO}<span style="display:flex;flex-direction:column"><b>NovelArchiver</b><span class="muted" style="font-size:13px"><button type="button" class="btn btn--link" style="padding:0;font-size:13px" data-act="shortcuts">Keyboard shortcuts</button></span></span></div>
+          <div style="display:flex;align-items:center;gap:12px">${LOGO}<span style="display:flex;flex-direction:column"><b>NovelArchiver</b>${state.platform === 'android' ? '' : `<span class="muted" style="font-size:13px"><button type="button" class="btn btn--link" style="padding:0;font-size:13px" data-act="shortcuts">Keyboard shortcuts</button></span>`}</span></div>
           <div class="sites">${SITES.map((x) => `<span>${esc(x)}</span>`).join('')}</div>
           <p class="muted" style="font-size:13px;line-height:1.6">For keeping a personal offline copy of stories you read. Please don’t redistribute chapters, and support the authors and translators where you can.</p>
         </div></section>
@@ -1646,7 +1731,7 @@
     } else {
       chime();
       notify(`${d.title} is ready`, `${plural(d.ok || 0, 'chapter')} saved for offline reading.`);
-      if (route().name !== 'library' || document.hidden) toast(`${d.title} is ready`, { tone: 'ok', action: { label: 'Start reading', fn: () => { location.href = `/library/${encodeURIComponent(d.slug)}/`; } } });
+      if (route().name !== 'library' || document.hidden) toast(`${niceTitle(d.title)} is ready`, { tone: 'ok', action: { label: 'Start reading', fn: () => { location.href = `/library/${encodeURIComponent(d.slug)}/`; } } });
     }
   });
   on('stopped', (d) => { logLine(d.message || 'Stopped'); addResult('stopped', d); scheduleJobs(); loadLibrary(); });
@@ -1655,7 +1740,7 @@
     if (d.slug || d.url || d.title) addResult('error', d);
     else toast(cap(d.message) || 'Something went wrong', { tone: 'bad' });
     scheduleJobs();
-    notify(`${d.title || 'Download'} stopped`, d.message || '');
+    notify(`${niceTitle(d.title) || 'Download'} stopped`, d.message || '');
     loadLibrary();
   });
   on('backup', (d) => { if (backupListener) backupListener(d); });
@@ -1663,10 +1748,14 @@
   // ================================================================ START
   async function start() {
     applyTheme(state.settings.theme);
+    // A running download is drawn above the shelf. Fetch it before the first
+    // paint (briefly) so the cached shelf doesn't jump down when it arrives.
+    const activity = loadActivity();
+    if (route().name === 'library') await Promise.race([activity, sleep(400)]);
     render();
     try { const p = await api('Platform'); if (p) state.platform = p; } catch (e) {}
     document.documentElement.dataset.platform = state.platform;
-    await Promise.all([loadActivity(), loadLibrary()]);
+    await Promise.all([activity, loadLibrary()]);
     if (route().name === 'library') { const u = $('#novelUrl'); if (state.intake.phase === 'idle' && !(u && (u.value || document.activeElement === u))) renderIntake(); }
     else if (route().name === 'settings') render();
   }
