@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>InkShelfs: read web novels and manga offline, without the ads</title>
-<meta name="description" content="Save the web novels, manga, manhwa and manhua you follow to your Windows PC (novels also on Android) and read them offline, with no ads or pop-ups. Free and open source. Formerly NovelArchiver.">
+<meta name="description" content="Save the web novels, manga, manhwa and manhua you follow to your Windows PC or Android phone and read them offline, with no ads or pop-ups. Free and open source. Formerly NovelArchiver.">
 <meta name="theme-color" content="#f6f2ea" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#121417" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -232,7 +232,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
         <a class="btn primary dl" data-os="Windows" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/InkShelfs.exe"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5 10 4.5v7H3zm0 13 7 1v-7H3zM11 4.4 21 3v8.5H11zm0 15.2L21 21v-8.5H11z"/></svg>Windows <small>.exe</small></a>
         <a class="btn dl" data-os="Android" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/InkShelfs-android-test.apk"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.6 9.5 19.4 6.4a.4.4 0 1 0-.7-.4l-1.8 3.2A10.8 10.8 0 0 0 12 8.2c-1.8 0-3.5.4-4.9 1L5.3 6a.4.4 0 1 0-.7.4l1.8 3.1A9.5 9.5 0 0 0 1.5 17h21a9.5 9.5 0 0 0-4.9-7.5zM7 14.4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>Android <small>.apk</small></a>
       </div>
-      <p class="meta"><span class="v"><i aria-hidden="true"></i>Version 3.0</span><span>Free and open source</span><span>Manga on Windows; novels on both</span><a href="#install">First install? Read this</a></p>
+      <p class="meta"><span class="v"><i aria-hidden="true"></i>Version 3.1</span><span>Free and open source</span><span>Novels and manga on Windows and Android</span><a href="#install">First install? Read this</a></p>
     </div>
     <div class="stage">
       <div class="win" aria-hidden="true">
@@ -304,7 +304,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
         <p>Paste a series or chapter link from MangaDex, WEBTOON, Asura Scans or nine other sites. Pick all chapters, the first few, a range, or from the one you pasted. Every page is checked to be a real image before it’s saved, so a site’s error page never ends up in your copy.</p>
         <div class="kinds"><span>Manga</span><span>Manhwa</span><span>Manhua</span><span>Webtoons</span></div>
         <ul><li>A long strip for webtoons; pages right-to-left or left-to-right; two pages side by side</li><li>Pages keep their real size before they load, so the strip never jumps under your thumb</li><li>At the end of a chapter the next one opens, or downloads with one click</li><li>Select chapters to download or to free up space; save a series as one CBZ for Komga, Kavita or Mihon</li></ul>
-        <p class="muted" style="font-size:.95rem">Manga is on Windows in 3.0. Novels work on Windows and Android.</p>
+        <p class="muted" style="font-size:.95rem">On Android too: swipe to turn pages, double-tap to zoom, and downloads keep going with the screen off.</p>
       </div>
       <div class="shots">
         <div class="win" aria-hidden="true"><div class="bar"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div><img src="img/desk-manga-series.webp" width="1600" height="1000" loading="lazy" alt="A manga series page in InkShelfs with its chapter list and download buttons."></div>
@@ -376,7 +376,13 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
       <p class="muted" style="margin-top:16px;font-size:.95rem">Every site was tested with a real download. The app’s Sites page lists them all with a “Try an example” link. Other novel sites open in a general reader mode, and when a site changes its layout, its rules can be fixed without a new release.</p>
     </div>
     <div>
-      <h2>What’s new in 3.0</h2>
+      <h2>What’s new in 3.1</h2>
+      <ul class="new">
+        <li><b>Android manga</b><span>Manga, manhwa and manhua on your phone: the same 12 sites, background downloads, Only on Wi-Fi, and CBZ saved to Downloads.</span></li>
+        <li><b>Touch reader</b><span>Swipe to turn pages in the reading direction; double-tap to zoom in and pan, again to fit.</span></li>
+        <li><b>Phone layout</b><span>A compact library header, a tidier series page, and how much space manga uses in Settings.</span></li>
+      </ul>
+      <h2 style="margin-top:40px;font-size:1.6rem">3.0</h2>
       <ul class="new">
         <li><b>InkShelfs</b><span>NovelArchiver has a new name, a new icon and a second shelf. Your novels, reading places and settings come with it.</span></li>
         <li><b>Manga</b><span>Manga, manhwa and manhua from 12 sites, on the same shelf as your novels, with All, Novels and Manga tabs.</span></li>
@@ -396,7 +402,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
     <div class="head"><h2>Questions</h2></div>
     <div class="faq">
       <details><summary>What happened to NovelArchiver?</summary><p>It’s the same app with a new name. InkShelfs opens your existing NovelArchiver library on Windows, and manga gets its own shelf beside it. On Android, InkShelfs installs over the NovelArchiver test app and keeps your library.</p></details>
-      <details><summary>Does Android have manga?</summary><p>Not yet. In 3.0 manga is on Windows; novels work on both Windows and Android.</p></details>
+      <details><summary>Does Android have manga?</summary><p>Yes, since 3.1: the same sites, reader and library as on Windows. Swipe to turn pages and double-tap to zoom.</p></details>
       <details><summary>How much space does manga take?</summary><p>A chapter is a set of pictures, usually 5–30 MB. A long series can take a few GB, so you can delete the pages of chapters you’ve read from the series page and download them again later.</p></details>
       <details><summary>Is it free?</summary><p>Yes, and open source. There are no accounts, no subscriptions and no ads in the app.</p></details>
       <details><summary>Does it work without internet?</summary><p>Reading does. You need a connection to download chapters and to get new ones; after that everything opens offline.</p></details>
