@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NovelArchiver: read web novels offline, without the ads</title>
-<meta name="description" content="Save the web novels you follow to your Windows PC or Android phone and read them on the commute, offline, with no ads or pop-ups. Free and open source.">
+<title>InkShelfs: read web novels and manga offline, without the ads</title>
+<meta name="description" content="Save the web novels, manga, manhwa and manhua you follow to your Windows PC (novels also on Android) and read them offline, with no ads or pop-ups. Free and open source. Formerly NovelArchiver.">
 <meta name="theme-color" content="#f6f2ea" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#121417" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' aria-hidden='true'%3E%3Crect width='64' height='64' rx='15' fill='%231D1B18'/%3E%3Cpath d='M16 15a3 3 0 0 1 3-3h3v40h-3a3 3 0 0 1-3-3z' fill='%23CDBFA6'/%3E%3Cpath d='M22 12h20a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4H22z' fill='%23F7F3EC'/%3E%3Cpath d='M32 12h8v20l-4-3-4 3z' fill='%23A8431F'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%231D1B18'/%3E%3Cpath d='M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z' fill='%23F7F3EC'/%3E%3Cpath d='M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z' fill='%23E9DFCE'/%3E%3Cpath d='M37 20h9v10h-9zM37 33h9v12h-9z' fill='%231D1B18'/%3E%3Ccircle cx='48' cy='48' r='7' fill='%23A8431F'/%3E%3C/svg%3E">
 <style>
 :root{
   --paper:#f6f2ea;--card:#fffdf8;--sunk:#ede6d9;--ink:#1d1b18;--ink-2:#3d3830;--muted:#6b645a;--line:#e2d9c9;
@@ -155,6 +155,40 @@ pre.cmd{margin:10px 0 0;padding:10px 12px;border-radius:8px;background:var(--sun
 .new b{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);padding-top:3px}
 @media (max-width:420px){.new li{grid-template-columns:1fr;gap:2px}}
 
+/* manga row */
+.kinds{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.kinds span{font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.shots{display:grid;gap:18px}
+.shots .win + .win{margin-left:12%}
+.sites h3{font-size:1.05rem;margin-top:26px}
+.sites-wrap h3{font:600 .82rem/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 0 0}
+.renamed{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;padding:5px 12px 5px 6px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:13.5px;color:var(--ink-2)}
+.renamed b{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:1px 8px;font-size:11.5px;letter-spacing:.04em}
+
+/* support pop-ups (shown after a download starts; never block it) */
+dialog.thanks{width:min(30rem,calc(100% - 32px));border:0;border-radius:20px;padding:0;background:var(--card);color:var(--ink);box-shadow:0 30px 80px -30px rgba(0,0,0,.6)}
+dialog.thanks::backdrop{background:rgba(18,20,23,.55)}
+@media (prefers-reduced-motion:no-preference){dialog.thanks[open]{animation:pop .28s cubic-bezier(.23,1,.32,1)}@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}}}
+.thanks .in{padding:26px 26px 22px;display:grid;gap:14px}
+.thanks .step{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.thanks h2{font-size:1.65rem;line-height:1.15}
+.thanks p{color:var(--ink-2);font-size:.98rem}
+.thanks .got{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--sunk);font-size:.9rem;color:var(--ink-2)}
+.thanks .got i{flex:none;width:8px;height:8px;border-radius:4px;background:var(--ok);margin-top:.5em}
+.thanks ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.thanks li{display:grid;grid-template-columns:22px 1fr;gap:8px;font-size:.96rem;color:var(--ink-2)}
+.thanks li b{color:var(--ink);font-weight:600}
+.thanks li svg{width:18px;height:18px;margin-top:3px;color:var(--accent)}
+.thanks .foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:4px}
+.thanks .foot label{margin-right:auto;display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted);cursor:pointer}
+.thanks .foot input{accent-color:var(--accent);width:16px;height:16px}
+.thanks .btn{min-height:44px;padding:0 18px;font-size:15px}
+.thanks .x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:18px;border:0;background:transparent;color:var(--muted);font-size:22px;line-height:1;cursor:pointer}
+.thanks .x:hover{background:var(--sunk);color:var(--ink)}
+.thanks .dots{display:flex;gap:6px}
+.thanks .dots i{width:6px;height:6px;border-radius:3px;background:var(--line)}
+.thanks .dots i.on{background:var(--accent);width:16px}
+
 /* faq */
 .faq{max-width:48rem}
 .faq details{border-bottom:1px solid var(--line);padding:18px 0}
@@ -176,9 +210,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
 
 <header class="nav">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="NovelArchiver home"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#1D1B18"/><path d="M16 15a3 3 0 0 1 3-3h3v40h-3a3 3 0 0 1-3-3z" fill="#CDBFA6"/><path d="M22 12h20a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4H22z" fill="#F7F3EC"/><path d="M32 12h8v20l-4-3-4 3z" fill="#A8431F"/></svg>NovelArchiver</a>
+    <a class="brand" href="#top" aria-label="InkShelfs home"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#1D1B18"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><path d="M37 20h9v10h-9zM37 33h9v12h-9z" fill="#1D1B18"/><path d="M18 21h10M18 27h10M18 33h7" stroke="#B5AC9E" stroke-width="2.4" stroke-linecap="round"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs</a>
     <a class="l" href="#tour">How it works</a>
-    <a class="l" href="#authors">Supporting authors</a>
+    <a class="l" href="#manga">Manga</a>
+    <a class="l" href="#sites">Sites</a>
+    <a class="l" href="#authors">Supporting creators</a>
     <a class="l" href="#install">Installing</a>
     <a class="l" href="#faq">FAQ</a>
     <a class="btn primary" href="#download">Download</a>
@@ -189,18 +225,19 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
 <div class="hero" id="download">
   <div class="wrap">
     <div>
+      <span class="renamed"><b>NEW</b>NovelArchiver is now InkShelfs, and it reads manga too</span>
       <h1>The next chapter, <em>on the train</em>.</h1>
-      <p class="lede">NovelArchiver saves the web novels you follow to your PC or phone, so you can read on the commute, at lunch, or wherever the signal drops. No ads in the middle of a chapter, no pop-ups, no waiting for pages to load.</p>
+      <p class="lede">InkShelfs saves the web novels, manga, manhwa and manhua you follow to your PC or phone, so you can read on the commute, at lunch, or wherever the signal drops. No ads in the middle of a chapter, no pop-ups, no waiting for pages to load.</p>
       <div class="cta">
-        <a class="btn primary" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/NovelArchiver.exe"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5 10 4.5v7H3zm0 13 7 1v-7H3zM11 4.4 21 3v8.5H11zm0 15.2L21 21v-8.5H11z"/></svg>Windows <small>.exe</small></a>
-        <a class="btn" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/NovelArchiver-android-test.apk"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.6 9.5 19.4 6.4a.4.4 0 1 0-.7-.4l-1.8 3.2A10.8 10.8 0 0 0 12 8.2c-1.8 0-3.5.4-4.9 1L5.3 6a.4.4 0 1 0-.7.4l1.8 3.1A9.5 9.5 0 0 0 1.5 17h21a9.5 9.5 0 0 0-4.9-7.5zM7 14.4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>Android <small>.apk</small></a>
+        <a class="btn primary dl" data-os="Windows" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/InkShelfs.exe"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5 10 4.5v7H3zm0 13 7 1v-7H3zM11 4.4 21 3v8.5H11zm0 15.2L21 21v-8.5H11z"/></svg>Windows <small>.exe</small></a>
+        <a class="btn dl" data-os="Android" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/InkShelfs-android-test.apk"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.6 9.5 19.4 6.4a.4.4 0 1 0-.7-.4l-1.8 3.2A10.8 10.8 0 0 0 12 8.2c-1.8 0-3.5.4-4.9 1L5.3 6a.4.4 0 1 0-.7.4l1.8 3.1A9.5 9.5 0 0 0 1.5 17h21a9.5 9.5 0 0 0-4.9-7.5zM7 14.4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>Android <small>.apk</small></a>
       </div>
-      <p class="meta"><span class="v"><i aria-hidden="true"></i>Version 2.1.6</span><span>Free and open source</span><a href="#install">First install? Read this</a></p>
+      <p class="meta"><span class="v"><i aria-hidden="true"></i>Version 3.0</span><span>Free and open source</span><span>Manga on Windows; novels on both</span><a href="#install">First install? Read this</a></p>
     </div>
     <div class="stage">
       <div class="win" aria-hidden="true">
-        <div class="bar"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M22 12h20a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4H22z" fill="#F7F3EC"/><path d="M32 12h8v20l-4-3-4 3z" fill="#A8431F"/></svg>NovelArchiver<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div>
-        <img src="img/desk-library-grid-dark.webp" width="2560" height="1600" alt="NovelArchiver on Windows: a library of saved novels with their posters.">
+        <div class="bar"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div>
+        <img src="img/desk-inkshelf-library.webp" width="1600" height="1000" alt="InkShelfs on Windows: one library with novels and manga, and All, Novels and Manga tabs.">
       </div>
       <div class="phone"><img src="img/phone-reader.webp" width="1170" height="2532" alt="Reading a chapter on an Android phone."></div>
     </div>
@@ -213,7 +250,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
     <div class="moments">
       <div><b>The commute</b><p>Chapters are on your phone before you leave. Underground, in a dead zone, on a flight: the next page is already there.</p></div>
       <div><b>Lunch at the office</b><p>No autoplay video, no full-screen pop-ups, no “continue in our app”. Just the chapter, in a quiet reader you can set the way you like.</p></div>
-      <div><b>Stories that keep going</b><p>Following ten ongoing novels? One tap on Get new chapters brings in everything that came out since yesterday, and shows you which ones have something new.</p></div>
+      <div><b>Stories that keep going</b><p>Following ten ongoing novels and a few weekly manhwa? One click on Get new chapters brings in everything that came out since yesterday, novels and manga together.</p></div>
     </div>
   </div>
 </section>
@@ -223,7 +260,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
     <div class="row">
       <div class="txt">
         <h2>Paste a link. See what you’ll get first.</h2>
-        <p>Paste a novel page or any chapter link. NovelArchiver looks it up and shows the poster, how many chapters there are, and anything worth knowing, before a single chapter downloads.</p>
+        <p>Paste a novel or manga page, or any chapter link. InkShelfs works out what it is, looks it up and shows the poster, how many chapters there are, and anything worth knowing, before a single chapter downloads.</p>
         <ul><li>Everything, a range, or from the chapter you’re on</li><li>Choose the speed, and whether to keep chapter images</li><li>Paid or locked chapters are skipped and stay locked</li></ul>
       </div>
       <div class="pics"><div class="phone"><img src="img/phone-lookup.webp" width="1170" height="2532" loading="lazy" alt="The lookup sheet on a phone: poster, chapter count and download options."></div></div>
@@ -252,20 +289,39 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
       <div class="txt">
         <h2>The same library on your PC</h2>
         <p>On Windows you get the same library and reader in a desktop window, with room for the full chapter list, 100 chapters a page. Export any novel as an EPUB for Kindle, Play Books, Apple Books or KOReader, and back up the whole library to one file.</p>
+        <ul><li>EPUB for novels, CBZ for manga</li><li>One site window: a “verify you’re human” check passed once counts for both</li></ul>
       </div>
-      <div class="win" aria-hidden="true"><div class="bar"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M22 12h20a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4H22z" fill="#F7F3EC"/><path d="M32 12h8v20l-4-3-4 3z" fill="#A8431F"/></svg>NovelArchiver<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div><img src="img/desk-novel.webp" width="2560" height="1600" loading="lazy" alt="A novel's page on Windows with its chapter list."></div>
+      <div class="win" aria-hidden="true"><div class="bar"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div><img src="img/desk-novel.webp" width="2560" height="1600" loading="lazy" alt="A novel's page on Windows with its chapter list."></div>
+    </div>
+  </div>
+</section>
+
+<section id="manga">
+  <div class="wrap tour">
+    <div class="row">
+      <div class="txt">
+        <h2>Manga, manhwa and manhua, <em style="font-style:italic;color:var(--accent)">offline</em>.</h2>
+        <p>Paste a series or chapter link from MangaDex, WEBTOON, Asura Scans or nine other sites. Pick all chapters, the first few, a range, or from the one you pasted. Every page is checked to be a real image before it’s saved, so a site’s error page never ends up in your copy.</p>
+        <div class="kinds"><span>Manga</span><span>Manhwa</span><span>Manhua</span><span>Webtoons</span></div>
+        <ul><li>A long strip for webtoons; pages right-to-left or left-to-right; two pages side by side</li><li>Pages keep their real size before they load, so the strip never jumps under your thumb</li><li>At the end of a chapter the next one opens, or downloads with one click</li><li>Select chapters to download or to free up space; save a series as one CBZ for Komga, Kavita or Mihon</li></ul>
+        <p class="muted" style="font-size:.95rem">Manga is on Windows in 3.0. Novels work on Windows and Android.</p>
+      </div>
+      <div class="shots">
+        <div class="win" aria-hidden="true"><div class="bar"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div><img src="img/desk-manga-series.webp" width="1600" height="1000" loading="lazy" alt="A manga series page in InkShelfs with its chapter list and download buttons."></div>
+        <div class="win" aria-hidden="true"><div class="bar"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div><img src="img/desk-manga-reader.webp" width="1600" height="1000" loading="lazy" alt="The manga reader showing two pages side by side, right to left."></div>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="authors" id="authors">
   <div class="wrap">
-    <div class="head"><h2>A convenience, <em>not a replacement</em>.</h2><p>Web novels exist because authors and translators spend years writing them, and the sites that host them pay for every page you load. NovelArchiver takes the ads and pop-ups out of reading on a train. It doesn’t make the work free to make. If a story keeps you coming back, give something back.</p></div>
+    <div class="head"><h2>A convenience, <em>not a replacement</em>.</h2><p>Web novels and comics exist because authors, artists and translators spend years making them, and the sites that host them pay for every page you load. InkShelfs takes the ads and pop-ups out of reading on a train. It doesn’t make the work free to make. If a story keeps you coming back, give something back.</p></div>
     <div class="give">
       <div><b>Follow it where it lives</b><p>Favourite, follow and rate the novel on its own site. Rankings are how new readers find it.</p></div>
       <div><b>Say something</b><p>Leave a comment or a review. Authors read them, and they keep a lot of stories going.</p></div>
       <div><b>Support them directly</b><p>Patreon, Ko-fi, the site’s own coins or tips: even a small monthly pledge matters more than you’d think.</p></div>
-      <div><b>Buy the official release</b><p>When a story gets an e-book, print or licensed translation, that’s the copy to own.</p></div>
+      <div><b>Buy the official release</b><p>When a story gets an e-book, a printed volume or a licensed translation, that’s the copy to own.</p></div>
     </div>
     <div class="never">
       <div><h3>No paid chapters</h3><p>Locked and paid chapters are skipped and stay locked. Unlock them on the site, the way the author intended.</p></div>
@@ -277,14 +333,14 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
 
 <section id="install">
   <div class="wrap">
-    <div class="head"><h2>Installing: about the warnings</h2><p>NovelArchiver is free and isn’t sold through the Microsoft Store or Google Play, so it isn’t signed with a paid publisher certificate. The first time you open it, Windows or Android will warn about an unknown app. That’s expected; here’s exactly what to tap.</p></div>
+    <div class="head"><h2>Installing: about the warnings</h2><p>InkShelfs is free and isn’t sold through the Microsoft Store or Google Play, so it isn’t signed with a paid publisher certificate. The first time you open it, Windows or Android will warn about an unknown app. That’s expected; here’s exactly what to tap.</p></div>
     <div class="install">
       <div class="card">
         <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5 10 4.5v7H3zm0 13 7 1v-7H3zM11 4.4 21 3v8.5H11zm0 15.2L21 21v-8.5H11z"/></svg>Windows 10 and 11</h3>
         <p class="why">Microsoft Defender SmartScreen blocks apps it hasn’t seen many people run yet.</p>
         <ol class="steps">
-          <li><span>Your browser may say <span class="say">“NovelArchiver.exe isn’t commonly downloaded”</span>. In Edge choose <span class="ui">⋯</span>, <span class="ui">Keep</span>, then <span class="ui">Keep anyway</span>.<small>In Chrome, choose <span class="ui">Keep</span> on the download.</small></span></li>
-          <li><span>Open <code>NovelArchiver.exe</code>. A blue box says <span class="say">“Windows protected your PC”</span>. Click <span class="ui">More info</span>, the small link under the text.</span></li>
+          <li><span>Your browser may say <span class="say">“InkShelfs.exe isn’t commonly downloaded”</span>. In Edge choose <span class="ui">⋯</span>, <span class="ui">Keep</span>, then <span class="ui">Keep anyway</span>.<small>In Chrome, choose <span class="ui">Keep</span> on the download.</small></span></li>
+          <li><span>Open <code>InkShelfs.exe</code>. A blue box says <span class="say">“Windows protected your PC”</span>. Click <span class="ui">More info</span>, the small link under the text.</span></li>
           <li><span>The publisher shows as <span class="say">“Unknown publisher”</span>. Click <span class="ui blue">Run anyway</span>.<small>Windows asks once for each new version.</small></span></li>
         </ol>
       </div>
@@ -295,34 +351,40 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
           <li><span>Chrome may say <span class="say">“File might be harmful”</span>. Tap <span class="ui">Download anyway</span>.</span></li>
           <li><span>Open the downloaded <code>.apk</code>. If you see <span class="say">“not allowed to install unknown apps from this source”</span>, tap <span class="ui">Settings</span>, turn on <span class="ui">Allow from this source</span>, then go back.</span></li>
           <li><span>Tap <span class="ui">Install</span>. If Play Protect warns about an <span class="say">“unknown developer”</span>, tap <span class="ui">More details</span>, then <span class="ui">Install anyway</span>.<small>If it offers to scan the app, either choice is fine.</small></span></li>
-          <li><span>Updating later? Install the new <code>.apk</code> over the old one. Your library stays.</span></li>
+          <li><span>Updating later? Install the new <code>.apk</code> over the old one. Your library stays.<small>Had the NovelArchiver test app? InkShelfs installs over it and keeps your library.</small></span></li>
         </ol>
       </div>
     </div>
     <div class="check"><strong>Want to check you have the real file?</strong> Every release lists its SHA-256 fingerprints in <a href="https://github.com/sulaimankhan8/novelarchiver/releases/latest">SHA256SUMS.txt</a>, and all the source code is <a href="https://github.com/sulaimankhan8/novelarchiver">on GitHub</a>. On Windows, compare with:
-<pre class="cmd">Get-FileHash $HOME\Downloads\NovelArchiver.exe</pre></div>
+<pre class="cmd">Get-FileHash $HOME\Downloads\InkShelfs.exe</pre>
+<p style="margin-top:10px">Coming from NovelArchiver on Windows? InkShelfs opens the same library, reading places and settings. Nothing to move.</p></div>
   </div>
 </section>
 
-<section>
+<section id="sites">
   <div class="wrap split">
-    <div>
+    <div class="sites-wrap">
       <h2>Works with the sites you read</h2>
+      <h3>Novels · 11</h3>
       <ul class="sites">
         <li>NovelBin</li><li>NovelFull</li><li>ReadNovelFull</li><li>NovelPing</li><li>Royal Road</li><li>WuxiaWorld</li><li>ScribbleHub</li><li>FreeWebNovel</li><li>NovelFire</li><li>EmpireNovel</li><li>Webnovel <span class="muted">(free chapters)</span></li>
       </ul>
-      <p class="muted" style="margin-top:16px;font-size:.95rem">Other sites open in a general reader mode. Site layouts change; when one breaks, its rules can be fixed without a new release.</p>
+      <h3>Manga, manhwa and manhua · 12</h3>
+      <ul class="sites">
+        <li>MangaDex</li><li>Mangapill</li><li>Weeb Central</li><li>MangaKatana</li><li>MangaRead</li><li>Toonily</li><li>ManhuaPlus</li><li>Flame Comics</li><li>WEBTOON <span class="muted">(free episodes)</span></li><li>MangaGeko</li><li>MangaNato / MangaKakalot</li><li>Asura Scans</li>
+      </ul>
+      <p class="muted" style="margin-top:16px;font-size:.95rem">Every site was tested with a real download. The app’s Sites page lists them all with a “Try an example” link. Other novel sites open in a general reader mode, and when a site changes its layout, its rules can be fixed without a new release.</p>
     </div>
     <div>
-      <h2>What’s new in 2.1</h2>
+      <h2>What’s new in 3.0</h2>
       <ul class="new">
-        <li><b>Catch up</b><span>Get new chapters checks every ongoing novel and downloads only what came out since last time. A New chapters filter shows which ones have something to read.</span></li>
-        <li><b>Background</b><span>On Android, downloads keep going when you switch apps or turn the screen off, with progress in a notification.</span></li>
-        <li><b>Reading</b><span>Font, size, spacing, width and theme, on the novel page, in Settings, or with Aa while you read.</span></li>
-        <li><b>Update</b><span>A novel’s new chapters, edited chapters and new poster in one go, with a summary of what changed. Retry fetches only what failed.</span></li>
-        <li><b>Queue</b><span>Add novels while one downloads. Pause, resume, or take one out.</span></li>
-        <li><b>Backup</b><span>The whole library, reading places and settings in one file. Restoring merges; it never deletes.</span></li>
-        <li><b>Android</b><span>Notifications, “Only on Wi-Fi”, and human checks that pass inside the app.</span></li>
+        <li><b>InkShelfs</b><span>NovelArchiver has a new name, a new icon and a second shelf. Your novels, reading places and settings come with it.</span></li>
+        <li><b>Manga</b><span>Manga, manhwa and manhua from 12 sites, on the same shelf as your novels, with All, Novels and Manga tabs.</span></li>
+        <li><b>One Add box</b><span>Paste any link; InkShelfs works out whether it’s a novel or a manga.</span></li>
+        <li><b>Reader</b><span>Long strip, pages right-to-left or left-to-right, and two pages side by side. Pages never jump while they load.</span></li>
+        <li><b>Sites page</b><span>Every supported site, how it works and when it was tested, with an example to try.</span></li>
+        <li><b>Catch up</b><span>Get new chapters checks novels and manga together, and downloads only what’s new.</span></li>
+        <li><b>CBZ</b><span>Save a manga series as one file for comic readers such as Komga, Kavita and Mihon.</span></li>
       </ul>
       <p style="margin-top:16px;font-size:.95rem"><a href="https://github.com/sulaimankhan8/novelarchiver/releases/latest">Full release notes</a></p>
     </div>
@@ -333,10 +395,13 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
   <div class="wrap">
     <div class="head"><h2>Questions</h2></div>
     <div class="faq">
+      <details><summary>What happened to NovelArchiver?</summary><p>It’s the same app with a new name. InkShelfs opens your existing NovelArchiver library on Windows, and manga gets its own shelf beside it. On Android, InkShelfs installs over the NovelArchiver test app and keeps your library.</p></details>
+      <details><summary>Does Android have manga?</summary><p>Not yet. In 3.0 manga is on Windows; novels work on both Windows and Android.</p></details>
+      <details><summary>How much space does manga take?</summary><p>A chapter is a set of pictures, usually 5–30 MB. A long series can take a few GB, so you can delete the pages of chapters you’ve read from the series page and download them again later.</p></details>
       <details><summary>Is it free?</summary><p>Yes, and open source. There are no accounts, no subscriptions and no ads in the app.</p></details>
       <details><summary>Does it work without internet?</summary><p>Reading does. You need a connection to download chapters and to get new ones; after that everything opens offline.</p></details>
-      <details><summary>Can I use other apps while it downloads?</summary><p>Yes. On Android a notification shows the progress and the download carries on in the background, even with the screen off. Some phones (Xiaomi, Oppo, Realme, Vivo) stop background apps aggressively; if yours does, set NovelArchiver’s battery use to “Unrestricted”.</p></details>
-      <details><summary>Will it download paid or locked chapters?</summary><p>No. Paid chapters are skipped and stay locked on the site. NovelArchiver only saves what the site already shows you for free.</p></details>
+      <details><summary>Can I use other apps while it downloads?</summary><p>Yes. On Android a notification shows the progress and the download carries on in the background, even with the screen off. Some phones (Xiaomi, Oppo, Realme, Vivo) stop background apps aggressively; if yours does, set InkShelfs’ battery use to “Unrestricted”.</p></details>
+      <details><summary>Will it download paid or locked chapters?</summary><p>No. Paid chapters are skipped and stay locked on the site. InkShelfs only saves what the site already shows you for free.</p></details>
       <details><summary>A site asked me to verify I’m human. Now what?</summary><p>The download pauses and a site window opens. Tick the check yourself and the download carries on. The app never solves or skips these checks for you.</p></details>
       <details><summary>Does it send my library anywhere?</summary><p>No. Chapters are saved on your device and read from there. Backups are a file you keep wherever you like.</p></details>
       <details><summary>Can I move my library to a new phone or PC?</summary><p>Yes. Settings → Back up saves everything to one file; Restore on the new device merges it in.</p></details>
@@ -348,8 +413,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
   <div class="wrap">
     <h2>Download tonight’s chapters before you leave.</h2>
     <div class="cta">
-      <a class="btn primary" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/NovelArchiver.exe">Download for Windows</a>
-      <a class="btn" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/NovelArchiver-android-test.apk">Download for Android</a>
+      <a class="btn primary dl" data-os="Windows" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/InkShelfs.exe">Download for Windows</a>
+      <a class="btn dl" data-os="Android" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/InkShelfs-android-test.apk">Download for Android</a>
     </div>
   </div>
 </section>
@@ -357,9 +422,70 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
 
 <footer>
   <div class="wrap">
-    <span>NovelArchiver · for personal, offline reading. Please support the authors you read.</span>
+    <span>InkShelfs (formerly NovelArchiver) · for personal, offline reading. Please support the authors and artists you read.</span>
     <span><a href="https://github.com/sulaimankhan8/novelarchiver">Source code</a> · <a href="https://github.com/sulaimankhan8/novelarchiver/releases">All releases</a></span>
   </div>
 </footer>
+
+<dialog class="thanks" id="thanks1" aria-labelledby="t1h">
+  <button type="button" class="x" data-close aria-label="Close">×</button>
+  <div class="in">
+    <span class="step">Your <span data-os-name>InkShelfs</span> download has started</span>
+    <h2 id="t1h">Support the people who make the stories</h2>
+    <p>Every chapter you save was written, drawn or translated by someone. If a story keeps you coming back, go to its creator and support them directly.</p>
+    <ul>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/></svg><span><b>Patreon, Ko-fi or tips.</b> Most authors, artists and translators link them on their story’s page or profile.</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/></svg><span><b>Buy the official release</b> when there is one: an e-book, a printed volume, a licensed translation.</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span><b>Rate, follow and comment.</b> It’s free, and it’s how new readers find them.</span></li>
+    </ul>
+    <div class="foot"><span class="dots" aria-hidden="true"><i class="on"></i><i></i></span><span style="flex:1"></span><button type="button" class="btn primary" data-next>Next</button></div>
+  </div>
+</dialog>
+
+<dialog class="thanks" id="thanks2" aria-labelledby="t2h">
+  <button type="button" class="x" data-close aria-label="Close">×</button>
+  <div class="in">
+    <span class="step">One more thing</span>
+    <h2 id="t2h">Support the sites you read on</h2>
+    <p>The sites that host stories pay for every page you load. InkShelfs is a convenience for reading offline, not a way around them.</p>
+    <ul>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span><b>Keep visiting them.</b> Read new chapters there when you’re online, and allow their ads if you can.</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span><b>Use their own support options:</b> memberships, coins, premium or a donation page.</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span><b>Paid chapters stay paid.</b> InkShelfs skips them; unlock them on the site.</span></li>
+    </ul>
+    <div class="foot"><label><input type="checkbox" id="thanksOff"> Don’t show these again</label><button type="button" class="btn primary" data-close>Done</button></div>
+  </div>
+</dialog>
+
+<script>
+// After a download link is clicked, the download goes ahead as normal; two
+// short notes then ask readers to support creators and the sites they read
+// on. Both close with Esc, the × or a click outside, and can be turned off.
+(function () {
+  var d1 = document.getElementById('thanks1'), d2 = document.getElementById('thanks2');
+  if (!d1 || !d2 || typeof d1.showModal !== 'function') return;
+  var off = function () { try { return localStorage.getItem('ink-thanks-off') === '1'; } catch (e) { return false; } };
+  function closeAll() {
+    if (document.getElementById('thanksOff').checked) { try { localStorage.setItem('ink-thanks-off', '1'); } catch (e) {} }
+    if (d1.open) d1.close();
+    if (d2.open) d2.close();
+  }
+  [d1, d2].forEach(function (d) {
+    d.addEventListener('click', function (e) {
+      if (e.target === d) closeAll(); // click on the backdrop
+      if (e.target.closest('[data-close]')) closeAll();
+      if (e.target.closest('[data-next]')) { d1.close(); d2.showModal(); }
+    });
+  });
+  document.querySelectorAll('a.dl').forEach(function (a) {
+    a.addEventListener('click', function () {
+      if (off()) return;
+      var os = a.getAttribute('data-os') || '';
+      document.querySelectorAll('[data-os-name]').forEach(function (s) { s.textContent = os || 'InkShelfs'; });
+      setTimeout(function () { if (!d1.open && !d2.open) d1.showModal(); }, 350); // let the download start first
+    });
+  });
+})();
+</script>
 </body>
 </html>
