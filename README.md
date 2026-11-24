@@ -1,8 +1,8 @@
-# NovelArchiver
+# InkShelfs (formerly NovelArchiver)
 
-Save web novels to your own device and read them offline, with no ads, pop-ups or redirects. Good for flights, commutes and patchy connections.
+Save web novels, manga, manhwa and manhua to your own device and read them offline, with no ads, pop-ups or redirects. Good for flights, commutes and patchy connections.
 
-NovelArchiver runs locally on **Windows** and **Android**. Paste a novel page or any chapter link. It saves the chapters with their formatting (bold, italics, tables, images and in-story **[System]** boxes) into a library on your device, with a clean reader and EPUB export.
+InkShelfs runs locally on **Windows** (novels and manga) and **Android** (novels). Paste a novel page or any chapter link. It saves the chapters with their formatting (bold, italics, tables, images and in-story **[System]** boxes) into a library on your device, with a clean reader and EPUB export.
 
 **Download:** see [Releases](../../releases) or the [download page](https://novelarchiver.vercel.app) (also on [GitHub Pages](https://sulaimankhan8.github.io/novelarchiver/)).
 
@@ -23,11 +23,11 @@ NovelArchiver runs locally on **Windows** and **Android**. Paste a novel page or
 
 ### Sites that check for bots
 
-Some sites only serve real browsers, or show Cloudflare's "Verify you are human" box. For those, NovelArchiver loads pages in a visible built-in browser window. If a check appears, **you** tick it, and it's remembered. The app never automates or bypasses these checks.
+Some sites only serve real browsers, or show Cloudflare's "Verify you are human" box. For those, InkShelfs loads pages in a visible built-in browser window. If a check appears, **you** tick it, and it's remembered. The app never automates or bypasses these checks.
 
 ## Responsible use
 
-NovelArchiver is meant for keeping a **personal offline copy** of stories you read. Don't redistribute downloaded chapters. Respect authors and the sites' terms, and support the original publishers and translators where you can.
+InkShelfs is meant for keeping a **personal offline copy** of stories you read. Don't redistribute downloaded chapters. Respect authors and the sites' terms, and support the original publishers and translators where you can.
 
 ## How it works
 
@@ -55,7 +55,7 @@ The desktop app is Go + [Wails v2](https://wails.io). The Android app runs the s
 **Desktop (Windows):** needs Go 1.22+, the Wails CLI and GCC (MSYS2).
 
 ```powershell
-wails build -clean        # -> build\bin\NovelArchiver.exe
+wails build -clean        # -> build\bin\InkShelfs.exe  (or: powershell -File build.ps1)
 ```
 
 **Android:** needs the Android SDK, the NDK (`sdkmanager ndk/29.0.14206865`) and Go.
@@ -86,7 +86,24 @@ go run ./cmd/na list
 
 ## Where your library lives
 
-- Windows: `%AppData%\NovelArchiver\library` (override with `NOVELARCHIVER_LIBRARY`)
+- Windows: `%AppData%\NovelArchiver\library` (override with `NOVELARCHIVER_LIBRARY`). The folder keeps its old name so existing libraries carry over.
 - Android: the app's private storage (exports go to Downloads)
 
 Each novel is a folder with `book.json`, `chapters/0001.html …`, `cover.*` and `img/`.
+
+## Manga, manhwa and manhua
+
+Built into the same Windows app (`InkShelfs.exe`). The library shelf has All / Novels / Manga tabs, and the Add box works out by itself whether a link is a novel or a manga.
+
+- **12 manga sites:** MangaDex, Mangapill, Weeb Central, MangaKatana, MangaRead, Toonily, ManhuaPlus, Flame Comics, WEBTOON, MangaGeko, MangaNato/MangaKakalot and Asura Scans. The **Sites** page (globe button) lists every novel and manga site with a "Try an example" link. Profiles and the debugging workflow are in [internal/manga/README.md](internal/manga/README.md).
+- **Choose chapters:** all, the first N, a range, or from a pasted chapter on. Or tick chapters with **Select** on the series page. Every downloaded file is checked to be a real image.
+- **Reader:** long strip for webtoons; pages right-to-left or left-to-right; two pages side by side. Pages keep their real height before they load, so the strip never jumps. It remembers your page, and at the end of a chapter it opens (or downloads) the next one.
+- **Updates:** "Get new chapters" checks novels and manga together; only new chapters are downloaded.
+- **Export:** one `.cbz` per series with `ComicInfo.xml`, readable in Komga, Kavita, Mihon/Tachiyomi, CDisplayEx and other comic readers.
+- **One site window:** a "Verify you are human" check passed once counts for both novels and manga.
+
+```powershell
+go run ./cmd/ma test -lib $env:TEMP\ma-test   # live check of every manga site
+```
+
+Manga library: `%AppData%\MangaArchiver\library` (override with `MANGAARCHIVER_LIBRARY`), kept apart from the novels. Each series is a folder with `series.json`, `cover.*` and `ch/<key>/001.jpg …`.

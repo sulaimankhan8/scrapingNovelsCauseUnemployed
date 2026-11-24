@@ -25,6 +25,9 @@ type Profile struct {
 	Status    string   `json:"status"`
 	FetchMode string   `json:"fetchMode"`
 	Verified  string   `json:"verified,omitempty"`
+	// Home and Example are shown on the Supported sites page.
+	Home    string `json:"home,omitempty"`
+	Example string `json:"example,omitempty"`
 	// CanonicalHost, when set, replaces the host of any matching link
 	// (e.g. a mirror domain that is down or that the site's own servers
 	// refuse to serve).

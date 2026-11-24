@@ -20,8 +20,9 @@ import (
 // in internal/service, shared with the Android app; this adds the Wails
 // event bus, the WebView2 site browser and desktop-only helpers.
 type App struct {
-	svc *service.Service
-	ctx context.Context
+	svc   *service.Service
+	manga *MangaApp
+	ctx   context.Context
 }
 
 // NewApp opens the library in %AppData% and attaches the site browser.
@@ -36,19 +37,25 @@ func NewApp() *App {
 		// Cookies live next to the library so a passed human check is remembered.
 		if win, err := browser.New(browser.Options{
 			DataPath: filepath.Join(filepath.Dir(root), "SiteBrowser"),
+			Title:    "InkShelfs — site browser (leave open while downloading)",
 			OnStatus: func(msg string) { a.svc.Emit("status", map[string]any{"message": msg}) },
 			OnChallenge: func(host string) {
 				a.svc.Emit("challenge", map[string]any{"host": host, "message": service.ChallengeMessage})
 			},
-		}); err == nil {
+		}); err == nil && win != nil {
 			a.svc.SetBrowser(win)
+			a.manga = newMangaApp(win)
 		}
+	}
+	if a.manga == nil {
+		a.manga = newMangaApp(nil)
 	}
 	return a
 }
 
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	a.manga.startup(ctx)
 	_ = runtime.InitializeNotifications(ctx)
 	if a.svc.GetSettings().UpdateOnOpen {
 		go func() {
@@ -59,6 +66,7 @@ func (a *App) startup(ctx context.Context) {
 }
 
 func (a *App) shutdown(ctx context.Context) {
+	a.manga.shutdown() // first: it shares the site window the novel side closes
 	a.svc.Shutdown()
 	runtime.CleanupNotifications(ctx)
 }
@@ -139,6 +147,9 @@ func (a *App) RemoveQueued(id int) error                   { return a.svc.Remove
 func (a *App) CancelAll() error                            { return a.svc.CancelAll() }
 func (a *App) SetReading(slug string, chapter int) error   { return a.svc.SetReading(slug, chapter) }
 
+// NovelSites lists the supported novel sites for the Sites page.
+func (a *App) NovelSites() []service.SiteInfo { return a.svc.Sites() }
+
 // Platform tells the shared frontend which shell it runs in.
 func (a *App) Platform() string { return "desktop" }
 
@@ -182,7 +193,7 @@ func (a *App) BackupLibrary() (*service.BackupInfo, error) {
 		Title:            "Back up library",
 		DefaultDirectory: filepath.Join(home, "Documents"),
 		DefaultFilename:  service.BackupFileName(),
-		Filters:          []runtime.FileFilter{{DisplayName: "NovelArchiver backup (*.zip)", Pattern: "*.zip"}},
+		Filters:          []runtime.FileFilter{{DisplayName: "InkShelfs backup (*.zip)", Pattern: "*.zip"}},
 	})
 	if err != nil || dest == "" {
 		return nil, err
@@ -203,7 +214,7 @@ func (a *App) ChooseBackup() (*service.BackupInfo, error) {
 	src, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
 		Title:            "Restore from backup",
 		DefaultDirectory: filepath.Join(home, "Documents"),
-		Filters:          []runtime.FileFilter{{DisplayName: "NovelArchiver backup (*.zip)", Pattern: "*.zip"}},
+		Filters:          []runtime.FileFilter{{DisplayName: "InkShelfs backup (*.zip)", Pattern: "*.zip"}},
 	})
 	if err != nil || src == "" {
 		return nil, err

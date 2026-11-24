@@ -1,7 +1,9 @@
-/* NovelArchiver — app shell (library, novel page, settings).
+/* InkShelfs — app shell (library, novel page, settings). Manga, manhwa and
+   manhua screens live in manga.js, which plugs in through window.NA.
    Runs unchanged on the desktop (Wails: window.go.main.App, window.runtime)
    and on Android (android-shim.js provides the same API).
-   Views are hash routes: #/  #/novel/<slug>  #/settings */
+   Views are hash routes: #/  #/novel/<slug>  #/settings  #/sites
+   #/manga/<slug>  #/read/<slug>/<key> */
 (function () {
   'use strict';
 
@@ -17,6 +19,8 @@
     raw(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
   };
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  // Manga support (manga.js) is on when the desktop core has it.
+  const MG = () => !!(window.Manga && window.Manga.enabled());
   // Some sites shout titles in capitals; show them in title case.
   const SMALL = new Set(['a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'in', 'into', 'nor', 'of', 'on', 'or', 'the', 'to', 'vs', 'with']);
   // A download that fails before the site gives its title carries the link
@@ -134,6 +138,10 @@
 
   // ---------------------------------------------------------------- icons
   const P = {
+    globe: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+    panels: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 12h18M12 3v9"/>',
+    minus: '<path d="M5 12h14"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
     search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
     link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
     arrow: '<path d="M5 12h14M12 5l7 7-7 7"/>',
@@ -162,7 +170,8 @@
   };
   const icon = (name, size = 16, sw = 2) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[name]}</svg>`;
   const spinner = (size = 16, tone = 'var(--accent)') => `<svg class="spinner" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity=".22" stroke-width="3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="${tone}" stroke-width="3" stroke-linecap="round"/></svg>`;
-  const LOGO = '<svg width="40" height="40" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#1D1B18"/><path d="M16 15a3 3 0 0 1 3-3h3v40h-3a3 3 0 0 1-3-3z" fill="#CDBFA6"/><path d="M22 12h20a4 4 0 0 1 4 4v32a4 4 0 0 1-4 4H22z" fill="#F7F3EC"/><path d="M32 12h8v20l-4-3-4 3z" fill="#A8431F"/></svg>';
+  const MARK = '<rect width="64" height="64" rx="15" fill="#1D1B18"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><path d="M37 20h9v10h-9zM37 33h9v12h-9z" fill="#1D1B18"/><path d="M18 21h10M18 27h10M18 33h7" stroke="#B5AC9E" stroke-width="2.4" stroke-linecap="round"/><circle cx="48" cy="48" r="7" fill="#A8431F"/>';
+  const LOGO = `<svg width="40" height="40" viewBox="0 0 64 64" aria-hidden="true">${MARK}</svg>`;
 
   // ---------------------------------------------------------------- covers
   // The site's poster always wins. Without one (or if it fails to load) we
@@ -244,6 +253,7 @@
     lastProgressAt: 0,
     lastStatusAt: 0,
     filter: store.get('na-filter', 'all'),
+    kind: store.get('na-kind', 'all'),
     status: 'any',
     sort: store.get('na-sort', 'read'),
     query: '',
@@ -471,6 +481,9 @@
     const parts = h.split('/');
     if (parts[0] === 'novel' && parts[1]) return { name: 'novel', slug: decodeURIComponent(parts[1]) };
     if (parts[0] === 'settings') return { name: 'settings' };
+    if (parts[0] === 'sites') return { name: 'sites' };
+    if (MG() && parts[0] === 'manga' && parts[1]) return { name: 'manga', slug: decodeURIComponent(parts[1]) };
+    if (MG() && parts[0] === 'read' && parts[1] && parts[2]) return { name: 'read', slug: decodeURIComponent(parts[1]), key: +parts[2] };
     return { name: 'library' };
   }
   let lastRoute = '';
@@ -480,7 +493,13 @@
     const key = r.name + (r.slug || '');
     const main = $('#main');
     const sb = $('#settingsBtn'); if (r.name === 'settings') sb.setAttribute('aria-current', 'page'); else sb.removeAttribute('aria-current');
+    const sib = $('#sitesBtn'); if (sib) { if (r.name === 'sites') sib.setAttribute('aria-current', 'page'); else sib.removeAttribute('aria-current'); }
+    document.body.classList.toggle('reading', r.name === 'read');
+    if (window.Manga && window.Manga.leave) window.Manga.leave(r);
     if (r.name === 'settings') renderSettings(main);
+    else if (r.name === 'sites') window.Manga ? window.Manga.renderSites(main) : renderLibraryPage(main);
+    else if (r.name === 'manga') window.Manga.renderSeries(main, r.slug);
+    else if (r.name === 'read') window.Manga.renderReader(main, r.slug, r.key);
     else if (r.name === 'novel') renderNovelPage(main, r.slug);
     else renderLibraryPage(main);
     if (key !== lastRoute) { window.scrollTo(0, 0); lastRoute = key; }
@@ -492,10 +511,12 @@
     main.innerHTML = `<div class="wrap stack gap-40">
       <section class="intake" id="intake" aria-labelledby="addH"></section>
       <section class="jobs" id="jobs" aria-label="Downloads" hidden></section>
+      <section class="jobs" id="mjobs" aria-label="Manga downloads" hidden></section>
       <section class="stack" style="gap:20px" id="shelf" aria-labelledby="libH"></section>
     </div>`;
     renderIntake();
     renderJobs($('#jobs'));
+    if (MG()) window.Manga.paintJobs();
     renderShelf();
   }
 
@@ -543,13 +564,13 @@
     // Patched in place: option taps don't rebuild the card, so its entrance
     // plays once and the phone sheet keeps its scroll position.
     morph(box, `
-      <h1 class="page-h" id="addH">Add a novel</h1>
+      <h1 class="page-h" id="addH">${MG() ? 'Add a novel or manga' : 'Add a novel'}</h1>
       <form class="linkbox${it.phase === 'error' ? ' is-error' : ''}" id="intakeForm" novalidate>
         <label>${icon(it.phase === 'error' ? 'alert' : 'link', 18)}
-          <input type="url" id="novelUrl" placeholder="Paste a novel or chapter link" aria-label="Novel or chapter link" autocomplete="off" spellcheck="false" value="${esc(it.url)}" ${looking ? 'readonly' : ''} ${it.phase === 'error' ? 'aria-invalid="true" aria-describedby="intakeErr"' : ''}>
+          <input type="url" id="novelUrl" placeholder="${MG() ? 'Paste a novel or manga link (series or any chapter)' : 'Paste a novel or chapter link'}" aria-label="${MG() ? 'Novel or manga link' : 'Novel or chapter link'}" autocomplete="off" spellcheck="false" value="${esc(it.url)}" ${looking ? 'readonly' : ''} ${it.phase === 'error' ? 'aria-invalid="true" aria-describedby="intakeErr"' : ''}>
         </label>${btn}
       </form>
-      ${panel || `<p class="hint" data-key="hint">Works with NovelBin, NovelFull, Royal Road, WuxiaWorld, ScribbleHub and 6 more. Other sites open in reader mode.</p>`}`);
+      ${panel || (MG() ? `<p class="hint" data-key="hint">Works with 11 novel sites and 12 manga, manhwa and manhua sites, like Royal Road, NovelBin, MangaDex and WEBTOON. <a href="#/sites">See every supported site</a></p>` : `<p class="hint" data-key="hint">Works with NovelBin, NovelFull, Royal Road, WuxiaWorld, ScribbleHub and 6 more. Other sites open in reader mode. <a href="#/sites">See all</a></p>`)}`);
     // Attributes don't move a field's live value once it's been typed in.
     const input = $('#novelUrl');
     if (input && input.value !== it.url) input.value = it.url;
@@ -566,6 +587,11 @@
   async function lookup(raw) {
     const url = normaliseUrl(raw);
     if (!url) return;
+    if (MG() && await window.Manga.recognises(url)) {
+      cancelIntake();
+      window.Manga.openAdd(url);
+      return;
+    }
     const it = state.intake;
     const token = ++it.token;
     Object.assign(it, { phase: 'looking', url: raw.trim(), data: null, err: '', scope: 'all', from: '', to: '', descOpen: false, speed: state.settings.speed, images: state.settings.keepImages });
@@ -605,6 +631,7 @@
     if (menuState) { closeMenu(); return 'handled'; }
     if (overlayClose) { closeOverlay(); return 'handled'; }
     if (route().name === 'library' && state.intake.phase !== 'idle') { cancelIntake(); return 'handled'; }
+    if (route().name === 'read') { location.hash = `#/manga/${encodeURIComponent(route().slug)}`; return 'handled'; }
     if (route().name !== 'library') { location.hash = '#/'; return 'handled'; }
     return '';
   };
@@ -996,9 +1023,17 @@
       if (slot && slot.dataset.h !== html) { morph(slot, html); slot.dataset.h = html; }
     });
   }
+  // Everything the shelf shows for the current kind tab: novels, manga
+  // series (shaped like novels by manga.js, with _manga set), or both.
+  function shelfItems() {
+    const kind = MG() ? state.kind : 'novel';
+    let list = kind === 'manga' ? [] : state.novels.slice();
+    if (kind !== 'novel' && MG()) list = list.concat(window.Manga.items());
+    return list;
+  }
   function filteredBooks() {
     const q = state.query.trim().toLowerCase();
-    let list = state.novels.slice();
+    let list = shelfItems();
     const f = state.filter;
     list = list.filter((n) => {
       const r = readInfo(n);
@@ -1022,6 +1057,7 @@
     return list;
   }
   function bookCard(n, i) {
+    if (n._manga) return window.Manga.card(n, i);
     const r = readInfo(n);
     const href = `#/novel/${encodeURIComponent(n.slug)}`;
     const title = niceTitle(n.title);
@@ -1046,16 +1082,22 @@
       <div class="book__progress"><div class="bar bar--thin${r.started ? '' : ' bar--none'}" aria-hidden="true"><i style="--p:${(r.pct) / 100}"></i></div><span class="book__meta">${esc(meta)}</span>${st ? `<span class="book__meta">${esc(st)}</span>` : ''}</div>
     </article>`;
   }
+  // Cover-shaped placeholders while the library loads (no blank flash).
+  function shelfSkeleton() {
+    const one = '<div class="book sk-book" aria-hidden="true"><div class="sk-cover"></div><div class="sk-line" style="width:85%"></div><div class="sk-line" style="width:55%"></div></div>';
+    return `<div class="lib-head"><div class="titles"><h2 id="libH">Library</h2><p>Loading your library…</p></div></div><div class="grid" aria-busy="true">${one.repeat(6)}</div>`;
+  }
   function renderShelf() {
     const box = $('#shelf');
     if (!box) return;
-    if (!state.loaded) { morph(box, `<div class="hint shelf-wait">Loading your library…</div>`); return; }
-    const all = state.novels;
-    if (!all.length) {
+    if (!state.loaded) { morph(box, shelfSkeleton()); return; }
+    const mangaAll = MG() ? window.Manga.items() : [];
+    const all = shelfItems();
+    if (!state.novels.length && !mangaAll.length) {
       morph(box, `<div class="empty">
         <div class="shelf-art" aria-hidden="true"><i style="width:22px;height:78px;background:#23344F"></i><i style="width:26px;height:92px;background:#6E2A2A"></i><i style="width:18px;height:70px;background:#2F4A3A"></i><i style="width:24px;height:84px;background:#7A5518;position:relative"><i style="position:absolute;left:7px;top:0;width:10px;height:30px;background:#A8431F;border-radius:0"></i></i></div>
         <h3 id="libH">Your shelf is empty</h3>
-        <p>Paste a link to a novel, or to any chapter you’re reading. It’s saved to this device and opens without internet.</p>
+        <p>${MG() ? 'Paste a link to a novel, manga, manhwa or manhua, or to any chapter you’re reading.' : 'Paste a link to a novel, or to any chapter you’re reading.'} It’s saved to this device and opens without internet.</p>
         <button type="button" class="btn btn--primary" data-act="focus-url">Paste a link</button></div>`);
       return;
     }
@@ -1067,10 +1109,17 @@
       .filter(([k]) => k === 'all' || counts[k] > 0 || state.filter === k)
       .map(([k, l]) => `<button type="button" class="chip" data-filter="${k}" aria-pressed="${state.filter === k}">${k === 'attention' ? '<span class="dot"></span>' : k === 'fresh' ? '<span class="dot dot--ok"></span>' : ''}${l} <span class="n">${counts[k]}</span></button>`).join('');
     const list = filteredBooks();
+    const kindWord = !MG() || state.kind === 'novel' ? 'novels' : state.kind === 'manga' ? 'manga' : 'series';
+    const emptyKind = !all.length && MG() && state.kind !== 'all';
     const grid = list.length ? `<div class="grid">${list.map((n, i) => bookCard(n, i)).join('')}</div>`
-      : `<div class="empty" style="padding:32px"><h3 style="font-size:22px">No novels match</h3><p>${state.query ? `Nothing in your library matches “${esc(state.query)}”.` : 'Nothing in this view yet.'}</p><button type="button" class="btn" data-act="clear-filters">Show all novels</button></div>`;
+      : emptyKind ? `<div class="empty" style="padding:32px"><h3 style="font-size:22px">No ${state.kind === 'manga' ? 'manga' : 'novels'} yet</h3><p>Paste a ${state.kind === 'manga' ? 'manga, manhwa or manhua' : 'novel'} link above to add one.</p><a class="btn" href="#/sites">See supported sites</a></div>`
+      : `<div class="empty" style="padding:32px"><h3 style="font-size:22px">No ${kindWord} match</h3><p>${state.query ? `Nothing in your library matches “${esc(state.query)}”.` : 'Nothing in this view yet.'}</p><button type="button" class="btn" data-act="clear-filters">Show all ${kindWord}</button></div>`;
+    const novelN = state.novels.length, mangaN = mangaAll.length;
+    const summary = MG() ? `${plural(novelN, 'novel')} · ${plural(mangaN, 'manga series', 'manga series')}` : plural(novelN, 'novel');
+    const totalBytes = MG() ? state.novels.concat(mangaAll).reduce((a, n) => a + (n.sizeBytes || 0), 0) : bytes;
+    const kindSeg = MG() ? `<div class="seg kind-seg" role="group" aria-label="Show">${[['all', 'All', novelN + mangaN], ['novel', 'Novels', novelN], ['manga', 'Manga', mangaN]].map(([k, l, c]) => `<button type="button" data-kind="${k}" aria-pressed="${state.kind === k}">${l} <span class="n">${c}</span></button>`).join('')}</div>` : '';
     morph(box, `<div class="lib-head">
-        <div class="titles"><h2 id="libH">Library</h2><p>${plural(all.length, 'novel')} · ${mb(bytes)} on this device</p></div>
+        <div class="titles"><h2 id="libH">Library</h2><p>${summary} · ${mb(totalBytes)} on this device</p></div>${kindSeg}
         <button type="button" class="btn btn--md" data-act="catch-up" title="Check every ongoing novel and download only the chapters that came out since last time">${icon('refresh', 15)} Get new chapters</button>
         <div class="lib-head__sel">${hasStatus ? `<label>Status <select class="select" id="statusSel">${[['any', 'Any'], ['ongoing', 'Ongoing'], ['completed', 'Completed'], ['hiatus', 'On hiatus']].map(([v, l]) => `<option value="${v}" ${state.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>` : ''}
         <label>Sort <select class="select" id="sortSel">${[['read', 'Last read'], ['added', 'Recently added'], ['title', 'Title'], ['chapters', 'Most chapters']].map(([v, l]) => `<option value="${v}" ${state.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label></div>
@@ -1086,6 +1135,8 @@
   document.addEventListener('click', (e) => {
     const f = e.target.closest('[data-filter]');
     if (f) { state.filter = f.dataset.filter; store.set('na-filter', state.filter); renderShelf(); }
+    const kb = e.target.closest('[data-kind]');
+    if (kb) { state.kind = kb.dataset.kind; store.set('na-kind', state.kind); renderShelf(); }
     const c = e.target.closest('[data-toc]');
     if (c) { state.tocFilter = c.dataset.toc; state.tocPage = null; $$('[data-toc]').forEach((x) => x.setAttribute('aria-pressed', x === c)); paintToc(); }
   });
@@ -1129,11 +1180,14 @@
   // instead of a card and a notification per novel.
   const catchState = { checked: 0, novels: 0, chapters: 0 };
   async function catchUp() {
+    const mangaN = MG() ? await window.Manga.checkAll(true) : 0;
+    const andManga = mangaN ? ` and ${plural(mangaN, 'manga series', 'manga series')}` : '';
     try {
       const r = await api('CatchUp');
       const n = (r && r.queued) || 0;
-      if (!n) toast(r && r.skipped ? 'All your novels are completed, so there’s nothing to check.' : 'Everything is already being checked.');
-      else toast(`Checking ${plural(n, 'ongoing novel')} for new chapters.`);
+      if (!n && mangaN) toast(`Checking ${plural(mangaN, 'manga series', 'manga series')} for new chapters.`);
+      else if (!n) toast(r && r.skipped ? 'All your novels are completed, so there’s nothing to check.' : 'Everything is already being checked.');
+      else toast(`Checking ${plural(n, 'ongoing novel')}${andManga} for new chapters.`);
       loadActivity();
     } catch (e) {
       // Older core: fall back to the full update.
@@ -1483,7 +1537,7 @@
     const desktop = state.platform === 'desktop';
     main.innerHTML = `<div class="wrap settings">
       <nav aria-label="Settings sections" class="only-wide-nav">
-        ${[['appearance', 'Appearance'], ['reading', 'Reading'], ['downloads', 'Downloads'], ['updates', 'Updates'], ['storage', 'Storage'], ['about', 'About']].map(([id, l], i) => `<a href="#/settings" data-jump="${id}" class="${i === 0 ? 'is-on' : ''}">${l}</a>`).join('')}
+        ${[['appearance', 'Appearance'], ['reading', 'Reading'], ['downloads', 'Downloads'], ['updates', 'Updates']].concat(MG() ? [['manga', 'Manga']] : []).concat([['storage', 'Storage'], ['about', 'About']]).map(([id, l], i) => `<a href="#/settings" data-jump="${id}" class="${i === 0 ? 'is-on' : ''}">${l}</a>`).join('')}
       </nav>
       <div class="settings__body">
         <div class="stack" style="gap:4px"><a class="back" href="#/">${icon('back', 16)} Library</a><h1 class="page-h" style="font-size:40px">Settings</h1></div>
@@ -1502,14 +1556,16 @@
           ${row('Check saved chapters for revisions', 'Every chapter is the full check, and the slowest: about 10–15 minutes for 2,000 chapters.', seg('revise', [['all', 'Every chapter'], ['recent', 'Last 100'], ['off', 'Off']], 'Revision check'))}
           ${row('Update all novels when the app opens', 'Gets new chapters for your ongoing novels, like Get new chapters, skipping any checked in the last 12 hours. Saved chapters are re-checked for edits only when you press Update on a novel.', sw('updateOnOpen', 'Update all when the app opens'))}
         </div></section>
+        ${MG() ? window.Manga.settingsHTML(row, desktop) : ''}
         <section class="set-group" id="storage" aria-labelledby="sS"><h2 class="section-h" id="sS">Storage</h2><div class="card">
           ${desktop && st.libraryPath ? row('Library folder', esc(st.libraryPath), `<button type="button" class="btn btn--md" data-act="open-library">Open folder</button>`) : ''}
           ${row(`${esc(mb(st.totalBytes || 0))} used`, `${plural(st.totalNovels || 0, 'novel')} · ${plural(st.totalCleanChapters || 0, 'chapter')}. Free up space from each novel’s page.`, '')}
           ${row('Back up library', 'One file with every novel, poster, reading place and these settings. Restore it on a new PC or phone.', `<div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="btn btn--md" data-act="backup">Back up…</button><button type="button" class="btn btn--ghost btn--md" data-act="restore">Restore…</button></div>`)}
         </div></section>
         <section class="set-group" id="about" aria-labelledby="sAb"><h2 class="section-h" id="sAb">About</h2><div class="card storage">
-          <div style="display:flex;align-items:center;gap:12px">${LOGO}<span style="display:flex;flex-direction:column"><b>NovelArchiver</b>${state.platform === 'android' ? '' : `<span class="muted" style="font-size:13px"><button type="button" class="btn btn--link" style="padding:0;font-size:13px" data-act="shortcuts">Keyboard shortcuts</button></span>`}</span></div>
-          <div class="sites">${SITES.map((x) => `<span>${esc(x)}</span>`).join('')}</div>
+          <div style="display:flex;align-items:center;gap:12px">${LOGO}<span style="display:flex;flex-direction:column"><b>InkShelfs</b>${state.platform === 'android' ? '' : `<span class="muted" style="font-size:13px"><button type="button" class="btn btn--link" style="padding:0;font-size:13px" data-act="shortcuts">Keyboard shortcuts</button></span>`}</span></div>
+          <div class="sites">${SITES.map((x) => `<span>${esc(x)}</span>`).join('')}${MG() ? '<span>+ 12 manga sites</span>' : ''}</div>
+          <a class="btn btn--md" href="#/sites" style="align-self:flex-start">${icon('globe', 15)} See every supported site</a>
           <p class="muted" style="font-size:13px;line-height:1.6">For keeping a personal offline copy of stories you read. Please don’t redistribute chapters, and support the authors and translators where you can.</p>
         </div></section>
       </div></div>`;
@@ -1521,6 +1577,7 @@
         $$(`[data-set="${key}"]`, main).forEach((b) => b.setAttribute('aria-checked', b === el));
       });
     });
+    if (MG()) window.Manga.wireSettings(main);
     $$('[data-jump]', main).forEach((a) => a.addEventListener('click', (e) => {
       e.preventDefault();
       const t = $('#' + a.dataset.jump); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1579,9 +1636,11 @@
       items.push({ group: 'Novels', title: r.reading ? `Continue ${n.title}` : `Open ${n.title}`, sub: r.reading ? `Chapter ${num(r.last)}` : `${plural(n.totalChapters, 'chapter')}`, thumb: coverHTML(n.cover, n.title, n.author, true),
         run: () => { if (r.reading) location.href = `/library/${encodeURIComponent(n.slug)}/${r.last}`; else location.hash = `#/novel/${encodeURIComponent(n.slug)}`; } });
     });
+    if (MG()) window.Manga.paletteItems(q).forEach((it) => items.push(it));
     const next = THEMES[(THEMES.indexOf(state.settings.theme) + 1) % THEMES.length];
     const actions = [
-      { title: 'Add a novel', key: '/', run: () => goAdd() },
+      { title: MG() ? 'Add a novel or manga' : 'Add a novel', key: '/', run: () => goAdd() },
+      { title: 'Supported sites', run: () => { location.hash = '#/sites'; } },
       { title: 'Get new chapters for every ongoing novel', run: catchUp },
       { title: 'Full update of every novel (re-checks saved chapters, slow)', run: updateAll },
       { title: `Theme: switch to ${THEME_LABEL[next]}`, key: 'T', run: cycleTheme },
@@ -1627,7 +1686,8 @@
     openOverlay(`<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="kT" style="width:min(620px,100%)">
       <div style="display:flex;align-items:center;justify-content:space-between"><h2 id="kT">Keyboard shortcuts</h2><button type="button" class="icon-btn icon-btn--sm" data-act="close-overlay" aria-label="Close">${icon('x', 16)}</button></div>
       <div class="keys"><div><h3>Library</h3>${rows([['Search novels and actions', 'Ctrl K'], ['Paste a link', '/'], ['Switch theme', 'T'], ['Show shortcuts', '?'], ['Close or clear', 'Esc']])}</div>
-      <div><h3>Reader</h3>${rows([['Previous / next chapter', '← →'], ['Text size', '− +'], ['Serif or sans', 'F'], ['Novel page', 'H'], ['Reader theme', 'Aa']])}</div></div></div>`);
+      <div><h3>Novel reader</h3>${rows([['Previous / next chapter', '← →'], ['Text size', '− +'], ['Serif or sans', 'F'], ['Novel page', 'H'], ['Reader theme', 'Aa']])}</div>
+      ${MG() ? `<div><h3>Manga reader</h3>${rows([['Turn page (pages modes)', '← →'], ['Next / previous chapter (strip)', '→ ←'], ['Strip, R→L, L→R, two pages', '1 2 3 4'], ['Back to series', 'Esc']])}</div>` : ''}</div></div>`);
   }
   function goAdd() {
     if (route().name !== 'library') { location.hash = '#/'; setTimeout(focusUrl, 50); } else focusUrl();
@@ -1796,6 +1856,21 @@
     loadLibrary();
   });
   on('backup', (d) => { if (backupListener) backupListener(d); });
+
+  // ================================================================ BRIDGE
+  // manga.js reuses the shell's helpers instead of copying them.
+  window.NA = {
+    api, on, esc, num, plural, mb, ago, icon, spinner, toast, notify, chime, morph, sleep,
+    openOverlay, closeOverlay, confirmDialog, openMenu, closeMenu, coverHTML, toneOf, niceTitle,
+    store, state, route, render, renderShelf, openSiteWindow, openExternal, goAdd, MARK, LOGO,
+    isOverlayOpen: () => !!overlayClose,
+    // Paste a link into the Add box and look it up (Sites page examples).
+    addLink: (u) => {
+      if (route().name !== 'library') location.hash = '#/';
+      setTimeout(() => { state.intake.url = u; lookup(u); window.scrollTo({ top: 0, behavior: 'smooth' }); }, 40);
+    },
+  };
+  if (window.Manga) window.Manga.init(window.NA);
 
   // ================================================================ START
   async function start() {

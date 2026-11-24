@@ -88,6 +88,10 @@ func (b *Window) ensure() (*view, error) {
 	}
 	v := &view{done: make(chan struct{}), wait: map[string]chan result{}, loads: make(chan loadEvent, 16)}
 	ready := make(chan error, 1)
+	title := b.opts.Title
+	if title == "" {
+		title = "Site browser (leave open while downloading)"
+	}
 	go func() {
 		runtime.LockOSThread()
 		defer close(v.done)
@@ -95,7 +99,7 @@ func (b *Window) ensure() (*view, error) {
 			DataPath:  b.opts.DataPath,
 			AutoFocus: true,
 			WindowOptions: webview2.WindowOptions{
-				Title: "NovelArchiver — site browser (leave open while downloading)", Width: 1000, Height: 760, Center: true,
+				Title: title, Width: 1000, Height: 760, Center: true,
 			},
 		})
 		if w == nil {
@@ -123,8 +127,8 @@ func (b *Window) ensure() (*view, error) {
 		})
 		w.Init(`window.addEventListener('load', function(){ setTimeout(function(){
   try { window.__naLoaded(location.href, document.title || ''); } catch (e) {} }, 400); });`)
-		w.SetHtml(`<!doctype html><title>NovelArchiver</title><body style="font:15px system-ui;padding:24px;color:#333">
-<h3>NovelArchiver site browser</h3><p>Pages from sites that need a real browser load here.
+		w.SetHtml(`<!doctype html><title>Site browser</title><body style="font:15px system-ui;padding:24px;color:#333">
+<h3>Site browser</h3><p>Pages from sites that need a real browser load here.
 If a site asks you to verify you're human, complete it in this window and the download continues.</p>`)
 		hwnd := uintptr(w.Window())
 		procShowWindow.Call(hwnd, swShowMinNoActiv) // stays in the taskbar, out of the way
@@ -349,7 +353,7 @@ func (b *Window) navigate(ctx context.Context, v *view, rawURL string, wantHTML 
 					challenged = true
 					deadline = time.After(3 * time.Minute)
 					b.front(v)
-					b.status("This site wants you to confirm you're human. Complete the check in the NovelArchiver site browser window.")
+					b.status("This site wants you to confirm you're human. Complete the check in the site browser window.")
 					if b.opts.OnChallenge != nil {
 						b.opts.OnChallenge(origin(rawURL))
 					}
@@ -375,7 +379,7 @@ func (b *Window) navigate(ctx context.Context, v *view, rawURL string, wantHTML 
 					challenged = true
 					deadline = time.After(3 * time.Minute)
 					b.front(v)
-					b.status("This site wants you to confirm you're human. Complete the check in the NovelArchiver site browser window.")
+					b.status("This site wants you to confirm you're human. Complete the check in the site browser window.")
 					if b.opts.OnChallenge != nil {
 						b.opts.OnChallenge(origin(rawURL))
 					}

@@ -1,0 +1,265 @@
+{
+  "note": "Manga/manhwa/manhua site profiles. Field meanings: internal/manga/README.md.",
+  "sites": [
+    {
+      "id": "mangadex",
+      "name": "MangaDex",
+      "type": "Manga, Manhwa, Manhua",
+      "home": "https://mangadex.org",
+      "domains": ["mangadex.org"],
+      "status": "tested",
+      "api": "mangadex",
+      "example": "https://mangadex.org/title/801513ba-a712-498c-8f57-cae55b38cc92/berserk",
+      "headers": { "User-Agent": "InkShelfs/3.0 (personal offline reader)" },
+      "seriesUrl": "^https?://(www\\.)?mangadex\\.org/title/(?<id>[0-9a-f-]{36})",
+      "chapterUrl": "^https?://(www\\.)?mangadex\\.org/chapter/(?<cid>[0-9a-f-]{36})"
+    },
+    {
+      "id": "mangapill",
+      "name": "Mangapill",
+      "type": "Manga",
+      "home": "https://mangapill.com",
+      "domains": ["mangapill.com"],
+      "status": "tested",
+      "example": "https://mangapill.com/manga/1/berserk",
+      "seriesUrl": "^https?://(www\\.)?mangapill\\.com/manga/(?<id>\\d+)(/[^/?#]*)?/?$",
+      "chapterUrl": "^https?://(www\\.)?mangapill\\.com/chapters/(?<cid>[\\d-]+)",
+      "seriesFromChapter": "a[href^='/manga/']@href",
+      "series": {
+        "title": "h1",
+        "cover": "img[data-src*='/i/']@data-src",
+        "description": "p.text-sm.text--secondary, meta[property='og:description']@content"
+      },
+      "chapters": { "items": "#chapters a[href^='/chapters/']", "order": "newest-first" },
+      "pages": { "images": "img.js-page@data-src|src" }
+    },
+    {
+      "id": "weebcentral",
+      "name": "Weeb Central",
+      "type": "Manga, Manhwa",
+      "home": "https://weebcentral.com",
+      "domains": ["weebcentral.com"],
+      "status": "tested",
+      "example": "https://weebcentral.com/series/01J76XYDMTRNJZJH9G1ADMPJQC/The-Great-Mage-Returns-After-4000-Years",
+      "seriesUrl": "^https?://(www\\.)?weebcentral\\.com/series/(?<id>[A-Z0-9]{20,})",
+      "chapterUrl": "^https?://(www\\.)?weebcentral\\.com/chapters/(?<cid>[A-Z0-9]{20,})",
+      "seriesFromChapter": "a[href*='/series/'][href*='-']@href",
+      "series": {
+        "title": "h1.hidden, h1",
+        "cover": "meta[property='og:image']@content",
+        "author": "a[href*='author=']",
+        "description": "p.whitespace-pre-wrap, meta[property='og:description']@content"
+      },
+      "chapters": {
+        "url": "{origin}/series/{id}/full-chapter-list",
+        "items": "a[href*='/chapters/']",
+        "title": "span.grow > span",
+        "order": "newest-first"
+      },
+      "pages": {
+        "url": "{chapterUrl}/images?is_prev=False&current_page=1&reading_style=long_strip",
+        "images": "img[alt^='Page']@src"
+      }
+    },
+    {
+      "id": "mangakatana",
+      "name": "MangaKatana",
+      "type": "Manga, Manhwa",
+      "home": "https://mangakatana.com",
+      "domains": ["mangakatana.com"],
+      "status": "tested",
+      "example": "https://mangakatana.com/manga/absolute-regression.27371",
+      "seriesUrl": "^https?://(www\\.)?mangakatana\\.com/manga/(?<slug>[^/?#]+\\.\\d+)/?$",
+      "chapterUrl": "^https?://(www\\.)?mangakatana\\.com/manga/(?<slug>[^/?#]+\\.\\d+)/c[^/?#]+",
+      "seriesFromChapter": "{origin}/manga/{slug}",
+      "series": {
+        "title": "h1.heading",
+        "cover": "div.cover img@src",
+        "author": ".author",
+        "status": ".value.status",
+        "description": "div.summary > p, div.summary"
+      },
+      "chapters": { "items": ".chapters .chapter a", "order": "newest-first" },
+      "pages": { "scriptArray": true }
+    },
+    {
+      "id": "mangaread",
+      "name": "MangaRead",
+      "type": "Manga, Manhwa, Manhua",
+      "home": "https://www.mangaread.org",
+      "domains": ["mangaread.org"],
+      "status": "tested",
+      "example": "https://www.mangaread.org/manga/until-death-do-us-part/",
+      "seriesUrl": "^https?://(www\\.)?mangaread\\.org/manga/(?<slug>[^/?#]+)/?$",
+      "chapterUrl": "^https?://(www\\.)?mangaread\\.org/manga/(?<slug>[^/?#]+)/(?<ch>[^/?#]+)/?",
+      "seriesFromChapter": "{origin}/manga/{slug}/",
+      "series": {
+        "title": ".post-title h1",
+        "cover": ".summary_image img@data-src|src",
+        "author": ".author-content a",
+        "description": ".description-summary .summary__content, .description-summary"
+      },
+      "chapters": { "url": "{seriesUrl}/ajax/chapters/", "method": "POST", "items": "li.wp-manga-chapter > a", "order": "newest-first" },
+      "pages": { "images": ".reading-content img@data-src|src" }
+    },
+    {
+      "id": "toonily",
+      "name": "Toonily",
+      "type": "Manhwa",
+      "home": "https://toonily.com",
+      "domains": ["toonily.com"],
+      "status": "tested",
+      "example": "https://toonily.com/serie/bj-archmage-09cc0281/",
+      "seriesUrl": "^https?://(www\\.)?toonily\\.com/(serie|webtoon)/(?<slug>[^/?#]+)/?$",
+      "chapterUrl": "^https?://(www\\.)?toonily\\.com/(serie|webtoon)/(?<slug>[^/?#]+)/(?<ch>chapter-[^/?#]+)/?",
+      "seriesFromChapter": "{origin}/serie/{slug}/",
+      "series": {
+        "title": ".post-title h1",
+        "cover": ".summary_image img@data-src|src",
+        "author": ".author-content a",
+        "description": ".summary__content, .description-summary"
+      },
+      "chapters": { "items": "li.wp-manga-chapter > a", "order": "newest-first" },
+      "pages": { "images": ".reading-content img@data-src|src" }
+    },
+    {
+      "id": "manhuaplus",
+      "name": "ManhuaPlus",
+      "type": "Manhua",
+      "home": "https://manhuaplus.org",
+      "domains": ["manhuaplus.org"],
+      "status": "tested",
+      "example": "https://manhuaplus.org/manga/demon-magic-emperor",
+      "seriesUrl": "^https?://(www\\.)?manhuaplus\\.org/manga/(?<slug>[^/?#]+)/?$",
+      "chapterUrl": "^https?://(www\\.)?manhuaplus\\.org/manga/(?<slug>[^/?#]+)/(?<ch>chapter-[^/?#]+)",
+      "seriesFromChapter": "{origin}/manga/{slug}",
+      "series": {
+        "title": "h1",
+        "author": "a[href*='/author/']",
+        "description": "#syn-target, .summary, meta[property='og:description']@content"
+      },
+      "chapters": { "items": "#myUL li.chapter > a", "order": "newest-first" },
+      "pages": {
+        "vars": { "chapterId": "re:CHAPTER_ID\\s*=\\s*(\\d+)" },
+        "url": "{origin}/ajax/image/list/chap/{chapterId}",
+        "jsonField": "html",
+        "images": "div.separator img@src|data-src",
+        "sortAttr": "data-index"
+      }
+    },
+    {
+      "id": "flamecomics",
+      "name": "Flame Comics",
+      "type": "Manhwa",
+      "home": "https://flamecomics.xyz",
+      "domains": ["flamecomics.xyz"],
+      "status": "tested",
+      "example": "https://flamecomics.xyz/series/24",
+      "seriesUrl": "^https?://(www\\.)?flamecomics\\.xyz/series/(?<id>\\d+)/?$",
+      "chapterUrl": "^https?://(www\\.)?flamecomics\\.xyz/series/(?<id>\\d+)/(?<token>[0-9a-f]{8,})",
+      "seriesFromChapter": "{origin}/series/{id}",
+      "series": { "title": "h1, meta[property='og:title']@content" },
+      "chapters": {
+        "json": {
+          "script": "#__NEXT_DATA__",
+          "path": "props.pageProps.chapters",
+          "title": "Chapter {chapter} - {title}",
+          "url": "/series/{series_id}/{token}",
+          "base": "https://flamecomics.xyz"
+        },
+        "order": "newest-first"
+      },
+      "pages": { "regex": "https://cdn\\.flamecomics\\.xyz/uploads/images/series/{id}/{token}/[^\"'?\\s\\\\]+" }
+    },
+    {
+      "id": "webtoons",
+      "name": "WEBTOON",
+      "type": "Manhwa (official, free episodes)",
+      "home": "https://www.webtoons.com/en/",
+      "domains": ["webtoons.com", "m.webtoons.com"],
+      "status": "tested",
+      "example": "https://www.webtoons.com/en/fantasy/tower-of-god/list?title_no=95",
+      "imageReferer": "origin",
+      "seriesUrl": "^https?://(www\\.|m\\.)?webtoons\\.com/(?<lang>[a-z-]+)/(?<genre>[^/]+)/(?<slug>[^/]+)/list\\?(.*&)?title_no=(?<titleNo>\\d+)",
+      "chapterUrl": "^https?://(www\\.|m\\.)?webtoons\\.com/(?<lang>[a-z-]+)/(?<genre>[^/]+)/(?<slug>[^/]+)/[^/]+/viewer\\?(.*&)?title_no=(?<titleNo>\\d+)",
+      "seriesFromChapter": "https://www.webtoons.com/{lang}/{genre}/{slug}/list?title_no={titleNo}",
+      "series": {
+        "title": "h1.subj",
+        "author": ".author_area > a, .author_area",
+        "description": "p.summary"
+      },
+      "chapters": {
+        "url": "https://m.webtoons.com/api/v1/webtoon/{titleNo}/episodes?pageSize=30000",
+        "json": { "path": "result.episodeList", "title": "episodeTitle", "url": "viewerLink", "base": "https://www.webtoons.com" },
+        "order": "oldest-first"
+      },
+      "pages": { "images": "#_imageList img._images@data-url" }
+    },
+    {
+      "id": "mgeko",
+      "name": "MangaGeko",
+      "type": "Manga, Manhwa, Manhua",
+      "home": "https://www.mgeko.cc",
+      "domains": ["mgeko.cc", "mgeko.com", "mangageko.com"],
+      "status": "tested",
+      "example": "https://www.mgeko.cc/manga/a9oj-the-greatest-jegal-academy-under-heaven/",
+      "seriesUrl": "^https?://(www\\.)?(mgeko|mangageko)\\.(cc|com)/manga/(?<slug>[^/?#]+)/?$",
+      "chapterUrl": "^https?://(www\\.)?(mgeko|mangageko)\\.(cc|com)/reader/[a-z]+/(?<cslug>[^/?#]+)/?",
+      "seriesFromChapter": "a[href^='/manga/']@href",
+      "series": {
+        "title": "h1.novel-title",
+        "cover": "meta[property='og:image']@content",
+        "author": "[itemprop='author']",
+        "description": "p.description, .description"
+      },
+      "chapters": { "url": "{seriesUrl}/all-chapters/", "items": "ul.chapter-list li > a", "title": ".chapter-title", "order": "newest-first" },
+      "pages": { "images": "img.mgr-page@src|data-src" }
+    },
+    {
+      "id": "natomanga",
+      "name": "MangaNato / MangaKakalot",
+      "type": "Manga, Manhwa, Manhua",
+      "home": "https://www.natomanga.com",
+      "domains": ["natomanga.com", "nelomanga.net", "nelomanga.com", "mangakakalot.gg", "manganato.gg", "saiyanmanga.com"],
+      "status": "human-check",
+      "fetchMode": "browser",
+      "imageReferer": "origin",
+      "example": "https://www.natomanga.com/manga/acting-gangster",
+      "seriesUrl": "^https?://(www\\.)?(natomanga|nelomanga|mangakakalot|manganato)\\.[a-z]+/manga/(?<slug>[^/?#]+)/?$",
+      "chapterUrl": "^https?://(www\\.)?(natomanga|nelomanga|mangakakalot|manganato)\\.[a-z]+/manga/(?<slug>[^/?#]+)/(?<ch>chapter-[^/?#]+)",
+      "seriesFromChapter": "{origin}/manga/{slug}",
+      "series": {
+        "title": ".manga-info-text h1, h1",
+        "cover": ".manga-info-pic img@src, meta[property='og:image']@content",
+        "author": ".manga-info-text a[href*='author']",
+        "description": "#contentBox, #panel-story-info-description"
+      },
+      "chapters": {
+        "url": "{origin}/api/manga/{slug}/chapters?limit=5000&offset=0",
+        "json": { "path": "data.chapters", "title": "chapter_name", "url": "{origin}/manga/{slug}/{chapter_slug}", "base": "{origin}" },
+        "order": "newest-first"
+      },
+      "pages": { "images": ".container-chapter-reader img@data-src|src", "exclude": "(?i)logo|banner" }
+    },
+    {
+      "id": "asura",
+      "name": "Asura Scans",
+      "type": "Manhwa",
+      "home": "https://asurascans.com",
+      "domains": ["asurascans.com", "asuracomic.net"],
+      "status": "human-check",
+      "fetchMode": "browser",
+      "example": "https://asurascans.com/comics/damn-reincarnation-7de80a82",
+      "seriesUrl": "^https?://(www\\.)?(asurascans\\.com|asuracomic\\.net)/(comics|series)/(?<slug>[^/?#]+)/?$",
+      "chapterUrl": "^https?://(www\\.)?(asurascans\\.com|asuracomic\\.net)/(comics|series)/(?<slug>[^/?#]+)/chapter/(?<num>[\\d.]+)",
+      "seriesFromChapter": "{origin}/comics/{slug}",
+      "series": { "title": "h1, span.text-xl.font-bold", "cover": "#cover-viewer-img@data-full-src, #mobile-cover-img@src" },
+      "chapters": { "items": "a[href*='{slug}/chapter/']:not([data-continue-link])", "title": "h3, span", "order": "newest-first" },
+      "pages": {
+        "regex": "(https?://[^\"'\\s\\\\]+/storage/media/\\d+/(?:conversions/)?[^\"'\\s\\\\]+\\.(?:webp|jpe?g|png))",
+        "images": "img[alt*='chapter' i]@src",
+        "exclude": "(?i)thumb|cover|logo"
+      }
+    }
+  ]
+}

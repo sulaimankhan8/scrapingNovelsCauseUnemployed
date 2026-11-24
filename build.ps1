@@ -1,5 +1,5 @@
 Write-Host "=======================================================" -ForegroundColor Cyan
-Write-Host "          NovelArchiver - Production Build" -ForegroundColor Cyan
+Write-Host "          InkShelfs - Production Build" -ForegroundColor Cyan
 Write-Host "=======================================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -41,14 +41,14 @@ Write-Host "[BUILD] Compiling desktop binary with Wails..." -ForegroundColor Cya
 
 & $wailsCmd build -clean
 
-if ($LASTEXITCODE -eq 0 -and (Test-Path "build\bin\NovelArchiver.exe")) {
-    Copy-Item "build\bin\NovelArchiver.exe" "NovelArchiver.exe" -Force
-    $size = (Get-Item "NovelArchiver.exe").Length
+if ($LASTEXITCODE -eq 0 -and (Test-Path "build\bin\InkShelfs.exe")) {
+    Copy-Item "build\bin\InkShelfs.exe" "InkShelfs.exe" -Force
+    $size = (Get-Item "InkShelfs.exe").Length
     $sizeMb = [math]::Round($size / 1MB, 2)
     Write-Host ""
     Write-Host "=======================================================" -ForegroundColor Green
     Write-Host "[SUCCESS] Binary compiled successfully!" -ForegroundColor Green
-    Write-Host "Output: NovelArchiver.exe ($sizeMb MB)" -ForegroundColor Green
+    Write-Host "Output: InkShelfs.exe ($sizeMb MB)" -ForegroundColor Green
     Write-Host "=======================================================" -ForegroundColor Green
 } else {
     Write-Host "[ERROR] Build failed. Check compiler errors above." -ForegroundColor Red

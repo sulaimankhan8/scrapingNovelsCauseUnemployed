@@ -74,6 +74,10 @@ export function Notify(arg1, arg2) {
   return window['go']['main']['App']['Notify'](arg1, arg2);
 }
 
+export function NovelSites() {
+  return window['go']['main']['App']['NovelSites']();
+}
+
 export function OpenExternalURL(arg1) {
   return window['go']['main']['App']['OpenExternalURL'](arg1);
 }

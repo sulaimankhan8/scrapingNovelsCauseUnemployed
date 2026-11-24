@@ -130,6 +130,8 @@ func (c *Core) Call(method string, argsJSON string) (string, error) {
 	var out any
 	var err error
 	switch method {
+	case "NovelSites":
+		out = c.svc.Sites()
 	case "GetNovels":
 		out, err = c.svc.GetNovels()
 	case "GetNovel":

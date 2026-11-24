@@ -35,6 +35,8 @@ type Options struct {
 	OnChallenge func(host string)
 	// OnStatus receives short progress messages.
 	OnStatus func(msg string)
+	// Title is the window title; empty uses the NovelArchiver one.
+	Title string
 }
 
 var challengeTitle = regexp.MustCompile(`(?i)just a moment|attention required|verify you are human|security check|checking your browser|ddos-guard`)

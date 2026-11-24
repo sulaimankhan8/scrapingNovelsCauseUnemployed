@@ -38,6 +38,8 @@ export function GetSystemStats():Promise<service.SystemStats>;
 
 export function Notify(arg1:string,arg2:string):Promise<void>;
 
+export function NovelSites():Promise<Array<service.SiteInfo>>;
+
 export function OpenExternalURL(arg1:string):Promise<void>;
 
 export function OpenLibraryFolder():Promise<void>;

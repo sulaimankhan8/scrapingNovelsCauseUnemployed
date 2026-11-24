@@ -108,7 +108,7 @@ func (a *Service) LibraryRoot() string {
 func (a *Service) Store() *library.Store { return a.store }
 
 // ChallengeMessage is what the UI shows when a human check is pending.
-const ChallengeMessage = "Please complete the 'Verify you are human' check in the NovelArchiver site browser. The download continues automatically."
+const ChallengeMessage = "Please complete the 'Verify you are human' check in the site window. The download continues automatically."
 
 // Shutdown cancels the running job and closes the site browser.
 func (a *Service) Shutdown() {

@@ -86,14 +86,14 @@ public class DownloadService extends Service {
         if (intent != null && ACTION_PAUSE.equals(intent.getAction())) {
             Runnable p = onPause;
             if (p != null) new Thread(p).start();
-            if (!foreground) promote(build("NovelArchiver", "Pausing…", 0, 0));
+            if (!foreground) promote(build("InkShelfs", "Pausing…", 0, 0));
             return START_NOT_STICKY;
         }
         String title = intent != null ? intent.getStringExtra("title") : null;
         String text = intent != null ? intent.getStringExtra("text") : null;
         int current = intent != null ? intent.getIntExtra("current", 0) : 0;
         int total = intent != null ? intent.getIntExtra("total", 0) : 0;
-        Notification n = build(title == null ? "NovelArchiver" : title, text == null ? "Working…" : text, current, total);
+        Notification n = build(title == null ? "InkShelfs" : title, text == null ? "Working…" : text, current, total);
         if (!foreground) {
             promote(n);
         } else {

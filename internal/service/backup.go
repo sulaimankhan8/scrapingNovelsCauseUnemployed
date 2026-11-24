@@ -41,7 +41,7 @@ type BackupInfo struct {
 
 // BackupFileName suggests a name for today's backup.
 func BackupFileName() string {
-	return "NovelArchiver backup " + time.Now().Format("2006-01-02") + ".zip"
+	return "InkShelfs backup " + time.Now().Format("2006-01-02") + ".zip"
 }
 
 // Backup writes the whole library and settings to dest. Progress arrives as
@@ -174,7 +174,7 @@ func backupBooks(zr *zip.Reader) (map[string]*library.Book, *BackupInfo, error) 
 		}
 	}
 	if info == nil || info.App != "NovelArchiver" {
-		return nil, nil, errors.New("this file isn't a NovelArchiver backup")
+		return nil, nil, errors.New("this file isn't an InkShelfs (or NovelArchiver) backup")
 	}
 	return books, info, nil
 }

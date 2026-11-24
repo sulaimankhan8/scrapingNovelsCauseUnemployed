@@ -1,6 +1,6 @@
 # Builds the Android app.
-#   .\build_apk.ps1                 debug APK (phones + emulators)          -> NovelArchiver.apk
-#   .\build_apk.ps1 -Release        signed, shrunk APK for phones           -> NovelArchiver-release.apk
+#   .\build_apk.ps1                 debug APK (phones + emulators)          -> InkShelfs.apk
+#   .\build_apk.ps1 -Release        signed, shrunk APK for phones           -> InkShelfs-release.apk
 #   .\build_apk.ps1 -Release -DebugSign   same, signed with the debug key (test builds)
 #   add -Inspectable to allow chrome://inspect on the WebViews (developer testing only)
 # Release signing reads android\keystore.properties; see README "Android release".
@@ -11,7 +11,7 @@ param(
 )
 
 Write-Host "=======================================================" -ForegroundColor Cyan
-Write-Host "         NovelArchiver - Android APK Build" -ForegroundColor Cyan
+Write-Host "         InkShelfs - Android APK Build" -ForegroundColor Cyan
 Write-Host "=======================================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -72,12 +72,12 @@ if ($Release) {
     if ($DebugSign) { $extra += "-PdebugSign" }
     if ($Inspectable) { $extra += "-Pinspectable" }
     $apk = "android\app\build\outputs\apk\release\app-release.apk"
-    $out = "NovelArchiver-release.apk"
+    $out = "InkShelfs-release.apk"
 } else {
     $task = "assembleDebug"
     $extra = @()
     $apk = "android\app\build\outputs\apk\debug\app-debug.apk"
-    $out = "NovelArchiver.apk"
+    $out = "InkShelfs.apk"
 }
 Write-Host "[BUILD] Android APK ($task)..." -ForegroundColor Cyan
 & $gradleBat -p android $task @extra

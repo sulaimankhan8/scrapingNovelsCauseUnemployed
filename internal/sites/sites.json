@@ -13,6 +13,8 @@
       ],
       "status": "browser-only",
       "fetchMode": "browser",
+      "home": "https://novelbin.xyz",
+      "example": "https://novelbin.xyz/novel/lord-of-the-mysteries",
       "canonicalHost": "novelbin.xyz",
       "verified": "Verified 2026-11-22 through the in-app browser: discovery (1,432 chapters for LotM) and chapter downloads work. The JSON CDN only answers requests from novelbin.xyz pages (403 for novelbin.me/.com, which also return 503), so every NovelBin link is moved to novelbin.xyz.",
       "input": {
@@ -53,6 +55,8 @@
       ],
       "status": "verified",
       "fetchMode": "http",
+      "home": "https://novelfull.com",
+      "example": "https://novelfull.com/lord-of-the-mysteries.html",
       "input": {
         "novelUrl": "^https?://(www\\.)?novelfull\\.[a-z]+/(?<slug>[a-z0-9-]+)\\.html",
         "chapterUrl": "^https?://(www\\.)?novelfull\\.[a-z]+/(?<slug>[a-z0-9-]+)/chapter-[^/]+\\.html",
@@ -94,6 +98,8 @@
       ],
       "status": "verified",
       "fetchMode": "http",
+      "home": "https://readnovelfull.com",
+      "example": "https://readnovelfull.com/lord-of-the-mysteries-v1.html",
       "input": {
         "novelUrl": "^https?://(www\\.)?(readnovelfull|allnovelfull)\\.[a-z]+/(?<slug>[a-z0-9-]+?)(-v\\d+)?\\.html$",
         "chapterUrl": "^https?://(www\\.)?(readnovelfull|allnovelfull)\\.[a-z]+/(?<slug>[a-z0-9-]+)/chapter-[^/]+\\.html",
@@ -132,6 +138,8 @@
       ],
       "status": "verified",
       "fetchMode": "http",
+      "home": "https://novelping.com",
+      "example": "https://novelping.com/book/a-borrowed-soul",
       "verified": "Verified 2026-11-23: novel page, full chapter list from /ajax/chapter-archive (126 of 126 for \"A Borrowed Soul\"), chapter text from #chr-content.",
       "input": {
         "novelUrl": "^https?://(www\\.)?novelping\\.com/book/(?<slug>[a-z0-9-]+)/?(?:[?#].*)?$",
@@ -172,6 +180,8 @@
       ],
       "status": "browser-only",
       "fetchMode": "browser",
+      "home": "https://www.royalroad.com",
+      "example": "https://www.royalroad.com/fiction/21220/mother-of-learning",
       "verified": "Verified 2026-11-22 through the in-app browser (chapters 1-4 downloaded, decoy paragraphs removed). Cloudflare serves 'Just a moment...' (403) to Go's HTTP client.",
       "input": {
         "novelUrl": "^https?://(www\\.)?royalroad\\.com/fiction/(?<id>\\d+)(/[^/]+)?/?$",
@@ -211,6 +221,8 @@
       ],
       "status": "verified",
       "fetchMode": "http",
+      "home": "https://www.wuxiaworld.com",
+      "example": "https://www.wuxiaworld.com/novel/martial-world",
       "input": {
         "novelUrl": "^https?://(www\\.)?wuxiaworld\\.com/novel/(?<slug>[a-z0-9-]+)/?$",
         "chapterUrl": "^https?://(www\\.)?wuxiaworld\\.com/novel/(?<slug>[a-z0-9-]+)/[a-z0-9-]+",
@@ -245,6 +257,8 @@
       ],
       "status": "verified",
       "fetchMode": "http",
+      "home": "https://freewebnovel.com",
+      "example": "https://freewebnovel.com/novel/last-gun-alchemist",
       "input": {
         "novelUrl": "^https?://(www\\.)?freewebnovel\\.com/novel/(?<slug>[a-z0-9-]+)/?$",
         "chapterUrl": "^https?://(www\\.)?freewebnovel\\.com/novel/(?<slug>[a-z0-9-]+)/chapter-(?<num>\\d+)",
@@ -287,6 +301,8 @@
       ],
       "status": "partial",
       "fetchMode": "http+browser",
+      "home": "https://novelfire.net",
+      "example": "https://novelfire.net/book/lord-of-the-mysteries",
       "verified": "Verified 2026-11-22: TOC over plain HTTP, chapters through the in-app browser. Chapter pages send non-browsers to a JS 'Loading...' page (readnovel.site), which then redirects to the mirror novelphoenix.com. That works in a real browser.",
       "input": {
         "novelUrl": "^https?://(www\\.)?novelfire\\.net/book/(?<slug>[a-z0-9-]+)/?$",
@@ -327,6 +343,8 @@
       ],
       "status": "browser-only",
       "fetchMode": "browser",
+      "home": "https://www.webnovel.com",
+      "example": "https://www.webnovel.com/book/32824130400116105",
       "verified": "Verified 2026-11-22 through the in-app browser: catalog (1,274 chapters, 1,239 paid and skipped) and free chapters download. Cloudflare serves 'Just a moment...' (403) to Go's HTTP client. The catalog is at /book/{id}/catalog. Most later chapters are paid or locked, so only free chapters can be saved.",
       "input": {
         "novelUrl": "^https?://(www\\.)?webnovel\\.com/book/(?:[a-z0-9-]+_)?(?<id>\\d+)/?$",
@@ -369,6 +387,8 @@
       ],
       "status": "human-check",
       "fetchMode": "browser",
+      "home": "https://www.empirenovel.com",
+      "example": "https://www.empirenovel.com/novel/genetic-ascension",
       "verified": "Verified 2026-11-22 through the in-app browser after one manual Cloudflare tick (remembered afterwards). Chapter URLs are /novel/{slug}/{n}, numbered 1..last.",
       "input": {
         "novelUrl": "^https?://(www\\.)?empirenovel\\.com/novel/(?<slug>[a-z0-9-]+)/?$",
@@ -410,6 +430,8 @@
       ],
       "status": "browser-only",
       "fetchMode": "browser",
+      "home": "https://www.scribblehub.com",
+      "example": "https://www.scribblehub.com/series/747093/collide-gamer/",
       "verified": "Verified 2026-11-22 through the in-app browser (Cloudflare let the browser through without a tick).",
       "input": {
         "novelUrl": "^https?://(www\\.)?scribblehub\\.com/series/(?<id>\\d+)(/[^/]+)?/?$",

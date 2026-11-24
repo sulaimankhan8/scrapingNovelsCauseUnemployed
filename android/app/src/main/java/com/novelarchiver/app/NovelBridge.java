@@ -117,7 +117,7 @@ public class NovelBridge implements Events {
         if (!force && now - lastShown < 1000) return;
         lastShown = now;
         String more = queued > 0 ? " · " + queued + " more in the queue" : "";
-        DownloadService.show(activity, jobTitle.isEmpty() ? "NovelArchiver" : jobTitle, text + more, current, total);
+        DownloadService.show(activity, jobTitle.isEmpty() ? "InkShelfs" : jobTitle, text + more, current, total);
     }
 
     @JavascriptInterface
