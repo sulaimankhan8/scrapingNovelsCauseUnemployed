@@ -1120,7 +1120,7 @@
     const kindSeg = MG() ? `<div class="seg kind-seg" role="group" aria-label="Show">${[['all', 'All', novelN + mangaN], ['novel', 'Novels', novelN], ['manga', 'Manga', mangaN]].map(([k, l, c]) => `<button type="button" data-kind="${k}" aria-pressed="${state.kind === k}">${l} <span class="n">${c}</span></button>`).join('')}</div>` : '';
     morph(box, `<div class="lib-head">
         <div class="titles"><h2 id="libH">Library</h2><p>${summary} · ${mb(totalBytes)} on this device</p></div>${kindSeg}
-        <button type="button" class="btn btn--md" data-act="catch-up" title="Check every ongoing novel and download only the chapters that came out since last time">${icon('refresh', 15)} Get new chapters</button>
+        <button type="button" class="btn btn--md" data-act="catch-up" aria-label="Get new chapters" title="Check every ongoing series and download only the chapters that came out since last time">${icon('refresh', 15)}<span class="wide"> Get new chapters</span></button>
         <div class="lib-head__sel">${hasStatus ? `<label>Status <select class="select" id="statusSel">${[['any', 'Any'], ['ongoing', 'Ongoing'], ['completed', 'Completed'], ['hiatus', 'On hiatus']].map(([v, l]) => `<option value="${v}" ${state.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>` : ''}
         <label>Sort <select class="select" id="sortSel">${[['read', 'Last read'], ['added', 'Recently added'], ['title', 'Title'], ['chapters', 'Most chapters']].map(([v, l]) => `<option value="${v}" ${state.sort === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label></div>
       </div>

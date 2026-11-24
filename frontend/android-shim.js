@@ -39,21 +39,23 @@
     });
   }
 
-  window.go = {
-    main: {
-      App: new Proxy({}, {
-        get: function (_, method) {
-          // Not Go methods: "then" would make the proxy look like a promise
-          // (await/resolve would call it and wait forever), and the others
-          // are probed by JSON, devtools and String().
-          if (typeof method !== 'string' || method === 'then' || method === 'catch' ||
-              method === 'finally' || method === 'toJSON' || method === 'constructor' ||
-              method === 'valueOf' || method === 'toString') return undefined;
-          return function () { return call(method, Array.prototype.slice.call(arguments)); };
-        }
-      })
-    }
-  };
+  // A bridge object whose every method is a Go call. prefix routes it:
+  // App.X -> "X" (novels), MangaApp.X -> "Manga.X" (manga).
+  function bridge(prefix) {
+    return new Proxy({}, {
+      get: function (_, method) {
+        // Not Go methods: "then" would make the proxy look like a promise
+        // (await/resolve would call it and wait forever), and the others
+        // are probed by JSON, devtools and String().
+        if (typeof method !== 'string' || method === 'then' || method === 'catch' ||
+            method === 'finally' || method === 'toJSON' || method === 'constructor' ||
+            method === 'valueOf' || method === 'toString') return undefined;
+        return function () { return call(prefix + method, Array.prototype.slice.call(arguments)); };
+      }
+    });
+  }
+
+  window.go = { main: { App: bridge(''), MangaApp: bridge('Manga.') } };
 
   window.runtime = {
     EventsOn: function (event, fn) {

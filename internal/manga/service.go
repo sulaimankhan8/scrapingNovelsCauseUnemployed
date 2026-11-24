@@ -40,6 +40,9 @@ type ServiceOptions struct {
 	// Emit receives events for the UI: "progress", "library", "done",
 	// "status", "challenge".
 	Emit func(event string, data any)
+	// MayDownload, when set, is asked before each chapter; false pauses the
+	// job until it turns true (Android: "Only on Wi-Fi" on mobile data).
+	MayDownload func() bool
 }
 
 // Settings are the user's preferences (settings.json beside the library).
@@ -606,6 +609,9 @@ func (s *Service) runDownload(ctx context.Context, j *Job) error {
 	var blocked error
 	var bmu sync.Mutex
 	for _, c := range todo {
+		if err := s.waitNetwork(ctx, j); err != nil {
+			break
+		}
 		select {
 		case sem <- struct{}{}:
 		case <-ctx.Done():
@@ -660,6 +666,32 @@ func (s *Service) runDownload(ctx context.Context, j *Job) error {
 		return blocked
 	}
 	return nil
+}
+
+// waitNetwork holds a download while MayDownload says no (on mobile data
+// with "Only on Wi-Fi" on), checking every few seconds.
+func (s *Service) waitNetwork(ctx context.Context, j *Job) error {
+	ok := s.opts.MayDownload
+	if ok == nil || ok() {
+		return ctx.Err()
+	}
+	prev := ""
+	s.setJob(j, func(j *Job) {
+		prev, j.Message = j.Message, "Waiting for Wi-Fi. The download continues when you’re connected."
+	})
+	t := time.NewTicker(3 * time.Second)
+	defer t.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-t.C:
+			if ok() {
+				s.setJob(j, func(j *Job) { j.Message = prev })
+				return nil
+			}
+		}
+	}
 }
 
 func (s *Service) runUpdate(ctx context.Context, j *Job) error {

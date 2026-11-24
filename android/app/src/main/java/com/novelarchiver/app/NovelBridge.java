@@ -59,6 +59,10 @@ public class NovelBridge implements Events {
                 core.call("CancelTask", "[]");
             } catch (Exception ignored) {
             }
+            try {
+                core.call("Manga.CancelCurrent", "[]");
+            } catch (Exception ignored) {
+            }
         };
     }
 
@@ -68,17 +72,59 @@ public class NovelBridge implements Events {
     private volatile String jobKind = "download";
     private volatile int queued = 0;
     private long lastShown = 0;
+    // Novels and manga download independently; the service stays up while
+    // either is busy.
+    private volatile boolean novelBusy = false;
+    private volatile boolean mangaBusy = false;
+    private volatile int mangaQueued = 0;
+
+    private void stopIfIdle() {
+        if (!novelBusy && !mangaBusy) DownloadService.stop(activity);
+    }
 
     private void track(String event, String json) {
         try {
             switch (event) {
+                case "manga:queue": {
+                    JSONObject a = new JSONObject(json);
+                    JSONObject cur = a.optJSONObject("current");
+                    org.json.JSONArray q = a.optJSONArray("queue");
+                    mangaQueued = q == null ? 0 : q.length();
+                    mangaBusy = cur != null || mangaQueued > 0;
+                    if (!mangaBusy) {
+                        stopIfIdle();
+                        return;
+                    }
+                    if (cur != null && !novelBusy) {
+                        jobTitle = cur.optString("title", "");
+                        jobKind = cur.optString("kind", "download");
+                        show("update".equals(jobKind) ? "Checking for new chapters…" : "Getting ready…", 0, 0, true);
+                    }
+                    break;
+                }
+                case "manga:progress": {
+                    if (novelBusy) break; // the novel download owns the notification
+                    JSONObject j = new JSONObject(json);
+                    jobTitle = j.optString("title", jobTitle);
+                    int done = j.optInt("done"), total = j.optInt("total");
+                    String msg = j.optString("message", "");
+                    String text = "update".equals(j.optString("kind"))
+                            ? "Checking for new chapters…"
+                            : (total > 0 ? "Manga · " + done + " of " + total + " chapters" : "Manga") + (msg.isEmpty() ? "" : " · " + msg);
+                    show(text, done, total, false);
+                    break;
+                }
+                case "manga:challenge":
+                    show("Needs you: open the app and tick the check", 0, 0, true);
+                    break;
                 case "queue": {
                     JSONObject a = new JSONObject(json);
                     JSONObject cur = a.optJSONObject("current");
                     org.json.JSONArray q = a.optJSONArray("queue");
                     queued = q == null ? 0 : q.length();
-                    if (cur == null && queued == 0) {
-                        DownloadService.stop(activity);
+                    novelBusy = cur != null || queued > 0;
+                    if (!novelBusy) {
+                        stopIfIdle();
                         return;
                     }
                     if (cur != null) {
@@ -116,7 +162,8 @@ public class NovelBridge implements Events {
         long now = SystemClock.elapsedRealtime();
         if (!force && now - lastShown < 1000) return;
         lastShown = now;
-        String more = queued > 0 ? " · " + queued + " more in the queue" : "";
+        int waiting = queued + mangaQueued;
+        String more = waiting > 0 ? " · " + waiting + " more in the queue" : "";
         DownloadService.show(activity, jobTitle.isEmpty() ? "InkShelfs" : jobTitle, text + more, current, total);
     }
 
@@ -129,6 +176,8 @@ public class NovelBridge implements Events {
                 if (core == null) throw new IllegalStateException("The library could not start.");
                 if ("ExportEPUB".equals(method)) {
                     payload = exportEPUB(new org.json.JSONArray(argsJson).getString(0));
+                } else if ("Manga.ExportCBZ".equals(method)) {
+                    payload = exportCBZ(new org.json.JSONArray(argsJson).getString(0));
                 } else if ("BackupLibrary".equals(method)) {
                     payload = backupLibrary();
                 } else if ("ChooseBackup".equals(method)) {
@@ -167,6 +216,16 @@ public class NovelBridge implements Events {
         JSONObject res = new JSONObject(core.exportEPUB(slug, tmpDir.getAbsolutePath()));
         File tmp = new File(res.getString("path"));
         res.put("path", toDownloads(tmp, res.getString("fileName"), "application/epub+zip"));
+        return res.toString();
+    }
+
+    /** Go writes a manga series as one CBZ to the cache; it is then copied into Downloads. */
+    private String exportCBZ(String slug) throws Exception {
+        File tmpDir = new File(activity.getCacheDir(), "export");
+        tmpDir.mkdirs();
+        JSONObject res = new JSONObject(core.exportCBZ(slug, tmpDir.getAbsolutePath()));
+        File tmp = new File(res.getString("path"));
+        res.put("path", toDownloads(tmp, res.getString("fileName"), "application/vnd.comicbook+zip"));
         return res.toString();
     }
 

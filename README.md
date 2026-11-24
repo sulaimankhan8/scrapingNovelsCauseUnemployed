@@ -2,7 +2,7 @@
 
 Save web novels, manga, manhwa and manhua to your own device and read them offline, with no ads, pop-ups or redirects. Good for flights, commutes and patchy connections.
 
-InkShelfs runs locally on **Windows** (novels and manga) and **Android** (novels). Paste a novel page or any chapter link. It saves the chapters with their formatting (bold, italics, tables, images and in-story **[System]** boxes) into a library on your device, with a clean reader and EPUB export.
+InkShelfs runs locally on **Windows** and **Android**, for novels and manga. Paste a novel page or any chapter link. It saves the chapters with their formatting (bold, italics, tables, images and in-story **[System]** boxes) into a library on your device, with a clean reader and EPUB export.
 
 **Download:** see [Releases](../../releases) or the [download page](https://novelarchiver.vercel.app) (also on [GitHub Pages](https://sulaimankhan8.github.io/novelarchiver/)).
 
@@ -93,7 +93,7 @@ Each novel is a folder with `book.json`, `chapters/0001.html …`, `cover.*` and
 
 ## Manga, manhwa and manhua
 
-Built into the same Windows app (`InkShelfs.exe`). The library shelf has All / Novels / Manga tabs, and the Add box works out by itself whether a link is a novel or a manga.
+Built into the same app on Windows (`InkShelfs.exe`) and Android (`InkShelfs.apk`, since 3.1). The library shelf has All / Novels / Manga tabs, and the Add box works out by itself whether a link is a novel or a manga. On Android, swipe to turn pages and double-tap to zoom; manga downloads keep going in the background and follow "Only on Wi-Fi".
 
 - **12 manga sites:** MangaDex, Mangapill, Weeb Central, MangaKatana, MangaRead, Toonily, ManhuaPlus, Flame Comics, WEBTOON, MangaGeko, MangaNato/MangaKakalot and Asura Scans. The **Sites** page (globe button) lists every novel and manga site with a "Try an example" link. Profiles and the debugging workflow are in [internal/manga/README.md](internal/manga/README.md).
 - **Choose chapters:** all, the first N, a range, or from a pasted chapter on. Or tick chapters with **Select** on the series page. Every downloaded file is checked to be a real image.
@@ -104,6 +104,7 @@ Built into the same Windows app (`InkShelfs.exe`). The library shelf has All / N
 
 ```powershell
 go run ./cmd/ma test -lib $env:TEMP\ma-test   # live check of every manga site
+go run ./cmd/androidsim -root $env:TEMP\sim    # the Android UI in a browser, on the real phone core (no emulator)
 ```
 
 Manga library: `%AppData%\MangaArchiver\library` (override with `MANGAARCHIVER_LIBRARY`), kept apart from the novels. Each series is a folder with `series.json`, `cover.*` and `ch/<key>/001.jpg …`.

@@ -15,6 +15,7 @@
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
   const enc = encodeURIComponent;
+  const onPhone = () => NA && NA.state && NA.state.platform === 'android';
 
   const M = {
     lib: [], activity: { current: null, queue: [] }, settings: null,
@@ -121,7 +122,7 @@
     if (it.readKey) items.push({ label: 'Continue reading', fn: () => { location.hash = readHref(slug, it.readKey); } });
     items.push({ label: 'Check for new chapters', fn: () => act(() => call('CheckUpdates', slug), 'Checking for new chapters…') });
     items.push({ label: 'Save as CBZ file…', sub: 'One file for comic readers', fn: () => exportCBZ(slug) });
-    items.push({ label: 'Show folder', fn: () => call('OpenFolder', slug) });
+    if (!onPhone()) items.push({ label: 'Show folder', fn: () => call('OpenFolder', slug) });
     items.push('sep');
     items.push({ label: 'Remove from library…', danger: true, fn: () => removeSeries(slug, it.title) });
     NA.openMenu(anchor, items);
@@ -133,7 +134,8 @@
   async function exportCBZ(slug) {
     try {
       const r = await call('ExportCBZ', slug);
-      if (r) NA.toast(`Saved ${NA.plural(r.chapters, 'chapter')} (${sizeOf(r.bytes)}) as CBZ`, { tone: 'ok', action: { label: 'Show file', fn: () => NA.api('ShowFileInFolder', r.path).catch(() => {}) } });
+      if (r && onPhone()) NA.toast(`Saved ${NA.plural(r.chapters, 'chapter')} as CBZ in ${r.path || 'Downloads'}`, { tone: 'ok', timeout: 6000 });
+      else if (r) NA.toast(`Saved ${NA.plural(r.chapters, 'chapter')} (${sizeOf(r.bytes)}) as CBZ`, { tone: 'ok', action: { label: 'Show file', fn: () => NA.api('ShowFileInFolder', r.path).catch(() => {}) } });
     } catch (e) { NA.toast(e.message, { tone: 'bad' }); }
   }
   async function removeSeries(slug, title) {
@@ -419,12 +421,12 @@
     if (a === 'series-menu') {
       return NA.openMenu(t, [
         { label: 'Save as CBZ file…', sub: 'One file for comic readers', fn: () => exportCBZ(slug) },
-        { label: 'Show folder', fn: () => call('OpenFolder', slug) },
+        onPhone() ? null : { label: 'Show folder', fn: () => call('OpenFolder', slug) },
         { label: `Open on ${d.siteName}`, fn: () => NA.openExternal(d.url) },
         { label: 'Delete saved pages of read chapters…', sub: 'Frees space; they can be downloaded again', fn: () => freeRead() },
         'sep',
         { label: 'Remove from library…', danger: true, fn: () => removeSeries(slug, d.title) },
-      ]);
+      ].filter(Boolean));
     }
     if (a === 'more-desc') { const el = $('#mgDesc'); el.classList.toggle('mg-clamp'); t.textContent = el.classList.contains('mg-clamp') ? 'More' : 'Less'; return; }
     if (a === 'show-all') { M.chShowAll = true; return paintSeries($('#main')); }
@@ -620,6 +622,42 @@
       setCount();
     });
     root.addEventListener('mousemove', (e) => { if (e.clientY < 72 || e.clientY > innerHeight - 72) showUI(true); });
+    // Touch (phones, touch screens): swipe sideways to turn pages, in the
+    // reading direction; double-tap a page to zoom in and pan, again to fit.
+    let t0 = null, lastTap = 0;
+    root.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) { t0 = null; return; }
+      t0 = { x: e.touches[0].clientX, y: e.touches[0].clientY, at: Date.now() };
+    }, { passive: true });
+    root.addEventListener('touchend', (e) => {
+      if (!t0 || R.mode === 'strip') { t0 = null; return; }
+      const p = e.changedTouches[0];
+      const dx = p.clientX - t0.x, dy = p.clientY - t0.y, dt = Date.now() - t0.at;
+      const paged = $('.mg-paged', body);
+      t0 = null;
+      if (!paged) return;
+      if (paged.classList.contains('is-zoom')) {
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && Date.now() - lastTap < 300) { paged.classList.remove('is-zoom'); lastTap = 0; }
+        else lastTap = Date.now();
+        return;
+      }
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4 && dt < 700) {
+        const rtl = R.mode !== 'ltr';
+        turn((rtl ? dx > 0 : dx < 0) ? 1 : -1);
+        e.preventDefault();
+        return;
+      }
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && e.target.closest('.mg-page')) {
+        if (Date.now() - lastTap < 300) {
+          paged.classList.add('is-zoom');
+          const r = paged.getBoundingClientRect();
+          paged.scrollLeft = Math.max(0, (p.clientX - r.left) * 1.5);
+          paged.scrollTop = Math.max(0, (p.clientY - r.top) * 1.5);
+          lastTap = 0;
+          e.preventDefault();
+        } else lastTap = Date.now();
+      }
+    });
     const onKey = (e) => {
       if (NA.isOverlayOpen() || (e.target.matches && e.target.matches('input:not([type=range]),select,textarea'))) return;
       if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -762,6 +800,7 @@
       ${row('Pages at once per chapter', 'Pages of one chapter download in parallel.', sel('pageWorkers', [[2, '2'], [4, '4'], [6, '6'], [8, '8']], 'Pages at once'))}
       ${row('Download new chapters automatically', 'When a check finds new chapters of a series you’re downloading, save them too.', sw('autoDownloadNew', 'Download new chapters automatically'))}
       ${row('Check manga for new chapters when the app opens', 'Looks at every series a few seconds after start. “Get new chapters” on the library does this any time.', sw('checkOnOpen', 'Check manga on open'))}
+      ${row(`${sizeOf(M.lib.reduce((a, it) => a + (it.bytes || 0), 0))} used by manga`, `${NA.plural(M.lib.length, 'series', 'series')} · ${NA.plural(M.lib.reduce((a, it) => a + (it.downloaded || 0), 0), 'chapter')} saved. To free space, open a series and choose “Delete saved pages of read chapters”.`, '')}
       ${desktop ? row('Manga library folder', esc(M.libFolder || 'In your AppData folder, beside the novels'), `<button type="button" class="btn btn--md" data-mact="open-mlib">Open folder</button>`) : ''}
     </div></section>`;
   }

@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                 Uri url = request.getUrl();
                 if (!HOST.equals(url.getHost())) return null;
                 String path = url.getPath() == null ? "/" : url.getPath();
-                if (path.startsWith("/library/")) {
+                if (path.startsWith("/library/") || path.startsWith("/mangalib/")) {
                     return serveLibrary(path);
                 }
                 return serveAsset(path);

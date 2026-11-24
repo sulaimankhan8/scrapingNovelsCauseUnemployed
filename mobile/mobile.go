@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"novelarchiver/internal/browser"
+	"novelarchiver/internal/manga"
 	"novelarchiver/internal/reader"
 	"novelarchiver/internal/service"
 )
@@ -35,10 +36,14 @@ type BrowserDriver interface {
 	Show(visible bool)
 }
 
-// Core is one app instance.
+// Core is one app instance: the novel service and, beside it, the manga
+// service (nil if its library couldn't open).
 type Core struct {
-	svc    *service.Service
-	reader *reader.Handler
+	svc        *service.Service
+	reader     *reader.Handler
+	manga      *manga.Service
+	mangaFiles *manga.Handler
+	unmetered  func() bool // set by SetNetwork
 }
 
 // New opens (or creates) the library in libraryDir. driver may be nil.
@@ -58,21 +63,48 @@ func New(libraryDir string, events Events, driver BrowserDriver) (*Core, error) 
 	if svc.Store() == nil {
 		return nil, errors.New("could not open the library folder")
 	}
+	// One site window for novels and manga: a check passed once counts for both.
+	var site *browser.Driven
 	if driver != nil {
-		svc.SetBrowser(browser.NewDriven(driver, browser.Options{
+		site = browser.NewDriven(driver, browser.Options{
 			OnStatus: func(msg string) { emit("status", map[string]any{"message": msg}) },
 			OnChallenge: func(host string) {
 				emit("challenge", map[string]any{"host": host, "message": service.ChallengeMessage})
 			},
-		}))
+		})
+		svc.SetBrowser(site)
 	}
+	c := &Core{svc: svc, reader: &reader.Handler{Store: svc.Store()}}
+
+	mopts := manga.ServiceOptions{
+		NoBrowser: site == nil,
+		Emit:      func(ev string, data any) { emit("manga:"+ev, data) },
+		// Manga follows the same "Only on Wi-Fi" setting as novels.
+		MayDownload: func() bool {
+			return !svc.GetSettings().WifiOnly || c.unmetered == nil || c.unmetered()
+		},
+	}
+	if site != nil {
+		mopts.Browser = site
+	}
+	if m, err := manga.NewService(mangaRoot(svc.LibraryRoot()), mopts); err == nil {
+		c.manga = m
+		c.mangaFiles = &manga.Handler{Store: m.Store()}
+	}
+
 	if svc.GetSettings().UpdateOnOpen {
 		go func() {
 			time.Sleep(3 * time.Second)
 			_, _ = svc.UpdateAll(true)
 		}()
 	}
-	return &Core{svc: svc, reader: &reader.Handler{Store: svc.Store()}}, nil
+	if c.manga != nil && c.manga.GetSettings().CheckOnOpen {
+		go func() {
+			time.Sleep(4 * time.Second)
+			c.manga.CheckAll(true)
+		}()
+	}
+	return c, nil
 }
 
 // Network is implemented in Java: Unmetered is true on Wi-Fi/Ethernet.
@@ -84,9 +116,11 @@ type Network interface {
 func (c *Core) SetNetwork(n Network) {
 	if n == nil {
 		c.svc.NetworkOK = nil
+		c.unmetered = nil
 		return
 	}
 	c.svc.NetworkOK = n.Unmetered
+	c.unmetered = n.Unmetered
 }
 
 // NotifyEnabled says whether the user wants system notifications.
@@ -126,6 +160,16 @@ func (c *Core) Call(method string, argsJSON string) (string, error) {
 			_ = json.Unmarshal(args[i], &n)
 		}
 		return n
+	}
+	if out, err, ok := c.callManga(method, args); ok {
+		if err != nil {
+			return "", err
+		}
+		b, err := json.Marshal(out)
+		if err != nil {
+			return "", err
+		}
+		return string(b), nil
 	}
 	var out any
 	var err error
@@ -225,8 +269,12 @@ type Response struct {
 }
 
 // Serve renders /library/... paths (contents page, chapters, cover, images)
-// for the WebView's request interceptor.
+// and /mangalib/... (manga covers and pages) for the WebView's request
+// interceptor.
 func (c *Core) Serve(path string) *Response {
+	if r, ok := c.serveManga(path); ok {
+		return r
+	}
 	rec := httptest.NewRecorder()
 	c.reader.ServeHTTP(rec, httptest.NewRequest("GET", path, nil))
 	mime := rec.Header().Get("Content-Type")
@@ -254,5 +302,11 @@ func (c *Core) ExportEPUB(slug string, dir string) (string, error) {
 // LibraryPath is the absolute library folder.
 func (c *Core) LibraryPath() string { return c.svc.LibraryRoot() }
 
-// Shutdown stops the running download.
-func (c *Core) Shutdown() { c.svc.Shutdown() }
+// Shutdown stops the running downloads (manga first: it shares the site
+// window the novel side closes).
+func (c *Core) Shutdown() {
+	if c.manga != nil {
+		c.manga.Shutdown()
+	}
+	c.svc.Shutdown()
+}

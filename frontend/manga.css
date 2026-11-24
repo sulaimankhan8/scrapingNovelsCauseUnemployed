@@ -179,6 +179,11 @@ a.mg-ch__t:hover { color: var(--accent); }
 .mg-notyet p { margin: 10px 0 0; color: var(--ink-2); font-size: 14px; }
 
 /* ---------- reader ---------- */
+/* Double-tap zoom (touch): the page grows and the area scrolls to pan. */
+.mg-paged.is-zoom { display: block; overflow: auto; padding: 0; touch-action: pan-x pan-y; }
+.mg-paged.is-zoom .mg-page { height: auto; width: 250%; max-width: none !important; }
+.mg-paged.is-zoom .mg-page img { width: 100%; max-height: none; max-width: none; }
+.mg-paged.is-zoom ~ .mg-zone { display: none; }
 body.reading { background: #0B0B0D; overflow: hidden; }
 body.reading .top { display: none; }
 body.reading #main { padding: 0; }
@@ -216,6 +221,9 @@ body.reading #main { padding: 0; }
 .mg-rbar--top { top: 0; border-bottom: 1px solid #1E1F23; }
 .mg-rbar--bot { bottom: 0; border-top: 1px solid #1E1F23; }
 @media (prefers-reduced-motion: no-preference) { .mg-rbar { transition: transform .25s var(--ease-out), opacity .2s; } }
+/* With the bars hidden, a page in pages mode uses the whole screen. */
+.mg-reader.ui-off .mg-paged:not(.is-zoom) { padding: 6px 4px; }
+@media (prefers-reduced-motion: no-preference) { .mg-paged { transition: padding .25s var(--ease-out); } }
 .mg-reader.ui-off .mg-rbar--top { transform: translateY(-100%); opacity: 0; pointer-events: none; }
 .mg-reader.ui-off .mg-rbar--bot { transform: translateY(100%); opacity: 0; pointer-events: none; }
 .mg-rbar .icon-btn { color: #E8E4DC; }
@@ -258,4 +266,40 @@ body.reading #main { padding: 0; }
 @media (max-width: 560px) {
   .mg-found { grid-template-columns: 88px minmax(0, 1fr); }
   .mg-hero__acts .btn--lg { height: 44px; padding: 0 14px; font-size: 14px; }
+}
+
+/* ---------- phones (Android and narrow windows) ---------- */
+@media (max-width: 640px) {
+  /* Library header: tabs across, the update button as an icon, filters on one row. */
+  .lib-head { gap: 10px; align-items: center; }
+  .lib-head .titles { flex: 1 1 100%; }
+  .lib-head .kind-seg { flex: 1; }
+  .lib-head .kind-seg button { flex: 1; justify-content: center; }
+  .lib-head [data-act="catch-up"] .wide { display: none; }
+  .lib-head [data-act="catch-up"] { width: 44px; height: 44px; padding: 0; justify-content: center; flex: none; }
+  .lib-head__sel { flex: 1 1 100%; flex-wrap: nowrap; }
+  .lib-head__sel label { flex: 1; min-width: 0; }
+  .lib-head__sel .select { flex: 1; min-width: 0; }
+  .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: calc(-1 * var(--gutter)); padding-right: var(--gutter); }
+  .chips::-webkit-scrollbar { display: none; }
+  .chips .chip { flex: none; }
+
+  /* Manga series page: compact banner, actions in a two-column grid. */
+  .mg-hero__in { padding-bottom: 22px; gap: 14px; }
+  .mg-hero__row { gap: 16px; }
+  .mg-hero__cover { width: 112px; }
+  .mg-hero__title { font-size: 30px; }
+  .mg-hero__acts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .mg-hero__acts .btn--lg { width: 100%; padding: 0 10px; height: 46px; font-size: 14px; }
+  .mg-hero__acts .mg-hero__go { grid-column: 1 / -1; }
+  .mg-hero .icon-btn.mg-btn-o { width: 100%; height: 46px; }
+  .mg-stats div { padding: 8px 10px; }
+  .mg-stats dd { font-size: 19px; }
+  .mg-tools { gap: 8px; }
+  .mg-find { flex: 1 1 100%; }
+  .mg-tools .seg { overflow-x: auto; flex-wrap: nowrap; max-width: 100%; }
+  .mg-tools .seg button { flex: none; }
+  .mg-ch { padding: 0 10px 0 12px; gap: 8px; }
+  .mg-ch__s .btn--sm { height: 36px; }
+  .mg-selbar { top: 8px; }
 }
