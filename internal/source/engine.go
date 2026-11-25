@@ -276,7 +276,7 @@ func (e *Engine) readMetadata(ctx context.Context, p *sites.Profile, n *Novel) (
 	n.Vars["novelUrl"] = strings.TrimRight(page.URL, "/")
 	n.Vars["novelPage"] = "fetched"
 
-	special := map[string]bool{"api": true, "fields": true, "jsonLd": true, "strategy": true, "fetchMode": true}
+	special := map[string]bool{"api": true, "fields": true, "jsonLd": true, "strategy": true, "fetchMode": true, "cover": sites.Str(sec, "cover") == "none"}
 	for key, v := range sec {
 		expr, ok := v.(string)
 		if !ok || special[key] {
@@ -309,6 +309,11 @@ func (e *Engine) readMetadata(ctx context.Context, p *sites.Profile, n *Novel) (
 		n.FirstChapterURL = fc
 	}
 	genericMetadata(doc, n)
+	// "cover": "none": the site has no per-novel covers, and its share image
+	// is a site banner (Syosetu); the app draws its own cover instead.
+	if sites.Str(sec, "cover") == "none" {
+		n.Cover = ""
+	}
 	return doc, nil
 }
 
@@ -591,6 +596,14 @@ func (e *Engine) FetchChapter(ctx context.Context, n *Novel, ref ChapterRef) (*C
 	}
 	ch.HTML = html
 	return ch, nil
+}
+
+// NumberedTOC reports whether the site's chapter URLs are guessed from
+// chapter numbers (toc.strategy "sequential"), so a 404 may just be a
+// number the site skipped.
+func (e *Engine) NumberedTOC(siteID string) bool {
+	p := e.profile(siteID)
+	return p != nil && sites.Str(p.TOC, "strategy") == "sequential"
 }
 
 func (e *Engine) profile(id string) *sites.Profile {

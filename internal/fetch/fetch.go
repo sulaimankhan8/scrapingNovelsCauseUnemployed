@@ -71,6 +71,8 @@ type hostGate struct {
 	sem  chan struct{}
 	mu   sync.Mutex
 	next time.Time
+	// extra is added between requests after the host said 429.
+	extra time.Duration
 }
 
 const defaultUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36 NovelArchiver/2"
@@ -118,7 +120,7 @@ func (g *hostGate) wait(ctx context.Context, minDelay time.Duration) error {
 	if at.Before(now) {
 		at = now
 	}
-	g.next = at.Add(minDelay)
+	g.next = at.Add(minDelay + g.extra)
 	g.mu.Unlock()
 	select {
 	case <-time.After(time.Until(at)):
@@ -126,6 +128,31 @@ func (g *hostGate) wait(ctx context.Context, minDelay time.Duration) error {
 	case <-ctx.Done():
 		return ctx.Err()
 	}
+}
+
+// slower is called when the host answers 429: every request to it, from
+// every worker, is spaced further apart (up to 8 s more). faster undoes
+// that a step at a time as requests succeed.
+func (g *hostGate) slower() {
+	g.mu.Lock()
+	switch {
+	case g.extra == 0:
+		g.extra = time.Second
+	case g.extra < 8*time.Second:
+		g.extra *= 2
+	}
+	g.mu.Unlock()
+}
+
+func (g *hostGate) faster() {
+	g.mu.Lock()
+	if g.extra > 0 {
+		g.extra -= g.extra / 8
+		if g.extra < 50*time.Millisecond {
+			g.extra = 0
+		}
+	}
+	g.mu.Unlock()
 }
 
 // Get fetches a URL with retries. 403/429/503 pages that look like bot checks
@@ -159,10 +186,14 @@ func (h *HTTP) Get(ctx context.Context, rawURL, referer string) (*Page, error) {
 		}
 		page, err := h.once(ctx, rawURL, referer)
 		if err == nil {
+			g.faster()
 			return page, nil
 		}
 		lastErr = err
 		var he *HTTPError
+		if errors.As(err, &he) && he.Status == 429 {
+			g.slower()
+		}
 		if errors.Is(err, ErrBlocked) || (errors.As(err, &he) && he.Status < 500 && he.Status != 429) {
 			return nil, err
 		}

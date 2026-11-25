@@ -340,6 +340,11 @@ func groupHits(query string, perSite [][]source.SearchHit, library map[string]st
 	score := func(x *acc) int {
 		switch {
 		case x.g.Key == qKey:
+			return 4
+		case qKey != "" && strings.HasPrefix(x.g.Key, qKey):
+			// "Omniscient Reader's Viewpoint" for "omniscient reader":
+			// the title starts with the query, ahead of fan works that
+			// only mention it ("SKYFALL | Omniscient Reader").
 			return 3
 		case containsAll(keyWords(x.g.Title), qWords):
 			return 2
@@ -403,7 +408,7 @@ func containsAll(have, want []string) bool {
 		set[w] = true
 	}
 	for _, w := range want {
-		if !set[w] {
+		if !set[w] && !set[w+"s"] { // "reader" matches "Reader's"
 			return false
 		}
 	}

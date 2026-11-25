@@ -715,6 +715,8 @@ main.view { padding: 36px 0 96px; }
 
 /* ---------- title search results ---------- */
 .sresults { display: flex; flex-direction: column; gap: 12px; }
+.job--done .job__head { gap: 12px; }
+.job--done .job__name span { display: inline-flex; align-items: center; gap: 4px; }
 .sresults__head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
 .sresults__h { font: 500 20px/1.25 var(--serif); margin: 0; overflow-wrap: anywhere; }
 .sresults__status { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
@@ -762,12 +764,17 @@ main.view { padding: 36px 0 96px; }
   .sgroup__title { font-size: 17px; }
   .sgroup__head { flex-wrap: wrap; }
   .sgroup__countall { flex: 1 1 100%; }
-  .srow { padding: 12px 14px; }
-  .srow__acts .btn { flex: 1; height: 40px; }
-  .srow__acts .btn--ghost { flex: 0 0 auto; }
+  .srow { padding: 10px 14px; gap: 6px 12px; }
+  .srow__latest { display: none; }
+  .srow__acts .btn { flex: 1; height: 38px; }
 }
 
 /* ---------- other-language search and novels ---------- */
 .sresults__langs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; }
 .sresults__langs .chip:disabled { opacity: .7; cursor: default; }
 .sgroup__orig, .found__orig { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+
+/* Nothing may widen the page: a phone must never scroll sideways. */
+html, body { overflow-x: clip; }
+.top__in > * { flex-shrink: 0; }
+.top__in > .mjobs-pill { flex-shrink: 1; }

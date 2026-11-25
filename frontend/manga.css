@@ -34,6 +34,9 @@
   font: 600 13px var(--sans); cursor: pointer;
 }
 .mjobs-pill span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mjobs-pill { min-width: 0; flex: 0 1 auto; }
+.mjobs-pill__s { display: none; font-variant-numeric: tabular-nums; }
+.mg-busy__t { font-variant-numeric: tabular-nums; }
 .mjobs-pill:hover { background: var(--sunk-2); }
 .mg-job { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--card); }
 .mg-jobs .mg-job + .mg-job { margin-top: 8px; }
@@ -87,7 +90,6 @@
 #mgSeries { margin-top: -36px; } /* the banner meets the top bar */
 .mg-hero {
   background-color: var(--tone, #3D4650); color: #FFFDF8; position: relative;
-  background-image: radial-gradient(rgba(255, 253, 248, .09) 1px, transparent 1.4px); background-size: 6px 6px;
 }
 .mg-hero--sk { background-color: var(--sunk); padding: 40px 0; }
 .mg-hero__in { padding-top: 18px; padding-bottom: 30px; display: flex; flex-direction: column; gap: 18px; }
@@ -109,11 +111,10 @@
 .mg-btn-o { background: transparent; color: #FFFDF8; border: 1px solid rgba(255, 253, 248, .35); }
 .mg-btn-o:hover { background: rgba(255, 253, 248, .12); }
 .mg-hero .icon-btn.mg-btn-o { width: 48px; height: 48px; }
-.mg-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; min-width: 280px; }
-.mg-stats div { background: rgba(255, 253, 248, .1); border-radius: var(--r); padding: 10px 12px; }
+/* The same plain facts row as the novel page: label above the number. */
+.mg-stats { display: flex; gap: 28px; flex-wrap: wrap; margin: 0; }
 .mg-stats dt { font-size: 12px; color: rgba(255, 253, 248, .78); }
-.mg-stats dd { margin: 0; font: 500 22px/1.2 var(--serif); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.mg-stats div { display: flex; flex-direction: column-reverse; }
+.mg-stats dd { margin: 0; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .mg-body { padding-top: 24px; padding-bottom: 64px; display: flex; flex-direction: column; gap: 12px; }
 .mg-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .mg-find { height: 38px; flex: 0 1 220px; }
@@ -293,8 +294,6 @@ body.reading #main { padding: 0; }
   .mg-hero__acts .btn--lg { width: 100%; padding: 0 10px; height: 46px; font-size: 14px; }
   .mg-hero__acts .mg-hero__go { grid-column: 1 / -1; }
   .mg-hero .icon-btn.mg-btn-o { width: 100%; height: 46px; }
-  .mg-stats div { padding: 8px 10px; }
-  .mg-stats dd { font-size: 19px; }
   .mg-tools { gap: 8px; }
   .mg-find { flex: 1 1 100%; }
   .mg-tools .seg { overflow-x: auto; flex-wrap: nowrap; max-width: 100%; }
@@ -302,4 +301,18 @@ body.reading #main { padding: 0; }
   .mg-ch { padding: 0 10px 0 12px; gap: 8px; }
   .mg-ch__s .btn--sm { height: 36px; }
   .mg-selbar { top: 8px; }
+}
+
+/* Phones: the download pill is a spinner and a number, and the wordmark
+   steps aside while it shows, so the header always fits the screen. */
+@media (max-width: 640px) {
+  .mjobs-pill { padding: 0 10px 0 8px; gap: 6px; max-width: none; }
+  .mjobs-pill__t { display: none; }
+  .mjobs-pill__s { display: inline; }
+  .has-mjobs .top .brand span { display: none; }
+}
+@media (max-width: 640px) {
+  /* "Chapters [1] to [97]" stays on one line in the phone sheet. */
+  .mg-opt { gap: 8px; }
+  .mg-opt input[type=number] { width: 60px; }
 }

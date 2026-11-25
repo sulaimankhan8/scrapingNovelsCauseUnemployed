@@ -31,3 +31,11 @@ func TestNorm(t *testing.T) {
 		t.Error("NeedsTranslation")
 	}
 }
+
+func TestStatus(t *testing.T) {
+	for in, want := range map[string]string{"全本": "Completed", "已完结": "Completed", "完結済": "Completed", "連載中": "Ongoing", "连载": "Ongoing", "완결": "Completed", "연재중": "Ongoing", "Ongoing": "Ongoing", "": ""} {
+		if got := Status(in); got != want {
+			t.Errorf("Status(%q) = %q, want %q", in, got, want)
+		}
+	}
+}

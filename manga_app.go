@@ -196,6 +196,13 @@ func (m *MangaApp) RemoveQueued(id int) {
 		m.svc.RemoveQueued(id)
 	}
 }
+// CancelJob stops one manga download (or drops it from the queue).
+func (m *MangaApp) CancelJob(id int) {
+	if m.svc != nil {
+		m.svc.CancelJob(id)
+	}
+}
+
 func (m *MangaApp) CancelCurrent() {
 	if m.svc != nil {
 		m.svc.CancelCurrent()

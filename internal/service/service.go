@@ -204,10 +204,15 @@ type NovelItem struct {
 	CleanCount    int    `json:"cleanCount"`
 	FailedCount   int    `json:"failedCount"`
 	LockedCount   int    `json:"lockedCount"`
-	HasIndex      bool   `json:"hasIndex"`
-	CatalogURL    string `json:"catalogUrl"`
-	SizeBytes     int64  `json:"sizeBytes"`
-	SizeMb        string `json:"sizeMb"`
+	GoneCount     int    `json:"goneCount"`
+	// UntranslatedCount is saved chapters of a foreign novel with no
+	// English copy yet; TitleUntranslated, its title is still the original.
+	UntranslatedCount int    `json:"untranslatedCount"`
+	TitleUntranslated bool   `json:"titleUntranslated"`
+	HasIndex          bool   `json:"hasIndex"`
+	CatalogURL        string `json:"catalogUrl"`
+	SizeBytes         int64  `json:"sizeBytes"`
+	SizeMb            string `json:"sizeMb"`
 
 	Status     string    `json:"status,omitempty"` // Ongoing, Completed, ...
 	PendingCnt int       `json:"pendingCount"`
@@ -245,7 +250,8 @@ func (a *Service) item(b *library.Book) NovelItem {
 	it := NovelItem{
 		Slug: b.Slug, Title: b.Title, Author: b.Author, Cover: cover, Description: b.Description,
 		URL: b.URL, Site: b.SiteName, TotalChapters: len(b.Chapters),
-		RawCount: ok, CleanCount: ok, FailedCount: failed, LockedCount: locked,
+		RawCount: ok, CleanCount: ok, FailedCount: failed, LockedCount: locked, GoneCount: b.GoneCount(),
+		UntranslatedCount: a.untranslated(b), TitleUntranslated: b.Foreign() && b.OriginalTitle != "" && b.Title == b.OriginalTitle,
 		HasIndex: ok > 0, CatalogURL: "/library/" + b.Slug + "/",
 		SizeBytes: size, SizeMb: fmt.Sprintf("%.1f MB", float64(size)/(1<<20)),
 		Status: b.Status, PendingCnt: pending, RemovedCnt: removed, RevisedCnt: revised,
@@ -475,6 +481,33 @@ func (a *Service) RetryNovel(slug string) (map[string]any, error) {
 	return a.enqueue(&job{Kind: "update", Slug: b.Slug, Title: b.Title, URL: b.URL, Cover: a.coverPath(b)})
 }
 
+// TranslateNovel queues a job that translates the title and every saved
+// chapter of a foreign novel that has no English copy yet. Nothing is
+// downloaded.
+func (a *Service) TranslateNovel(slug string) (map[string]any, error) {
+	if err := a.ready(); err != nil {
+		return nil, err
+	}
+	b, err := a.store.Load(slug)
+	if err != nil {
+		return nil, err
+	}
+	return a.enqueue(&job{Kind: "translate", Slug: b.Slug, Title: b.Title, URL: b.URL, Cover: a.coverPath(b)})
+}
+
+// TranslateChapter translates one saved chapter right away (the reader's
+// "Translate now").
+func (a *Service) TranslateChapter(ctx context.Context, slug string, n int) error {
+	if err := a.ready(); err != nil {
+		return err
+	}
+	b, err := a.store.Load(slug)
+	if err != nil {
+		return err
+	}
+	return a.arch.TranslateChapter(ctx, b, n)
+}
+
 // RetryMissing queues a quick job that downloads only the chapters whose
 // last download failed. Saved chapters aren't re-checked and chapters you
 // never chose (a range download) aren't added, so retrying three failed
@@ -544,6 +577,13 @@ func (a *Service) AuditNovel(slug string) (map[string]any, error) {
 		"total": len(b.Chapters), "validCount": ok, "invalidCount": failed + pending,
 		"failed": failed, "pending": pending, "locked": locked, "invalid": invalid,
 	}, nil
+}
+
+func (a *Service) untranslated(b *library.Book) int {
+	if a.arch == nil {
+		return 0
+	}
+	return a.arch.Untranslated(b)
 }
 
 // DeleteNovel removes a novel and all its files.

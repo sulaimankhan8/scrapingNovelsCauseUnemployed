@@ -48,6 +48,24 @@ func Norm(code string) string {
 // to English.
 func NeedsTranslation(code string) bool { return Norm(code) != English }
 
+// Status puts a Chinese, Japanese or Korean site's status word ("全本",
+// "連載中", "완결") into the English the app uses. Anything else is
+// returned as it is.
+func Status(s string) string {
+	t := strings.TrimSpace(s)
+	switch {
+	case t == "":
+		return s
+	case strings.Contains(t, "完") || strings.Contains(t, "全本") || strings.Contains(t, "완결"):
+		return "Completed"
+	case strings.Contains(t, "連載") || strings.Contains(t, "连载") || strings.Contains(t, "연재"):
+		return "Ongoing"
+	case strings.Contains(t, "休") || strings.Contains(t, "휴재"):
+		return "Hiatus"
+	}
+	return s
+}
+
 var tags = regexp.MustCompile(`<[^>]*>`)
 
 // Detect names the language a text (or HTML fragment) is written in, from

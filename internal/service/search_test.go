@@ -81,3 +81,14 @@ func TestSearchStages(t *testing.T) {
 		t.Errorf("%s has no search page", id)
 	}
 }
+
+func TestGroupHitsPrefersTitleStartingWithQuery(t *testing.T) {
+	fan := []source.SearchHit{{SiteID: "wattpad", Title: "SKYFALL | Omniscient Reader", URL: "https://w.test/1"}}
+	real := []source.SearchHit{
+		{SiteID: "novelping", Title: "Omniscient Reader’s Viewpoint", URL: "https://p.test/orv"},
+	}
+	got := groupHits("Omniscient Reader", [][]source.SearchHit{fan, real}, nil, func(s string) string { return s })
+	if len(got) != 2 || got[0].Title != "Omniscient Reader’s Viewpoint" {
+		t.Fatalf("order = %q, want the real novel first", []string{got[0].Title, got[1].Title})
+	}
+}

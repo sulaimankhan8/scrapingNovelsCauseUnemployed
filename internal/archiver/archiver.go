@@ -111,10 +111,11 @@ func (a *Archiver) BookFromNovel(n *source.Novel) (*library.Book, error) {
 	b.SiteID, b.SiteName, b.URL = n.SiteID, n.SiteName, n.URL
 	if lang.NeedsTranslation(n.Language) && b.OriginalTitle == n.Title && b.Title != "" && b.Title != n.Title {
 		// Already translated: keep the English, refresh the originals.
-		b.OriginalAuthor, b.OriginalDescription, b.Status = n.Author, n.Description, n.Status
+		b.OriginalAuthor, b.OriginalDescription, b.Status = n.Author, n.Description, lang.Status(n.Status)
 	} else {
 		b.Title, b.Author, b.Description, b.Status = n.Title, n.Author, n.Description, n.Status
 		if lang.NeedsTranslation(n.Language) {
+			b.Status = lang.Status(n.Status)
 			b.OriginalTitle, b.OriginalAuthor, b.OriginalDescription = n.Title, n.Author, n.Description
 		}
 	}
@@ -135,7 +136,7 @@ func (a *Archiver) BookFromNovel(n *source.Novel) (*library.Book, error) {
 		for _, r := range n.Chapters {
 			c := library.Chapter{Number: r.Number, Title: r.Title, URL: r.URL, Index: r.Index, Locked: r.Locked}
 			if prev, ok := old[chapterKey(r.URL, r.Index)]; ok && prev.Number == r.Number {
-				c.State, c.Error, c.Words = prev.State, prev.Error, prev.Words
+				c.State, c.Error, c.Words, c.AltURL = prev.State, prev.Error, prev.Words, prev.AltURL
 				c.Translated, c.TranslateError = prev.Translated, prev.TranslateError
 				if prev.TitleOriginal != "" && prev.TitleOriginal == r.Title {
 					c.TitleOriginal, c.Title = prev.TitleOriginal, prev.Title // keep the English title
@@ -180,7 +181,7 @@ func (a *Archiver) Run(ctx context.Context, b *library.Book, novel *source.Novel
 	if err := a.Store.Save(b); err != nil {
 		return err
 	}
-	a.translateBook(ctx, b)
+	a.translateBook(ctx, b, opts)
 	emit("started", map[string]any{"slug": b.Slug, "title": b.Title, "stage": "scraping"})
 	if changed := a.saveCover(ctx, b); changed && opts.Result != nil {
 		opts.Result.CoverChanged = true
@@ -226,7 +227,7 @@ func (a *Archiver) selectChapters(b *library.Book, opts Options) ([]int, int) {
 	var idx []int
 	cached := 0
 	for i, c := range b.Chapters {
-		if c.Number < from || c.Number > to || c.State == library.StateLocked {
+		if c.Number < from || c.Number > to || c.State == library.StateLocked || c.State == library.StateGone && !opts.Force {
 			continue
 		}
 		if opts.OnlyFailed && c.State != library.StateFailed {
@@ -294,7 +295,7 @@ func (a *Archiver) downloadList(ctx context.Context, b *library.Book, novel *sou
 				mu.Lock()
 				ref := b.Chapters[i]
 				mu.Unlock()
-				state, words, title, errMsg := a.downloadOne(jobCtx, b, novel, ref, opts)
+				state, words, title, errMsg, alt := a.downloadOne(jobCtx, b, novel, ref, opts)
 				if jobCtx.Err() != nil && state != library.StateOK {
 					return
 				}
@@ -306,6 +307,9 @@ func (a *Archiver) downloadList(ctx context.Context, b *library.Book, novel *sou
 				mu.Lock()
 				c := &b.Chapters[i]
 				c.State, c.Words, c.Error = state, words, errMsg
+				if alt != "" {
+					c.AltURL = alt
+				}
 				if title != "" && (c.Title == "" || strings.HasPrefix(c.Title, "Chapter ") && len(c.Title) <= len("Chapter 00000")) {
 					c.Title = title // sequential TOCs only know "Chapter N"
 				}
@@ -318,6 +322,8 @@ func (a *Archiver) downloadList(ctx context.Context, b *library.Book, novel *sou
 				status := "ok"
 				if state == library.StateOK {
 					atomic.AddInt64(&scraped, 1)
+				} else if state == library.StateGone {
+					status = "gone"
 				} else {
 					status = "err"
 					atomic.AddInt64(&failed, 1)
@@ -442,20 +448,90 @@ func pct(n, limit int) int {
 	return int(math.Min(100, float64(n)/float64(limit)*100))
 }
 
-func (a *Archiver) downloadOne(ctx context.Context, b *library.Book, novel *source.Novel, c library.Chapter, opts Options) (state string, words int, title, errMsg string) {
-	ref := source.ChapterRef{Number: c.Number, Title: c.Title, URL: c.URL, Index: c.Index, Locked: c.Locked}
+func (a *Archiver) downloadOne(ctx context.Context, b *library.Book, novel *source.Novel, c library.Chapter, opts Options) (state string, words int, title, errMsg, altURL string) {
+	u := c.URL
+	if c.AltURL != "" {
+		u = c.AltURL
+	}
+	ref := source.ChapterRef{Number: c.Number, Title: c.Title, URL: u, Index: c.Index, Locked: c.Locked}
 	ch, err := a.Engine.FetchChapter(ctx, novel, ref)
+	if err != nil && isNotFound(err) && a.Engine.NumberedTOC(novel.SiteID) {
+		// The URL was a guess from the chapter number. Ask the chapter
+		// before it where its Next link really goes.
+		next, gone := a.realNext(ctx, b, novel, c)
+		switch {
+		case gone:
+			return library.StateGone, 0, "", fmt.Sprintf("%s has no chapter %d; the chapter before it links straight past it.", siteName(b), c.Number), ""
+		case next != "" && next != u:
+			ref.URL = next
+			if ch, err = a.Engine.FetchChapter(ctx, novel, ref); err == nil {
+				altURL = next
+			}
+		}
+	}
 	if err != nil {
 		if errors.Is(err, source.ErrLocked) {
-			return library.StateLocked, 0, "", err.Error()
+			return library.StateLocked, 0, "", err.Error(), ""
 		}
-		return library.StateFailed, 0, "", err.Error()
+		return library.StateFailed, 0, "", err.Error(), ""
 	}
 	words, err = a.saveChapter(ctx, b, c.Number, ch, opts)
 	if err != nil {
-		return library.StateFailed, 0, "", err.Error()
+		return library.StateFailed, 0, "", err.Error(), ""
 	}
-	return library.StateOK, words, ch.Title, ""
+	return library.StateOK, words, ch.Title, "", altURL
+}
+
+// realNext reads the Next link of the nearest chapter before c that the
+// site has. It returns that link, or gone=true when the link skips c (it
+// goes to a later chapter's address, or there is no Next at all and c is
+// past the end).
+func (a *Archiver) realNext(ctx context.Context, b *library.Book, novel *source.Novel, c library.Chapter) (next string, gone bool) {
+	var prev *library.Chapter
+	later := map[string]bool{}
+	for i := range b.Chapters {
+		x := &b.Chapters[i]
+		switch {
+		case x.Number < c.Number && x.State != library.StateGone && (prev == nil || x.Number > prev.Number):
+			prev = x
+		case x.Number > c.Number:
+			later[strings.TrimRight(x.URL, "/")] = true
+			if x.AltURL != "" {
+				later[strings.TrimRight(x.AltURL, "/")] = true
+			}
+		}
+	}
+	if prev == nil {
+		return "", false
+	}
+	pu := prev.URL
+	if prev.AltURL != "" {
+		pu = prev.AltURL
+	}
+	pch, err := a.Engine.FetchChapter(ctx, novel, source.ChapterRef{Number: prev.Number, URL: pu, Index: prev.Index})
+	if err != nil {
+		return "", false // can't tell; stays failed
+	}
+	next = strings.TrimRight(pch.NextURL, "/")
+	if next == "" {
+		return "", len(later) == 0
+	}
+	if later[next] {
+		return "", true
+	}
+	return next, false
+}
+
+func isNotFound(err error) bool {
+	var he *fetch.HTTPError
+	return errors.As(err, &he) && (he.Status == 404 || he.Status == 410)
+}
+
+func siteName(b *library.Book) string {
+	if b.SiteName != "" {
+		return b.SiteName
+	}
+	return "The site"
 }
 
 // saveChapter cleans, downloads images (rewriting their links to local

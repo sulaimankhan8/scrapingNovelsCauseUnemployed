@@ -71,7 +71,15 @@ func (a *Service) searchForeign(query string, langs []string, c *searchCache) {
 			defer wg.Done()
 			code := lang.Norm(p.Language)
 			if len(names[code]) == 0 {
-				return // no title in this language to search with
+				// No title in this language to search with: say so, rather
+				// than leave the site out without a word.
+				r := siteResult{info: SiteSearch{ID: p.ID, Name: p.Name, Error: "couldn't work out the " + lang.Name(code) + " title; type it in " + lang.Name(code) + " to search this site"}, lang: code}
+				c.mu.Lock()
+				if c.query == query {
+					c.sites[p.ID] = r
+				}
+				c.mu.Unlock()
+				return
 			}
 			var hits []source.SearchHit
 			var lastErr error

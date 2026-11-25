@@ -10,6 +10,7 @@
 package reader
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -22,6 +23,8 @@ import (
 // Handler serves /library/... from a Store.
 type Handler struct {
 	Store *library.Store
+	// Translate puts one saved chapter into English now (nil: not offered).
+	Translate func(ctx context.Context, slug string, n int) error
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -65,7 +68,16 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.NotFound(w, r)
 			return
 		}
-		h.chapter(w, b, n, r.URL.Query().Get("text") == "original")
+		trErr := ""
+		if r.URL.Query().Get("translate") == "now" && h.Translate != nil && b.Foreign() {
+			if err := h.Translate(r.Context(), b.Slug, n); err != nil {
+				trErr = err.Error()
+			}
+			if nb, err := h.Store.Load(slug); err == nil {
+				b = nb
+			}
+		}
+		h.chapter(w, b, n, r.URL.Query().Get("text") == "original", trErr, h.Translate != nil)
 	}
 }
 
@@ -89,7 +101,7 @@ func (h *Handler) toc(w http.ResponseWriter, b *library.Book) {
 
 // chapter renders one chapter. For a translated novel it shows the
 // English copy unless original is set (or there is no English copy yet).
-func (h *Handler) chapter(w http.ResponseWriter, b *library.Book, n int, original bool) {
+func (h *Handler) chapter(w http.ResponseWriter, b *library.Book, n int, original bool, trErr string, canTranslate bool) {
 	idx := -1
 	for i, c := range b.Chapters {
 		if c.Number == n {
@@ -138,6 +150,7 @@ func (h *Handler) chapter(w http.ResponseWriter, b *library.Book, n int, origina
 		"Prev": prev, "Next": next, "Total": len(b.Chapters),
 		"Foreign": foreign, "ShowEN": showEN, "Untranslated": untranslated && !original,
 		"Lang": htmlLang, "Query": template.URL(query), "OrigLabel": origLabel(b.Language),
+		"CanTranslate": canTranslate, "TranslateErr": trErr,
 	})
 }
 
@@ -204,6 +217,8 @@ article p{margin:0 0 1em}
 .bar .lang a{border:0;min-height:30px;padding:5px 9px;border-radius:7px;font-size:13px}
 .bar .lang a[aria-current=true]{background:var(--ink);color:var(--bg);font-weight:600}
 .note{padding:10px 12px;border-radius:10px;background:var(--sys-bg);color:var(--sys-ink);font:14px/1.45 system-ui,sans-serif;margin:0 0 1.2em}
+.tr-now{display:inline-block;margin-left:6px;padding:6px 12px;border-radius:8px;background:var(--ink);color:var(--bg);font-weight:600;text-decoration:none;white-space:nowrap}
+.tr-now[aria-disabled=true]{opacity:.6;pointer-events:none}
 article h1.ch-title{font-size:1.5em;line-height:1.25;margin:.4em 0 1.2em}
 article img{max-width:100%;height:auto;display:block;margin:1em auto}
 article hr{border:0;border-top:1px solid var(--line);margin:2em auto;width:40%}
@@ -247,7 +262,7 @@ box-shadow:0 12px 24px -16px rgba(0,0,0,.35)}
 <main><article>
 {{if .Missing}}<h1 class="ch-title">{{.Ch.Title}}</h1>
 <p class="missing">This chapter isn't downloaded{{if .Ch.Error}} ({{.Ch.Error}}){{end}}. Press <b>Update</b> on the <a href="/#/novel/{{.Book.Slug}}">novel page</a> to fetch it.</p>
-{{else}}{{if .Untranslated}}<p class="note" lang="en">This chapter isn't translated yet, so it's shown as it was written. It's translated on the next update.</p>{{end}}{{.Body}}{{end}}
+{{else}}{{if .Untranslated}}<p class="note" lang="en">{{if .TranslateErr}}Couldn't translate it: {{.TranslateErr}}{{else}}This chapter isn't translated yet, so it's shown as it was written.{{end}}{{if .CanTranslate}} <a class="tr-now" href="?translate=now" onclick="this.textContent='Translating…';this.setAttribute('aria-disabled','true')">Translate now</a>{{end}}</p>{{end}}{{.Body}}{{end}}
 </article>
 <nav class="nav">
  {{if .Prev}}<a href="{{.Prev}}{{.Query}}" rel="prev">← Previous</a>{{else}}<span>← Previous</span>{{end}}
@@ -355,7 +370,7 @@ li .tag{margin-left:auto;font-size:12px;color:var(--muted)}
 <input id="q" type="search" placeholder="Find a chapter by number or title" aria-label="Find a chapter">
 <nav class="pager" id="pagerTop" aria-label="Chapter pages" hidden></nav>
 <ol id="list">{{range .Rows}}<li class="{{if eq .State "ok"}}ok{{else if .State}}{{.State}}{{else}}pending{{end}}" data-t="{{.Number}} {{.Title}}">
-{{if eq .State "ok"}}<a href="{{.Number}}"><span class="n">{{.Number}}</span>{{.Title}}</a>{{else}}<span><span class="n">{{.Number}}</span>{{.Title}}<span class="tag">{{if eq .State "locked"}}paid{{else if eq .State "failed"}}failed{{else}}not saved{{end}}</span></span>{{end}}
+{{if eq .State "ok"}}<a href="{{.Number}}"><span class="n">{{.Number}}</span>{{.Title}}</a>{{else}}<span><span class="n">{{.Number}}</span>{{.Title}}<span class="tag">{{if eq .State "locked"}}paid{{else if eq .State "failed"}}failed{{else if eq .State "gone"}}not on the site{{else}}not saved{{end}}</span></span>{{end}}
 </li>{{end}}</ol>
 <nav class="pager" id="pager" aria-label="Chapter pages" hidden></nav>
 </main>

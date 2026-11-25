@@ -142,6 +142,10 @@ export function StartScrape(arg1) {
   return window['go']['main']['App']['StartScrape'](arg1);
 }
 
+export function TranslateNovel(arg1) {
+  return window['go']['main']['App']['TranslateNovel'](arg1);
+}
+
 export function UpdateAll(arg1) {
   return window['go']['main']['App']['UpdateAll'](arg1);
 }

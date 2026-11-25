@@ -12,6 +12,8 @@ export function CancelAll():Promise<void>;
 
 export function CancelCurrent():Promise<void>;
 
+export function CancelJob(arg1:number):Promise<void>;
+
 export function Chapter(arg1:string,arg2:number):Promise<manga.ChapterView>;
 
 export function CheckAll(arg1:boolean):Promise<number>;

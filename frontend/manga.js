@@ -67,7 +67,12 @@
     return /^(manga|manhwa|manhua)$/i.test(t) ? t.charAt(0).toUpperCase() + t.slice(1).toLowerCase() : 'Manga';
   };
   const sizeOf = (b) => NA.mb(b);
-  const busyWith = (slug) => M.activity.current && M.activity.current.slug === slug;
+  // Several series download at once (one per site): every running job.
+  const runningJobs = () => (M.activity.running && M.activity.running.length ? M.activity.running : (M.activity.current ? [M.activity.current] : []));
+  const jobFor = (slug) => runningJobs().find((j) => j.slug === slug) || null;
+  const busyWith = (slug) => !!jobFor(slug);
+  // Manga, Manhwa or Manhua for a series in the library.
+  const kindOfSlug = (slug) => { const it = (M.lib || []).find((x) => x.slug === slug); return kindOf(it && it.type); };
   const queuedFor = (slug) => (M.activity.queue || []).some((j) => j.slug === slug);
   const seriesHref = (slug) => `#/manga/${enc(slug)}`;
   const readHref = (slug, key) => `#/read/${enc(slug)}/${key}`;
@@ -85,8 +90,8 @@
   }
 
   function badge(n) {
-    const cur = M.activity.current;
-    if (cur && cur.slug === n.slug) {
+    const cur = jobFor(n.slug);
+    if (cur) {
       if (cur.kind === 'update') return `<span class="book__badge">${NA.spinner(11, '#E0794F')} Checking</span>`;
       return `<span class="book__badge"><span class="dot"></span>Saving ${cur.total ? `${cur.done}/${cur.total}` : ''}</span>`;
     }
@@ -103,7 +108,7 @@
     const contLabel = reading ? `Continue · Ch. ${NA.num(n.lastRead)}` : 'Start reading';
     const pct = n.totalChapters ? Math.min(100, Math.round((n.lastRead / n.totalChapters) * 100)) : 0;
     const meta = reading ? `Ch. ${NA.num(n.lastRead)} of ${NA.num(n.totalChapters)}` : `${NA.num(n.downloaded)} of ${NA.num(n.totalChapters)} saved`;
-    const cover = NA.coverHTML(n.cover, title, n.type, false, i < 12).replace('class="cover', 'class="cover cover--manga');
+    const cover = NA.coverHTML(n.cover, title, '', false, i < 12).replace('class="cover', 'class="cover cover--manga');
     return `<article class="book book--manga" data-mslug="${esc(n.slug)}" data-key="m-${esc(n.slug)}">
       <div class="book__art">
         <a class="book__cover" href="${seriesHref(n.slug)}" aria-label="Open ${esc(title)}">${cover}<span class="kind-tag">${esc(n.type)}</span><span class="book__badge-slot">${badge(n)}</span></a>
@@ -140,7 +145,7 @@
   }
   async function removeSeries(slug, title) {
     const it = M.lib.find((x) => x.slug === slug) || {};
-    const ok = await NA.confirmDialog({ title: `Remove ${title}?`, body: `This deletes ${NA.plural(it.downloaded || 0, 'saved chapter')} (${sizeOf(it.bytes || 0)}) from this computer. It can’t be undone.`, ok: 'Remove', danger: true });
+    const ok = await NA.confirmDialog({ title: `Remove ${title}?`, body: `This deletes ${NA.plural(it.downloaded || 0, 'saved chapter')} (${sizeOf(it.bytes || 0)}) from this device. It can’t be undone.`, ok: 'Remove', danger: true });
     if (!ok) return;
     try {
       await call('DeleteSeries', slug);
@@ -203,7 +208,7 @@
         <label class="mg-opt"><input type="radio" name="mrng" value="first"> The first <input type="number" id="mFirst" min="1" max="${n}" value="${Math.min(5, n)}" aria-label="How many chapters"> chapters</label>
         <label class="mg-opt"><input type="radio" name="mrng" value="range"> Chapters <input type="number" id="mFrom" min="1" max="${n}" value="1" aria-label="From chapter"> to <input type="number" id="mTo" min="1" max="${n}" value="${n}" aria-label="To chapter"></label>
       </fieldset>
-      <p class="mg-tip muted">Pages are saved to this computer as images. A chapter is usually 5–30 MB, so a long series can take several GB.</p>
+      <p class="mg-tip muted">Pages are saved to this device as images. A chapter is usually 5–30 MB, so a long series can take several GB.</p>
       <div class="dialog__foot"><button type="button" class="btn" data-mact="close">Cancel</button><button type="button" class="btn btn--primary" id="mgGo">Download</button></div>`;
     $$('.mg-opt input[type=number]', body).forEach((inp) => inp.addEventListener('focus', () => { inp.closest('.mg-opt').querySelector('input[type=radio]').checked = true; }));
     if (pv.cover) call('CoverPreview', url).then((src) => { const b = $('#mgPvCover', body); if (src && b) b.innerHTML = `<div class="cover cover--manga"><img src="${src}" alt=""></div>`; }).catch(() => {});
@@ -237,8 +242,8 @@
     const pct = j.total ? Math.round((j.done / j.total) * 100) : 0;
     const what = j.kind === 'update' ? 'Checking for new chapters' : (j.message || 'Waiting…');
     return `<div class="mg-job${live ? ' is-live' : ''}" data-key="mj-${j.id}">
-      <div class="mg-job__head"><a href="${seriesHref(j.slug)}" class="mg-job__t">${esc(j.title)}</a><span class="mg-kind mg-kind--sm">Manga</span>
-        ${live ? `<button type="button" class="btn btn--sm" data-mact="stop">Stop</button>` : `<button type="button" class="btn btn--ghost btn--sm" data-mact="unqueue" data-id="${j.id}">Remove</button>`}</div>
+      <div class="mg-job__head"><a href="${seriesHref(j.slug)}" class="mg-job__t">${esc(j.title)}</a><span class="mg-kind mg-kind--sm">${esc(kindOfSlug(j.slug))}</span>
+        ${live ? `<button type="button" class="btn btn--sm" data-mact="stop" data-id="${j.id}">Stop</button>` : `<button type="button" class="btn btn--ghost btn--sm" data-mact="unqueue" data-id="${j.id}">Remove</button>`}</div>
       <span class="mg-job__msg">${esc(what)}${j.total ? ` · ${j.done} of ${j.total}` : ''}</span>
       ${live ? `<div class="bar${j.total ? '' : ' bar--ind'}"><i style="--p:${pct / 100}"></i></div>` : ''}
     </div>`;
@@ -246,30 +251,44 @@
   function paintJobs() {
     if (!ready) return;
     const a = M.activity;
-    const busy = !!(a.current || (a.queue || []).length);
+    const run = runningJobs(), q = a.queue || [];
+    const busy = !!(run.length || q.length);
     const pill = $('#mjobsPill');
     if (pill) {
       pill.hidden = !busy;
+      document.documentElement.classList.toggle('has-mjobs', busy);
       if (busy) {
-        const c = a.current;
-        let txt = c ? (c.kind === 'update' ? `Checking ${c.title}` : `${c.title}${c.total ? ` · ${c.done}/${c.total}` : ''}`) : 'Manga queued';
-        if ((a.queue || []).length) txt += ` (+${a.queue.length})`;
-        NA.morph(pill, `${NA.spinner(14)}<span>${esc(txt)}</span>`);
+        // One job: its title and progress. Several: how many, together.
+        let txt, short;
+        if (run.length === 1 && !q.length) {
+          const c = run[0];
+          txt = c.kind === 'update' ? `Checking ${c.title}` : `${c.title}${c.total ? ` · ${c.done}/${c.total}` : ''}`;
+          short = c.total ? `${c.done}/${c.total}` : '1';
+        } else {
+          txt = `${run.length ? `${run.length} downloading` : 'Waiting'}${q.length ? ` · ${q.length} waiting` : ''}`;
+          short = String(run.length + q.length);
+        }
+        NA.morph(pill, `${NA.spinner(14)}<span class="mjobs-pill__t">${esc(txt)}</span><span class="mjobs-pill__s" aria-hidden="true">${esc(short)}</span>`);
         pill.setAttribute('aria-label', `Manga downloads: ${txt}`);
       }
     }
     const box = $('#mjobs');
     if (box) {
       box.hidden = !busy;
-      NA.morph(box, busy ? `${jobLine(a.current, true)}${(a.queue || []).length ? `<p class="mg-job__more muted">${NA.plural(a.queue.length, 'more manga job')} waiting</p>` : ''}` : '');
+      NA.morph(box, busy ? `${run.map((j) => jobLine(j, true)).join('')}${q.length ? `<p class="mg-job__more muted">${NA.plural(q.length, 'more manga job')} waiting</p>` : ''}` : '');
+    }
+    const sb = $('#mgBusyBtn');
+    if (sb && M.series) {
+      const j = jobFor(M.series.slug);
+      if (j) { const l = $('.mg-busy__t', sb), t = j.total ? `Stop · ${j.done}/${j.total}` : 'Stop'; if (l && l.textContent !== t) l.textContent = t; }
     }
     const d = $('#mgJobsDlg');
     if (d) NA.morph($('.mg-jobs', d), jobsList());
   }
   function jobsList() {
-    const a = M.activity;
-    if (!a.current && !(a.queue || []).length) return '<p class="muted">Nothing is downloading.</p>';
-    return `${jobLine(a.current, true)}${(a.queue || []).map((j) => jobLine(j, false)).join('')}`;
+    const run = runningJobs(), q = M.activity.queue || [];
+    if (!run.length && !q.length) return '<p class="muted">Nothing is downloading.</p>';
+    return `${run.map((j) => jobLine(j, true)).join('')}${q.map((j) => jobLine(j, false)).join('')}`;
   }
   function openJobs() {
     const dlg = NA.openOverlay(`<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="mgJT" id="mgJobsDlg" style="width:min(560px,100%)">
@@ -281,6 +300,9 @@
   // ---------------------------------------------------------------- series page
   let seriesTimer = null;
   async function renderSeries(main, slug, quiet) {
+    // Back on a kept page for this series: refresh it in place.
+    const keptSeries = $('#mgSeries', main);
+    if (!quiet && keptSeries && keptSeries.dataset.slug === slug) quiet = true;
     if (!quiet) {
       M.select = null; M.chShowAll = false; M.chFilter = 'all'; M.chQuery = '';
       main.innerHTML = `<div class="mg-hero mg-hero--sk"><div class="wrap"><div class="mg-sk" style="width:180px;aspect-ratio:2/3;border-radius:8px"></div></div></div>`;
@@ -319,7 +341,8 @@
     if (st.reading) primary = `<a class="btn btn--lg mg-hero__go" href="${readHref(slug, st.reading.key)}">${NA.icon('panels', 16)} Continue · Ch. ${NA.num(st.reading.number)}</a>`;
     else if (st.firstSaved) primary = `<a class="btn btn--lg mg-hero__go" href="${readHref(slug, st.firstSaved.key)}">${NA.icon('panels', 16)} Start reading</a>`;
     else primary = `<button type="button" class="btn btn--lg mg-hero__go" disabled>${busy ? `${NA.spinner(16)} Saving the first chapter…` : 'Nothing saved yet'}</button>`;
-    const next10 = st.pending.slice(0, 10).map((c) => c.key);
+    const next10 = busy ? [] : st.pending.slice(0, 10).map((c) => c.key);
+    const job = jobFor(slug);
     const hero = `<div class="mg-hero" style="--tone:${NA.toneOf(d.title)}"><div class="wrap mg-hero__in">
       <a class="mg-back" href="#/">${NA.icon('back', 16)} Library</a>
       <div class="mg-hero__row">
@@ -331,23 +354,24 @@
           ${d.description ? `<p class="mg-hero__desc mg-clamp" id="mgDesc">${esc(d.description)}</p>` : ''}
           <div class="mg-hero__acts">
             ${primary}
+            ${job ? `<button type="button" class="btn btn--lg mg-btn-o" id="mgBusyBtn" data-mact="stop" data-id="${job.id}" aria-label="Stop downloading ${esc(d.title)}">${NA.spinner(15)}<span class="mg-busy__t">${job.total ? `Stop · ${job.done}/${job.total}` : 'Stop'}</span></button>` : ''}
             ${next10.length ? `<button type="button" class="btn btn--lg mg-btn-o" data-mact="dl-next" data-keys="${next10.join(',')}">Download next ${next10.length}</button>` : ''}
-            ${st.pending.length > 10 ? `<button type="button" class="btn btn--lg mg-btn-o" data-mact="dl-all">All ${NA.num(st.pending.length)} remaining</button>` : ''}
+            ${!busy && st.pending.length > 10 ? `<button type="button" class="btn btn--lg mg-btn-o" data-mact="dl-all">All ${NA.num(st.pending.length)} remaining</button>` : ''}
             ${st.failed ? `<button type="button" class="btn btn--lg mg-btn-o" data-mact="retry">Retry ${NA.num(st.failed)} failed</button>` : ''}
             <button type="button" class="btn btn--lg mg-btn-o" data-mact="check">${NA.icon('refresh', 15)} Check for new</button>
             <button type="button" class="icon-btn mg-btn-o" data-mact="series-menu" aria-label="More actions" aria-haspopup="menu" aria-expanded="false">${NA.icon('more', 18, 2.4)}</button>
           </div>
         </div>
         <dl class="mg-stats">
-          <div><dt>saved</dt><dd>${NA.num(st.saved)}</dd></div>
-          <div><dt>chapters</dt><dd>${NA.num(st.live.length)}</dd></div>
-          <div><dt>on disk</dt><dd>${sizeOf(st.bytes)}</dd></div>
+          <div><dt>Chapters</dt><dd>${NA.num(st.live.length)}</dd></div>
+          <div><dt>Saved</dt><dd>${NA.num(st.saved)}</dd></div>
+          <div><dt>On disk</dt><dd>${sizeOf(st.bytes)}</dd></div>
         </dl>
       </div></div></div>`;
     const sel = M.select;
     const tools = `<div class="mg-tools">
       <h2 class="section-h" style="margin:0">Chapters</h2>
-      <label class="field mg-find">${NA.icon('search', 15)}<input type="search" id="mgFind" placeholder="Go to chapter…" aria-label="Go to chapter" value="${esc(M.chQuery)}"></label>
+      <label class="field mg-find">${NA.icon('search', 15)}<input type="search" id="mgFind" placeholder="Number or title" aria-label="Find a chapter" value="${esc(M.chQuery)}"></label>
       <div class="seg" role="group" aria-label="Filter chapters">${[['all', 'All'], ['ok', 'Saved'], ['todo', 'Not saved'], ['unread', 'Unread']].concat(st.failed ? [['failed', `Failed · ${st.failed}`]] : []).map(([k, l]) => `<button type="button" data-mfilter="${k}" aria-pressed="${M.chFilter === k}">${l}</button>`).join('')}</div>
       <div class="seg" role="group" aria-label="Order"><button type="button" data-morder="asc" aria-pressed="${M.chOrder === 'asc'}">Oldest first</button><button type="button" data-morder="desc" aria-pressed="${M.chOrder === 'desc'}">Newest first</button></div>
       <button type="button" class="btn btn--md" data-mact="select" aria-pressed="${!!sel}">${sel ? 'Done' : 'Select'}</button>
@@ -384,8 +408,7 @@
     if (M.chOrder === 'desc') list = list.slice().reverse();
     if (!list.length) return '<p class="mg-none">No chapters here.</p>';
     const limit = M.chShowAll || q ? list.length : 150;
-    const cur = M.activity.current;
-    const job = cur && cur.slug === d.slug ? cur : null;
+    const job = jobFor(d.slug);
     const sel = M.select;
     const rows = list.slice(0, limit).map((c) => {
       const ok = c.state === 'ok';
@@ -726,7 +749,14 @@
     webnovel: 'Free chapters. Locked ones are skipped.',
     empirenovel: 'Tick the check once; it’s remembered after that.',
     scribblehub: 'Follows “Next” from chapter 1.',
+    wattpad: 'Stories and their parts; Paid Stories parts are skipped.',
+    ao3: 'Works and chapters, Mature ones included. Members-only works need a login.',
+    uukanshu: 'Traditional Chinese. Search finds novels by their Chinese title.',
+    '69shuba': 'Simplified Chinese, fast updates. Paste its links; its search always asks you to verify.',
+    syosetu: 'Free Japanese web novels. Search uses the site’s official API.',
+    kakuyomu: 'Free Japanese web novels from Kadokawa.',
   };
+  const LANG_PILL = { zh: 'Chinese · translated', ja: 'Japanese · translated', ko: 'Korean · translated' };
   const tested = (v) => {
     const m = /(\d{4})-(\d{2})-(\d{2})/.exec(String(v || ''));
     if (!m) return '';
@@ -751,7 +781,7 @@
     let tone, label, kindLabel, note;
     if (kind === 'novel') {
       [tone, label] = NOVEL_STATUS[s.status] || ['direct', 'Works directly'];
-      kindLabel = 'Web novels';
+      kindLabel = LANG_PILL[s.language] || '';
       note = [NOVEL_NOTES[s.id] || '', tested(s.verified)].filter(Boolean).join(' ');
     } else {
       tone = s.status === 'tested' ? 'direct' : 'check';
@@ -762,9 +792,8 @@
     const host = (s.domains && s.domains[0]) || String(s.home || '').replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '');
     const needsWindow = tone !== 'direct';
     return `<article class="mg-site" data-key="s-${kind}-${esc(s.id)}">
-      <div class="mg-site__head"><span class="mg-site__tile" style="background:${NA.toneOf(s.name)}" aria-hidden="true">${esc(s.name.charAt(0))}</span>
-        <div style="min-width:0"><h3>${esc(s.name)}</h3><span class="muted">${esc(host)}</span></div></div>
-      <div class="mg-chips"><span class="pill">${esc(kindLabel)}</span><span class="mg-status mg-status--${tone}"><i></i>${esc(label)}</span></div>
+      <div class="mg-site__head"><div style="min-width:0"><h3>${esc(s.name)}</h3><span class="muted">${esc(host)}</span></div></div>
+      <div class="mg-chips">${kindLabel ? `<span class="pill">${esc(kindLabel)}</span>` : ''}<span class="mg-status mg-status--${tone}"><i></i>${esc(label)}</span></div>
       ${note ? `<p class="mg-site__note">${esc(note)}</p>` : ''}
       <div class="mg-site__acts">
         ${s.example ? `<button type="button" class="btn btn--sm" data-mact="try" data-url="${esc(s.example)}">Try an example</button>` : ''}
@@ -795,7 +824,7 @@
     const sel = (key, opts, label) => `<select class="select" data-mset="${key}" aria-label="${esc(label)}">${opts.map(([v, l]) => `<option value="${v}" ${String(s[key]) === String(v) ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
     const sw = (key, label) => `<span class="switch"><input type="checkbox" role="switch" data-mset="${key}" aria-label="${esc(label)}" ${s[key] ? 'checked' : ''}><span></span></span>`;
     return `<section class="set-group" id="manga" aria-labelledby="sM"><h2 class="section-h" id="sM">Manga</h2><div class="card">
-      ${row('Reading mode', 'Automatic uses pages right-to-left for Japanese manga and a long strip for manhwa and manhua. You can change it per series in the reader.', sel('readMode', [['auto', 'Automatic'], ['strip', 'Long strip'], ['rtl', 'Pages, right to left'], ['ltr', 'Pages, left to right'], ['spread', 'Two pages']], 'Manga reading mode'))}
+      ${row('Reading mode', 'How chapters open. A long strip scrolls up and down; pages turn with a swipe. You can change it per series in the reader.', sel('readMode', [['strip', 'Long strip (scroll)'], ['rtl', 'Pages, right to left'], ['ltr', 'Pages, left to right'], ['spread', 'Two pages']], 'Manga reading mode'))}
       ${row('Chapters at once', 'More is faster but busier for the site.', sel('chapterWorkers', [[1, '1'], [2, '2'], [3, '3'], [4, '4']], 'Chapters at once'))}
       ${row('Pages at once per chapter', 'Pages of one chapter download in parallel.', sel('pageWorkers', [[2, '2'], [4, '4'], [6, '6'], [8, '8']], 'Pages at once'))}
       ${row('Download new chapters automatically', 'When a check finds new chapters of a series you’re downloading, save them too.', sw('autoDownloadNew', 'Download new chapters automatically'))}
@@ -834,14 +863,21 @@
 
   function wireEvents() {
     NA.on('manga:queue', (a) => {
-      const was = M.activity.current && M.activity.current.slug;
-      M.activity = { current: a.current || null, queue: a.queue || [] };
+      const before = runningJobs().map((j) => j.slug);
+      const seriesWasBusy = !!(M.seriesSlug && busyWith(M.seriesSlug));
+      M.activity = { current: a.current || null, running: a.running || (a.current ? [a.current] : []), queue: a.queue || [] };
       paintJobs();
       shelfBadges();
-      if (was && (!a.current || a.current.slug !== was)) refreshLib();
-      if (M.seriesSlug && NA.route().name === 'manga') refreshSeries();
+      // A series that stopped downloading: its card changes.
+      const now = new Set(runningJobs().map((j) => j.slug));
+      if (before.some((slug) => !now.has(slug))) refreshLib();
+      // Redraw the open series page only when its own download starts or ends.
+      if (M.seriesSlug && NA.route().name === 'manga' && busyWith(M.seriesSlug) !== seriesWasBusy) refreshSeries();
     });
     NA.on('manga:progress', (j) => {
+      const run = M.activity.running || [];
+      const i = run.findIndex((x) => x.id === j.id);
+      if (i >= 0) run[i] = j;
       if (M.activity.current && M.activity.current.id === j.id) M.activity.current = j;
       paintJobs();
       readerProgress(j);
@@ -892,7 +928,7 @@
       const a = t.dataset.mact;
       if (a === 'close') { e.preventDefault(); NA.closeOverlay(); if (t.getAttribute('href')) location.hash = t.getAttribute('href'); return; }
       if (a === 'card-menu') { e.preventDefault(); seriesMenu(t, t.dataset.slug); return; }
-      if (a === 'stop') { call('CancelCurrent').catch(() => {}); return; }
+      if (a === 'stop') { (t.dataset.id ? call('CancelJob', +t.dataset.id) : call('CancelCurrent')).catch(() => {}); return; }
       if (a === 'stop-all') { call('CancelAll').catch(() => {}); return; }
       if (a === 'unqueue') { call('RemoveQueued', +t.dataset.id).catch(() => {}); return; }
       if (a === 'try') { NA.addLink(t.dataset.url); return; }

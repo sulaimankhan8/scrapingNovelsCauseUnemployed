@@ -22,6 +22,10 @@ export function CancelCurrent() {
   return window['go']['main']['MangaApp']['CancelCurrent']();
 }
 
+export function CancelJob(arg1) {
+  return window['go']['main']['MangaApp']['CancelJob'](arg1);
+}
+
 export function Chapter(arg1, arg2) {
   return window['go']['main']['MangaApp']['Chapter'](arg1, arg2);
 }

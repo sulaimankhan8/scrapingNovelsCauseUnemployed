@@ -171,6 +171,8 @@ func (a *Service) runJob(ctx context.Context, j *job) {
 	switch j.Kind {
 	case "update":
 		a.runUpdate(ctx, j)
+	case "translate":
+		a.runTranslate(ctx, j)
 	default:
 		a.emit("status", map[string]any{"message": "Reading the novel's page…"})
 		n, err := a.discover(ctx, j.URL)
@@ -180,6 +182,28 @@ func (a *Service) runJob(ctx context.Context, j *job) {
 		}
 		a.runDownload(ctx, j, n, j.Opts, false)
 	}
+}
+
+// runTranslate translates a foreign novel's title and saved chapters.
+func (a *Service) runTranslate(ctx context.Context, j *job) {
+	b, err := a.store.Load(j.Slug)
+	if err != nil {
+		a.fail(ctx, err, j)
+		return
+	}
+	todo := a.arch.Untranslated(b)
+	a.emit("started", map[string]any{"slug": b.Slug, "title": b.Title, "stage": "translating"})
+	if err := a.arch.TranslateAll(ctx, b, a.emit); err != nil {
+		a.fail(ctx, err, j)
+		return
+	}
+	left := a.arch.Untranslated(b)
+	ok, failed, locked, _ := b.Counts()
+	a.emit("done", map[string]any{
+		"kind": "translate", "slug": b.Slug, "title": b.Title, "catalogUrl": "/library/" + b.Slug + "/",
+		"ok": ok, "failed": failed, "locked": locked, "total": len(b.Chapters),
+		"translated": todo - left, "untranslated": left, "sizeBytes": a.store.Size(b.Slug),
+	})
 }
 
 // before is what an update compares against to build its summary.

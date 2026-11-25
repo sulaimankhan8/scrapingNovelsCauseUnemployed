@@ -770,7 +770,8 @@
       "novel": {
         "title": "h1.p-novel__title",
         "author": ".p-novel__author a, .p-novel__author",
-        "description": "#novel_ex"
+        "description": "#novel_ex",
+        "cover": "none"
       },
       "toc": {
         "strategy": "paginated",

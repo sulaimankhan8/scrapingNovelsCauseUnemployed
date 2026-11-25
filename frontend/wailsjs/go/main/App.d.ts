@@ -72,6 +72,8 @@ export function ShowNovelFolder(arg1:string):Promise<void>;
 
 export function StartScrape(arg1:service.ScrapeOptions):Promise<Record<string, any>>;
 
+export function TranslateNovel(arg1:string):Promise<Record<string, any>>;
+
 export function UpdateAll(arg1:boolean):Promise<Record<string, any>>;
 
 export function UpdateNovel(arg1:string):Promise<Record<string, any>>;

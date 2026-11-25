@@ -106,6 +106,8 @@ func (c *Core) callManga(method string, args []json.RawMessage) (out any, err er
 		m.RemoveQueued(num(0))
 	case "CancelCurrent":
 		m.CancelCurrent()
+	case "CancelJob":
+		m.CancelJob(num(0))
 	case "CancelAll":
 		m.CancelAll()
 	case "GetSettings":

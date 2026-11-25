@@ -28,6 +28,9 @@ const (
 	StateOK      = "ok"
 	StateFailed  = "failed"
 	StateLocked  = "locked"
+	// StateGone is a chapter number the site doesn't have (a numbered-URL
+	// site that skipped it). It isn't a failure, and Retry leaves it alone.
+	StateGone = "gone"
 )
 
 // Chapter is one entry of a stored book.
@@ -37,6 +40,9 @@ type Chapter struct {
 	URL    string `json:"url,omitempty"`
 	Index  int    `json:"index"`
 	Locked bool   `json:"locked,omitempty"`
+	// AltURL is where the chapter really is, when the guessed URL (numbered
+	// TOCs) was wrong and the previous chapter's Next link led elsewhere.
+	AltURL string `json:"altUrl,omitempty"`
 	State  string `json:"state,omitempty"`
 	Error  string `json:"error,omitempty"`
 	Words  int    `json:"words,omitempty"`
@@ -108,11 +114,24 @@ func (b *Book) Counts() (ok, failed, locked, pending int) {
 			failed++
 		case StateLocked:
 			locked++
+		case StateGone:
+			// not on the site: in no bucket
 		default:
 			pending++
 		}
 	}
 	return
+}
+
+// GoneCount is how many chapter numbers the site doesn't have.
+func (b *Book) GoneCount() int {
+	n := 0
+	for _, c := range b.Chapters {
+		if c.State == StateGone {
+			n++
+		}
+	}
+	return n
 }
 
 // Store is the on-disk library.

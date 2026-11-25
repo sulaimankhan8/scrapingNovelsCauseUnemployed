@@ -56,7 +56,7 @@ type Settings struct {
 }
 
 func defaultSettings() Settings {
-	return Settings{ChapterWorkers: 2, PageWorkers: 4, AutoDownloadNew: true, ReadMode: "auto", Notify: true}
+	return Settings{ChapterWorkers: 2, PageWorkers: 4, AutoDownloadNew: true, ReadMode: "strip", Notify: true}
 }
 
 // Service is the whole app minus the window: library, queue, engine.
@@ -69,8 +69,9 @@ type Service struct {
 	mu         sync.Mutex
 	settings   Settings
 	queue      []*Job
-	current    *Job
-	cancel     context.CancelFunc
+	running    []*Job                     // jobs downloading now, oldest first
+	cancels    map[int]context.CancelFunc // by job id
+	siteIDs    map[string]string          // series slug -> site id (for canStart)
 	nextID     int
 	wake       chan struct{}
 	stopped    chan struct{}
@@ -105,9 +106,16 @@ type Job struct {
 
 // Activity is the queue as the UI shows it.
 type Activity struct {
+	// Current is the oldest running job (nil when idle). Running lists
+	// every job downloading now: different series run side by side, at
+	// most one per site.
 	Current *Job  `json:"current"`
+	Running []Job `json:"running"`
 	Queue   []Job `json:"queue"`
 }
+
+// maxParallel is how many series download at the same time.
+const maxParallel = 3
 
 // NewService opens the library and starts the download worker.
 func NewService(root string, o ServiceOptions) (*Service, error) {
@@ -208,9 +216,10 @@ func normSettings(st Settings) Settings {
 	st.ChapterWorkers = max(1, min(st.ChapterWorkers, 4))
 	st.PageWorkers = max(1, min(st.PageWorkers, 8))
 	switch st.ReadMode {
-	case "auto", "strip", "rtl", "ltr":
+	case "strip", "rtl", "ltr", "spread":
 	default:
-		st.ReadMode = "auto"
+		// "auto" (pages for Japanese manga) is gone: scrolling is the default.
+		st.ReadMode = "strip"
 	}
 	return st
 }
@@ -469,9 +478,12 @@ func (s *Service) emitQueue() { s.emit("queue", s.Activity()) }
 func (s *Service) Activity() Activity {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	a := Activity{Queue: []Job{}}
-	if s.current != nil {
-		c := *s.current
+	a := Activity{Queue: []Job{}, Running: []Job{}}
+	for _, j := range s.running {
+		a.Running = append(a.Running, *j)
+	}
+	if len(a.Running) > 0 {
+		c := a.Running[0]
 		a.Current = &c
 	}
 	for _, j := range s.queue {
@@ -493,53 +505,123 @@ func (s *Service) RemoveQueued(id int) {
 	s.emitQueue()
 }
 
-// CancelCurrent stops the running job (saved chapters stay).
+// CancelCurrent stops every running job (saved chapters stay).
 func (s *Service) CancelCurrent() {
 	s.mu.Lock()
-	if s.cancel != nil {
-		s.cancel()
+	for _, c := range s.cancels {
+		c()
 	}
 	s.mu.Unlock()
+}
+
+// CancelJob stops one running job, or drops it if it's still waiting.
+func (s *Service) CancelJob(id int) {
+	s.mu.Lock()
+	if c, ok := s.cancels[id]; ok {
+		c()
+		s.mu.Unlock()
+		return
+	}
+	s.mu.Unlock()
+	s.RemoveQueued(id)
 }
 
 // CancelAll empties the queue and stops the running job.
 func (s *Service) CancelAll() {
 	s.mu.Lock()
 	s.queue = nil
-	if s.cancel != nil {
-		s.cancel()
+	for _, c := range s.cancels {
+		c()
 	}
 	s.mu.Unlock()
 	s.emitQueue()
 }
 
+// worker starts queued jobs: up to maxParallel at once, never two for the
+// same series or the same site (so each site sees one job's traffic, as
+// before, and sites read through the one site window never collide).
 func (s *Service) worker() {
 	defer close(s.stopped)
+	var wg sync.WaitGroup
+	defer wg.Wait()
 	for {
 		s.mu.Lock()
-		var j *Job
-		if len(s.queue) > 0 {
-			j, s.queue = s.queue[0], s.queue[1:]
-			ctx, cancel := context.WithCancel(s.ctx)
-			s.current, s.cancel = j, cancel
-			j.Started = time.Now()
-			s.mu.Unlock()
-			s.emitQueue()
-			s.run(ctx, j)
-			cancel()
-			s.mu.Lock()
-			s.current, s.cancel = nil, nil
-			s.mu.Unlock()
+		started := false
+		if len(s.running) < maxParallel {
+			for i, j := range s.queue {
+				if !s.canStart(j) {
+					continue
+				}
+				s.queue = append(s.queue[:i:i], s.queue[i+1:]...)
+				ctx, cancel := context.WithCancel(s.ctx)
+				if s.cancels == nil {
+					s.cancels = map[int]context.CancelFunc{}
+				}
+				s.running = append(s.running, j)
+				s.cancels[j.ID] = cancel
+				j.Started = time.Now()
+				started = true
+				wg.Add(1)
+				go func(j *Job) {
+					defer wg.Done()
+					s.run(ctx, j)
+					cancel()
+					s.mu.Lock()
+					for k, r := range s.running {
+						if r == j {
+							s.running = append(s.running[:k:k], s.running[k+1:]...)
+							break
+						}
+					}
+					delete(s.cancels, j.ID)
+					s.mu.Unlock()
+					s.emitQueue()
+					select {
+					case s.wake <- struct{}{}:
+					default:
+					}
+				}(j)
+				break
+			}
+		}
+		s.mu.Unlock()
+		if started {
 			s.emitQueue()
 			continue
 		}
-		s.mu.Unlock()
 		select {
 		case <-s.wake:
 		case <-s.ctx.Done():
 			return
 		}
 	}
+}
+
+// canStart: j's series and site aren't busy. Call with s.mu held.
+func (s *Service) canStart(j *Job) bool {
+	site := s.siteOf(j.Slug)
+	for _, r := range s.running {
+		if r.Slug == j.Slug || (site != "" && s.siteOf(r.Slug) == site) {
+			return false
+		}
+	}
+	return true
+}
+
+// siteOf is the site id a series downloads from ("" if unknown).
+func (s *Service) siteOf(slug string) string {
+	if s.siteIDs == nil {
+		s.siteIDs = map[string]string{}
+	}
+	if id, ok := s.siteIDs[slug]; ok {
+		return id
+	}
+	b, err := s.store.Load(slug)
+	if err != nil {
+		return ""
+	}
+	s.siteIDs[slug] = b.SiteID
+	return b.SiteID
 }
 
 func (s *Service) setJob(j *Job, f func(*Job)) {
@@ -846,13 +928,11 @@ func (s *Service) readMode(b *Book) string {
 	if b.ReadMode != "" {
 		return b.ReadMode
 	}
-	if m := s.GetSettings().ReadMode; m != "auto" {
+	if m := s.GetSettings().ReadMode; m != "" && m != "auto" {
 		return m
 	}
-	t := strings.ToLower(b.Type)
-	if strings.HasPrefix(t, "manga") && !strings.Contains(t, "manhwa") {
-		return "rtl"
-	}
+	// Scrolling down a long strip is the default for every kind; pages
+	// (right-to-left or left-to-right) are a choice in the reader.
 	return "strip"
 }
 
@@ -949,14 +1029,21 @@ func (s *Service) RetryFailed(slug string) error {
 	if err != nil {
 		return err
 	}
+	// Only the chapters that failed: chapters never asked for stay as
+	// they are.
+	var keys []int
 	s.updateBook(slug, func(b *Book) {
 		for i := range b.Chapters {
 			if b.Chapters[i].State == StateFailed {
 				b.Chapters[i].State, b.Chapters[i].Error = StatePending, ""
+				keys = append(keys, b.Chapters[i].Key)
 			}
 		}
 	})
-	s.enqueue(&Job{Kind: "download", Slug: slug, Title: b.Title})
+	if len(keys) == 0 {
+		return nil
+	}
+	s.enqueue(&Job{Kind: "download", Slug: slug, Title: b.Title, Keys: keys})
 	return nil
 }
 
@@ -982,7 +1069,10 @@ func (s *Service) CheckAll(auto bool) int {
 // DeleteSeries removes a series and its files.
 func (s *Service) DeleteSeries(slug string) error {
 	s.mu.Lock()
-	busy := s.current != nil && s.current.Slug == slug
+	busy := false
+	for _, r := range s.running {
+		busy = busy || r.Slug == slug
+	}
 	var keep []*Job
 	for _, j := range s.queue {
 		if j.Slug != slug {
@@ -992,7 +1082,15 @@ func (s *Service) DeleteSeries(slug string) error {
 	s.queue = keep
 	s.mu.Unlock()
 	if busy {
-		s.CancelCurrent()
+		s.mu.Lock()
+		for _, r := range s.running {
+			if r.Slug == slug {
+				if c := s.cancels[r.ID]; c != nil {
+					c()
+				}
+			}
+		}
+		s.mu.Unlock()
 		time.Sleep(300 * time.Millisecond)
 	}
 	s.bookMu.Lock()

@@ -74,7 +74,7 @@ func New(libraryDir string, events Events, driver BrowserDriver) (*Core, error) 
 		})
 		svc.SetBrowser(site)
 	}
-	c := &Core{svc: svc, reader: &reader.Handler{Store: svc.Store()}}
+	c := &Core{svc: svc, reader: &reader.Handler{Store: svc.Store(), Translate: svc.TranslateChapter}}
 
 	mopts := manga.ServiceOptions{
 		NoBrowser: site == nil,
@@ -228,6 +228,8 @@ func (c *Core) Call(method string, argsJSON string) (string, error) {
 		out, err = c.svc.UpdateNovel(str(0))
 	case "RetryMissing":
 		out, err = c.svc.RetryMissing(str(0))
+	case "TranslateNovel":
+		out, err = c.svc.TranslateNovel(str(0))
 	case "CatchUp":
 		out, err = c.svc.CatchUp()
 	case "RedownloadNovel":
