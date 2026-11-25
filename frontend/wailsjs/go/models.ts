@@ -697,6 +697,30 @@ export namespace service {
 		    return a;
 		}
 	}
+	export class ChapterCount {
+	    url: string;
+	    total: number;
+	    free: number;
+	    latest?: string;
+	    status?: string;
+	    unknown?: boolean;
+	    existingSlug?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChapterCount(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.url = source["url"];
+	        this.total = source["total"];
+	        this.free = source["free"];
+	        this.latest = source["latest"];
+	        this.status = source["status"];
+	        this.unknown = source["unknown"];
+	        this.existingSlug = source["existingSlug"];
+	    }
+	}
 	export class ChapterRow {
 	    number: number;
 	    title: string;
@@ -726,6 +750,22 @@ export namespace service {
 	    }
 	}
 	
+	export class EnglishInfo {
+	    title: string;
+	    author: string;
+	    description: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new EnglishInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.title = source["title"];
+	        this.author = source["author"];
+	        this.description = source["description"];
+	    }
+	}
 	export class DiscoverResult {
 	    siteId: string;
 	    siteName: string;
@@ -736,6 +776,8 @@ export namespace service {
 	    description: string;
 	    status?: string;
 	    chapters: source.ChapterRef[];
+	    language: string;
+	    altNames?: string[];
 	    tocMode: string;
 	    firstChapterUrl?: string;
 	    inputKind: string;
@@ -746,6 +788,7 @@ export namespace service {
 	    existingSlug?: string;
 	    coverData?: string;
 	    downloaded: number;
+	    english?: EnglishInfo;
 	
 	    static createFrom(source: any = {}) {
 	        return new DiscoverResult(source);
@@ -762,6 +805,8 @@ export namespace service {
 	        this.description = source["description"];
 	        this.status = source["status"];
 	        this.chapters = this.convertValues(source["chapters"], source.ChapterRef);
+	        this.language = source["language"];
+	        this.altNames = source["altNames"];
 	        this.tocMode = source["tocMode"];
 	        this.firstChapterUrl = source["firstChapterUrl"];
 	        this.inputKind = source["inputKind"];
@@ -772,6 +817,7 @@ export namespace service {
 	        this.existingSlug = source["existingSlug"];
 	        this.coverData = source["coverData"];
 	        this.downloaded = source["downloaded"];
+	        this.english = this.convertValues(source["english"], EnglishInfo);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -792,6 +838,7 @@ export namespace service {
 		    return a;
 		}
 	}
+	
 	export class ExportResult {
 	    path: string;
 	    fileName: string;
@@ -1033,6 +1080,137 @@ export namespace service {
 	        this.fromPasted = source["fromPasted"];
 	    }
 	}
+	export class SearchHit {
+	    siteId: string;
+	    siteName: string;
+	    url: string;
+	    title: string;
+	    author?: string;
+	    cover?: string;
+	    latest?: string;
+	    chapters?: number;
+	    language?: string;
+	    titleOriginal?: string;
+	    existingSlug?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new SearchHit(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.siteId = source["siteId"];
+	        this.siteName = source["siteName"];
+	        this.url = source["url"];
+	        this.title = source["title"];
+	        this.author = source["author"];
+	        this.cover = source["cover"];
+	        this.latest = source["latest"];
+	        this.chapters = source["chapters"];
+	        this.language = source["language"];
+	        this.titleOriginal = source["titleOriginal"];
+	        this.existingSlug = source["existingSlug"];
+	    }
+	}
+	export class SearchGroup {
+	    key: string;
+	    title: string;
+	    author?: string;
+	    cover?: string;
+	    mostChapters: number;
+	    hits: SearchHit[];
+	
+	    static createFrom(source: any = {}) {
+	        return new SearchGroup(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.key = source["key"];
+	        this.title = source["title"];
+	        this.author = source["author"];
+	        this.cover = source["cover"];
+	        this.mostChapters = source["mostChapters"];
+	        this.hits = this.convertValues(source["hits"], SearchHit);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	export class SiteSearch {
+	    id: string;
+	    name: string;
+	    found: number;
+	    error?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new SiteSearch(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	        this.found = source["found"];
+	        this.error = source["error"];
+	    }
+	}
+	export class SearchResult {
+	    query: string;
+	    groups: SearchGroup[];
+	    sites: SiteSearch[];
+	    pending?: string[];
+	    optInSites?: string[];
+	    foreignLanguages?: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new SearchResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.query = source["query"];
+	        this.groups = this.convertValues(source["groups"], SearchGroup);
+	        this.sites = this.convertValues(source["sites"], SiteSearch);
+	        this.pending = source["pending"];
+	        this.optInSites = source["optInSites"];
+	        this.foreignLanguages = source["foreignLanguages"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	
 	export class SiteInfo {
 	    id: string;
@@ -1043,6 +1221,7 @@ export namespace service {
 	    status: string;
 	    fetchMode: string;
 	    verified: string;
+	    language: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new SiteInfo(source);
@@ -1058,8 +1237,10 @@ export namespace service {
 	        this.status = source["status"];
 	        this.fetchMode = source["fetchMode"];
 	        this.verified = source["verified"];
+	        this.language = source["language"];
 	    }
 	}
+	
 	export class SystemStats {
 	    totalNovels: number;
 	    totalRawChapters: number;

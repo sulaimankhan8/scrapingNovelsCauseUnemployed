@@ -18,8 +18,10 @@ import (
 
 	"novelarchiver/internal/clean"
 	"novelarchiver/internal/fetch"
+	"novelarchiver/internal/lang"
 	"novelarchiver/internal/library"
 	"novelarchiver/internal/source"
+	"novelarchiver/internal/translate"
 )
 
 // Emit sends a UI event ("started", "status", "progress", "done", "error").
@@ -83,6 +85,9 @@ type Archiver struct {
 	Engine *source.Engine
 	Store  *library.Store
 	Files  fetch.Fetcher // used for covers and images
+	// Translator puts chapters of Chinese, Japanese and Korean novels into
+	// English as they download (nil: no translation).
+	Translator translate.Translator
 }
 
 // BookFromNovel merges a fresh discovery into the stored book (if any), so
@@ -97,11 +102,26 @@ func (a *Archiver) BookFromNovel(n *source.Novel) (*library.Book, error) {
 			return nil, err
 		}
 	} else {
-		b = &library.Book{Slug: a.Store.NewSlug(n.Title)}
+		name := n.Title
+		if lang.NeedsTranslation(n.Language) {
+			name = foreignSlug(n.SiteID, n.URL)
+		}
+		b = &library.Book{Slug: a.Store.NewSlug(name)}
 	}
 	b.SiteID, b.SiteName, b.URL = n.SiteID, n.SiteName, n.URL
-	b.Title, b.Author, b.Description, b.Status = n.Title, n.Author, n.Description, n.Status
+	if lang.NeedsTranslation(n.Language) && b.OriginalTitle == n.Title && b.Title != "" && b.Title != n.Title {
+		// Already translated: keep the English, refresh the originals.
+		b.OriginalAuthor, b.OriginalDescription, b.Status = n.Author, n.Description, n.Status
+	} else {
+		b.Title, b.Author, b.Description, b.Status = n.Title, n.Author, n.Description, n.Status
+		if lang.NeedsTranslation(n.Language) {
+			b.OriginalTitle, b.OriginalAuthor, b.OriginalDescription = n.Title, n.Author, n.Description
+		}
+	}
 	b.CoverURL, b.TOCMode, b.Vars = n.Cover, n.TOCMode, n.Vars
+	if n.Language != "" && n.Language != "en" {
+		b.Language = n.Language
+	}
 	if b.FirstChapterURL == "" || n.InputKind != "chapter" {
 		b.FirstChapterURL = n.FirstChapterURL
 	}
@@ -116,6 +136,10 @@ func (a *Archiver) BookFromNovel(n *source.Novel) (*library.Book, error) {
 			c := library.Chapter{Number: r.Number, Title: r.Title, URL: r.URL, Index: r.Index, Locked: r.Locked}
 			if prev, ok := old[chapterKey(r.URL, r.Index)]; ok && prev.Number == r.Number {
 				c.State, c.Error, c.Words = prev.State, prev.Error, prev.Words
+				c.Translated, c.TranslateError = prev.Translated, prev.TranslateError
+				if prev.TitleOriginal != "" && prev.TitleOriginal == r.Title {
+					c.TitleOriginal, c.Title = prev.TitleOriginal, prev.Title // keep the English title
+				}
 			}
 			if c.Locked {
 				c.State = library.StateLocked
@@ -156,6 +180,7 @@ func (a *Archiver) Run(ctx context.Context, b *library.Book, novel *source.Novel
 	if err := a.Store.Save(b); err != nil {
 		return err
 	}
+	a.translateBook(ctx, b)
 	emit("started", map[string]any{"slug": b.Slug, "title": b.Title, "stage": "scraping"})
 	if changed := a.saveCover(ctx, b); changed && opts.Result != nil {
 		opts.Result.CoverChanged = true
@@ -169,6 +194,9 @@ func (a *Archiver) Run(ctx context.Context, b *library.Book, novel *source.Novel
 	}
 	if err == nil && opts.Revise != 0 {
 		err = a.revise(ctx, b, novel, opts, emit)
+	}
+	if err == nil {
+		err = a.translatePending(ctx, b, emit)
 	}
 	if saveErr := a.Store.Save(b); err == nil {
 		err = saveErr
@@ -270,11 +298,19 @@ func (a *Archiver) downloadList(ctx context.Context, b *library.Book, novel *sou
 				if jobCtx.Err() != nil && state != library.StateOK {
 					return
 				}
+				var tr *translated
+				if state == library.StateOK && a.shouldTranslate(b) {
+					t := a.translateOne(jobCtx, b, ref.Number)
+					tr = &t
+				}
 				mu.Lock()
 				c := &b.Chapters[i]
 				c.State, c.Words, c.Error = state, words, errMsg
 				if title != "" && (c.Title == "" || strings.HasPrefix(c.Title, "Chapter ") && len(c.Title) <= len("Chapter 00000")) {
 					c.Title = title // sequential TOCs only know "Chapter N"
+				}
+				if tr != nil {
+					tr.apply(c)
 				}
 				ref.Title = c.Title
 				mu.Unlock()
@@ -377,6 +413,9 @@ func (a *Archiver) crawl(ctx context.Context, b *library.Book, novel *source.Nov
 			return err
 		}
 		b.Chapters = append(b.Chapters, library.Chapter{Number: num, Title: ch.Title, URL: next, State: library.StateOK, Words: words})
+		if a.shouldTranslate(b) {
+			a.translateOne(ctx, b, num).apply(&b.Chapters[len(b.Chapters)-1])
+		}
 		if b.Vars == nil {
 			b.Vars = map[string]string{}
 		}

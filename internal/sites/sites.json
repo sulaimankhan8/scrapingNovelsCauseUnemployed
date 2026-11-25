@@ -66,7 +66,8 @@
         "title": "h3.title, meta[property='og:title']@content",
         "author": ".info a[href*='/author/']",
         "cover": ".book img@src",
-        "description": ".desc-text"
+        "description": ".desc-text",
+        "altNames": "div.info > div:has(h3:contains(\"Alternative\"))"
       },
       "toc": {
         "strategy": "paginated",
@@ -86,6 +87,18 @@
           "[id^='pf-']"
         ],
         "next": "#next_chap@href"
+      },
+      "search": {
+        "page": "https://novelfull.com/search?keyword={query}",
+        "fetchMode": "http",
+        "item": "#list-page .list-truyen > .row",
+        "title": "h3.truyen-title a@title, h3.truyen-title a",
+        "link": "h3.truyen-title a@href",
+        "cover": "img.cover@data-src|src",
+        "author": ".author",
+        "latest": ".text-info a@title",
+        "chapters": ".text-info a@title ~ (?i)chapter\\s*([\\d,]+)",
+        "verified": "Verified 2026-11-25 over plain HTTP."
       }
     },
     {
@@ -110,7 +123,8 @@
         "author": ".info-meta a[href*='/authors/']",
         "cover": ".book img@src",
         "description": ".desc-text",
-        "id": "[data-novel-id]@data-novel-id"
+        "id": "[data-novel-id]@data-novel-id",
+        "altNames": "ul.info > li:has(h3:contains(\"Alternative\"))"
       },
       "toc": {
         "strategy": "ajax",
@@ -128,6 +142,18 @@
           ".ads"
         ],
         "next": "#next_chap@href"
+      },
+      "search": {
+        "page": "https://readnovelfull.com/novel-list/search?keyword={query}",
+        "fetchMode": "http",
+        "item": "#list-page .list-novel > .row",
+        "title": "h3.novel-title a@title, h3.novel-title a",
+        "link": "h3.novel-title a@href",
+        "cover": "img.cover@data-src|src",
+        "author": ".author",
+        "latest": ".text-info a@title",
+        "chapters": ".text-info a@title ~ (?i)chapter\\s*([\\d,]+)",
+        "verified": "Verified 2026-11-25 over plain HTTP."
       }
     },
     {
@@ -170,6 +196,18 @@
           ".ads"
         ],
         "next": "a[data-chapter-nav='next']@data-chapter-url"
+      },
+      "search": {
+        "page": "https://novelping.com/search?keyword={query}",
+        "fetchMode": "http",
+        "item": "#search-results > .row",
+        "title": "h3.novel-title a@title, h3.novel-title a",
+        "link": "h3.novel-title a@href",
+        "cover": "img.cover@data-src|src",
+        "author": ".author",
+        "latest": ".text-info a@title",
+        "chapters": ".text-info a@title ~ (?i)chapter\\s*([\\d,]+)",
+        "verified": "Verified 2026-11-25 over plain HTTP."
       }
     },
     {
@@ -211,6 +249,17 @@
         "removeHiddenByPageCss": true,
         "next": "a.btn-primary[href*='/chapter/']:contains('Next')@href",
         "notes": "Paragraph classes are randomised. The page CSS hides decoy anti-piracy paragraphs (display:none), and those must be dropped. System screens are often <table> elements, so keep tables."
+      },
+      "search": {
+        "page": "https://www.royalroad.com/fictions/search?title={query}",
+        "fetchMode": "browser",
+        "item": ".fiction-list-item",
+        "title": "h2.fiction-title a",
+        "link": "h2.fiction-title a@href",
+        "cover": "figure img@src",
+        "chapters": ".stats span ~ ([\\d,]+)\\s*Chapters",
+        "verified": "Verified 2026-11-25 through the site browser (12 results). Royal Road refuses the app's own HTTP client, and the first visit in a session shows a Cloudflare 'verify you are human' check in the site window, so it's only searched when the user asks.",
+        "optIn": true
       }
     },
     {
@@ -289,6 +338,17 @@
           "div[align='center']"
         ],
         "next": "#next_url@href"
+      },
+      "search": {
+        "page": "https://freewebnovel.com/search?keyword={query}",
+        "fetchMode": "http",
+        "item": ".li-row:has(h3.tit)",
+        "title": "h3.tit a@title, h3.tit a",
+        "link": "h3.tit a@href",
+        "cover": ".pic img@src",
+        "latest": "a.chapter@title",
+        "chapters": "a.chapter ~ ([\\d,]+)\\s*Chapters",
+        "verified": "Verified 2026-11-25 over plain HTTP."
       }
     },
     {
@@ -333,6 +393,16 @@
           "script"
         ],
         "next": "a[rel='next'].nextchap@href"
+      },
+      "search": {
+        "page": "https://novelfire.net/search?keyword={query}",
+        "fetchMode": "http",
+        "item": "ul.novel-list li.novel-item",
+        "title": "a@title, .novel-title",
+        "link": "a@href",
+        "cover": "img@data-src|src",
+        "chapters": ".novel-stats ~ ([\\d,]+)\\s*Chapters",
+        "verified": "Verified 2026-11-25 over plain HTTP."
       }
     },
     {
@@ -377,6 +447,15 @@
         ],
         "next": "link[rel=next]@href",
         "notes": "Verified 2026-11-22 through the in-app browser. Paid chapters are marked locked from the catalog and skipped."
+      },
+      "search": {
+        "page": "https://www.webnovel.com/search?keywords={query}",
+        "fetchMode": "browser",
+        "item": "li:has(a.g_thumb[data-search-type='book'])",
+        "title": "h3 a@title, h3 a",
+        "link": "h3 a@href",
+        "cover": "a.g_thumb img@data-original|src",
+        "verified": "Verified 2026-11-25: the page answers curl, but WebNovel refuses the app's own HTTP client, so search goes through the site browser. The results page doesn't show chapter counts."
       }
     },
     {
@@ -458,6 +537,300 @@
           "h1:empty"
         ],
         "next": "a.btn-next@href"
+      },
+      "search": {
+        "page": "https://www.scribblehub.com/?s={query}&post_type=fictionposts",
+        "fetchMode": "browser",
+        "item": ".search_main_box",
+        "title": ".search_title a",
+        "link": ".search_title a@href",
+        "cover": ".search_img img@src",
+        "author": ".a_un_st",
+        "chapters": ".search_stats span ~ ([\\d,]+)\\s*Chapters",
+        "verified": "Not verified yet: the search page shows a Cloudflare check, so it only runs when the user asks for it and can tick the check in the site window.",
+        "optIn": true
+      }
+    },
+    {
+      "id": "wattpad",
+      "name": "Wattpad",
+      "domains": [
+        "wattpad.com",
+        "m.wattpad.com"
+      ],
+      "status": "verified",
+      "fetchMode": "http",
+      "verified": "Verified 2026-11-25 over plain HTTP: story details and the part list come from Wattpad's public JSON API, chapter text from its storytext endpoint. Paid Stories parts are locked and are skipped.",
+      "home": "https://www.wattpad.com",
+      "example": "https://www.wattpad.com/story/32736-the-vampire%27s-maid",
+      "input": {
+        "novelUrl": "^https?://(www\\.|m\\.)?wattpad\\.com/story/(?<id>\\d+)",
+        "chapterUrl": "^https?://(www\\.|m\\.)?wattpad\\.com/(?<part>\\d+)(-[^/?#]*)?/?(\\?.*)?$",
+        "novelFromChapter": "a.on-navigate[href^='/story/']@href"
+      },
+      "novel": {
+        "api": "https://www.wattpad.com/api/v3/stories/{id}?fields=id,title,user(name),cover,description,completed",
+        "fields": {
+          "id": "id",
+          "title": "title",
+          "author": "user.name",
+          "cover": "cover",
+          "description": "description",
+          "status": "completed"
+        }
+      },
+      "toc": {
+        "strategy": "api",
+        "api": "https://www.wattpad.com/api/v3/stories/{id}?fields=parts(id,title,url)",
+        "listPath": "parts",
+        "titleField": "title",
+        "urlField": "url"
+      },
+      "chapter": {
+        "strategy": "api",
+        "api": "https://www.wattpad.com/apiv2/?m=storytext&id={chapterId}",
+        "idFromUrl": "wattpad\\.com/(\\d+)",
+        "format": "html"
+      },
+      "search": {
+        "page": "https://www.wattpad.com/v4/search/stories?query={query}&limit=20&mature=true&fields=stories(id,title,user(name),cover,numParts,url)",
+        "fetchMode": "http",
+        "json": {
+          "path": "stories",
+          "title": "title",
+          "link": "url",
+          "author": "user.name",
+          "cover": "cover",
+          "chapters": "numParts"
+        },
+        "verified": "Verified 2026-11-25 over plain HTTP (Wattpad's public search API). The count is the number of parts."
+      }
+    },
+    {
+      "id": "ao3",
+      "name": "Archive of Our Own",
+      "domains": [
+        "archiveofourown.org",
+        "ao3.org"
+      ],
+      "status": "verified",
+      "fetchMode": "http",
+      "verified": "Verified 2026-11-25 over plain HTTP. Every request carries view_adult=true, so works rated Mature or Explicit show their text instead of AO3's warning page. Works locked to AO3 members need a login and aren't supported.",
+      "home": "https://archiveofourown.org",
+      "example": "https://archiveofourown.org/works/41952030",
+      "query": "view_adult=true",
+      "input": {
+        "novelUrl": "^https?://(www\\.)?(archiveofourown\\.org|ao3\\.org)/works/(?<id>\\d+)/?(\\?[^#]*)?(#.*)?$",
+        "chapterUrl": "^https?://(www\\.)?(archiveofourown\\.org|ao3\\.org)/works/(?<id>\\d+)/chapters/(?<cid>\\d+)",
+        "novelFromChapter": "id -> https://archiveofourown.org/works/{id}"
+      },
+      "novel": {
+        "title": "h2.title.heading",
+        "author": "h3.byline.heading a[rel='author']",
+        "description": "div.summary blockquote.userstuff"
+      },
+      "toc": {
+        "strategy": "ajax",
+        "url": "https://archiveofourown.org/works/{id}/navigate",
+        "items": "ol.chapter.index li a"
+      },
+      "chapter": {
+        "title": "div.chapter.preface h3.title",
+        "content": "div.userstuff.module[role='article'], #chapters > div.userstuff, #chapters div.userstuff",
+        "remove": [
+          "h3.landmark"
+        ],
+        "next": "li.chapter.next a@href"
+      },
+      "search": {
+        "page": "https://archiveofourown.org/works/search?work_search%5Bquery%5D={query}&work_search%5Bsort_column%5D=_score",
+        "fetchMode": "http",
+        "item": "li.work.blurb",
+        "title": "h4.heading a[href^='/works/']",
+        "link": "h4.heading a[href^='/works/']@href",
+        "author": "h4.heading a[rel='author']",
+        "chapters": "dd.chapters ~ ^([\\d,]+)/",
+        "verified": "Verified 2026-11-25 over plain HTTP. The count is the chapters posted so far."
+      }
+    },
+    {
+      "id": "uukanshu",
+      "name": "UU看書 (UUKanshu)",
+      "domains": [
+        "uukanshu.cc"
+      ],
+      "language": "zh",
+      "status": "verified",
+      "fetchMode": "http",
+      "verified": "Verified 2026-11-25 over plain HTTP. Traditional Chinese; chapters are translated to English as they download. Its search accepts Chinese titles and opens the novel directly on an exact match.",
+      "home": "https://uukanshu.cc",
+      "example": "https://uukanshu.cc/book/2090/",
+      "input": {
+        "novelUrl": "^https?://(www\\.)?uukanshu\\.cc/book/(?<id>\\d+)/?$",
+        "chapterUrl": "^https?://(www\\.)?uukanshu\\.cc/book/(?<id>\\d+)/(?<cid>\\d+)\\.html",
+        "novelFromChapter": "id -> https://uukanshu.cc/book/{id}/"
+      },
+      "novel": {
+        "title": "meta[property='og:novel:book_name']@content, h1",
+        "author": "meta[property='og:novel:author']@content",
+        "cover": "meta[property='og:image']@content",
+        "description": "meta[property='og:description']@content",
+        "status": "meta[property='og:novel:status']@content"
+      },
+      "toc": {
+        "strategy": "inline",
+        "items": "#list-chapterAll dd a"
+      },
+      "chapter": {
+        "title": "h1",
+        "content": ".readcotent",
+        "remove": [
+          "script",
+          "ins",
+          "iframe"
+        ]
+      },
+      "search": {
+        "page": "https://uukanshu.cc/search?searchkey={query}",
+        "fetchMode": "http",
+        "item": ".bookbox",
+        "title": ".bookname a",
+        "link": ".bookname a@href",
+        "author": ".author a",
+        "latest": ".cat a",
+        "verified": "Verified 2026-11-25 over plain HTTP. Needs a Chinese title (simplified or traditional)."
+      }
+    },
+    {
+      "id": "69shuba",
+      "name": "69书吧 (69shuba)",
+      "domains": [
+        "69shuba.com",
+        "69shuba.cx",
+        "69shu.com",
+        "69shuba.tw"
+      ],
+      "canonicalHost": "www.69shuba.com",
+      "language": "zh",
+      "status": "human-check",
+      "fetchMode": "browser",
+      "verified": "Verified 2026-11-25 through the site browser: pages are GBK-encoded and Cloudflare refuses the app's own HTTP client. Its search shows a Cloudflare Turnstile check every time, so the app doesn't search it; paste a book or chapter link instead.",
+      "home": "https://www.69shuba.com",
+      "example": "https://www.69shuba.com/book/90442.htm",
+      "input": {
+        "novelUrl": "^https?://(www\\.)?69shu(ba)?\\.[a-z]+/book/(?<id>\\d+)(\\.htm|/)?$",
+        "chapterUrl": "^https?://(www\\.)?69shu(ba)?\\.[a-z]+/txt/(?<id>\\d+)/(?<cid>\\d+)",
+        "novelFromChapter": "id -> https://www.69shuba.com/book/{id}.htm"
+      },
+      "novel": {
+        "title": "meta[property='og:novel:book_name']@content, h1",
+        "author": "meta[property='og:novel:author']@content",
+        "cover": "meta[property='og:image']@content",
+        "description": "meta[property='og:description']@content",
+        "status": "meta[property='og:novel:status']@content"
+      },
+      "toc": {
+        "strategy": "inline",
+        "pageUrl": "https://www.69shuba.com/book/{id}/",
+        "items": "#catalog ul li a",
+        "sortAttr": "data-num"
+      },
+      "chapter": {
+        "title": "h1",
+        "content": ".txtnav",
+        "remove": [
+          "h1",
+          ".txtinfo",
+          "#txtright",
+          "script",
+          ".bottom-ad",
+          ".contentadv",
+          ".txtcenter"
+        ]
+      }
+    },
+    {
+      "id": "syosetu",
+      "name": "Shousetsuka ni Narou (小説家になろう)",
+      "domains": [
+        "ncode.syosetu.com",
+        "syosetu.com"
+      ],
+      "language": "ja",
+      "status": "verified",
+      "fetchMode": "http",
+      "verified": "Verified 2026-11-25 over plain HTTP. Japanese; chapters are translated to English as they download. Search uses Syosetu's official public API.",
+      "home": "https://syosetu.com",
+      "example": "https://ncode.syosetu.com/n2710db/",
+      "input": {
+        "novelUrl": "^https?://ncode\\.syosetu\\.com/(?<ncode>n[0-9a-z]+)/?(\\?.*)?$",
+        "chapterUrl": "^https?://ncode\\.syosetu\\.com/(?<ncode>n[0-9a-z]+)/(?<num>\\d+)/?$",
+        "novelFromChapter": "ncode -> https://ncode.syosetu.com/{ncode}/"
+      },
+      "novel": {
+        "title": "h1.p-novel__title",
+        "author": ".p-novel__author a, .p-novel__author",
+        "description": "#novel_ex"
+      },
+      "toc": {
+        "strategy": "paginated",
+        "pageUrl": "https://ncode.syosetu.com/{ncode}/?p={n}",
+        "lastPage": "a.c-pager__item--last@href ~ p=(\\d+)",
+        "items": ".p-eplist__sublist a.p-eplist__subtitle"
+      },
+      "chapter": {
+        "title": "h1.p-novel__title",
+        "content": ".p-novel__body",
+        "remove": [
+          "rt",
+          "rp"
+        ]
+      },
+      "search": {
+        "page": "https://api.syosetu.com/novelapi/api/?out=json&lim=20&order=hyoka&of=t-n-w-ga&word={query}",
+        "fetchMode": "http",
+        "json": {
+          "path": "",
+          "title": "title",
+          "link": "https://ncode.syosetu.com/{ncode|lower}/",
+          "author": "writer",
+          "chapters": "general_all_no"
+        },
+        "verified": "Verified 2026-11-25: Syosetu's official search API. Needs a Japanese title."
+      }
+    },
+    {
+      "id": "kakuyomu",
+      "name": "Kakuyomu (カクヨム)",
+      "domains": [
+        "kakuyomu.jp"
+      ],
+      "language": "ja",
+      "status": "verified",
+      "fetchMode": "http",
+      "verified": "Verified 2026-11-25 over plain HTTP. Japanese; chapters are translated to English as they download. The chapter list comes from the work page's own data.",
+      "home": "https://kakuyomu.jp",
+      "example": "https://kakuyomu.jp/works/11054822665990631527",
+      "input": {
+        "novelUrl": "^https?://kakuyomu\\.jp/works/(?<id>\\d+)/?$",
+        "chapterUrl": "^https?://kakuyomu\\.jp/works/(?<id>\\d+)/episodes/(?<eid>\\d+)",
+        "novelFromChapter": "id -> https://kakuyomu.jp/works/{id}"
+      },
+      "novel": {
+        "title": "meta[property='og:title']@content",
+        "cover": "meta[property='og:image']@content",
+        "description": "meta[property='og:description']@content"
+      },
+      "toc": {
+        "strategy": "kakuyomu"
+      },
+      "chapter": {
+        "title": ".widget-episodeTitle",
+        "content": ".widget-episodeBody",
+        "remove": [
+          "rt",
+          "rp"
+        ]
       }
     }
   ],

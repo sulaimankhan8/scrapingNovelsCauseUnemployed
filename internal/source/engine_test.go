@@ -254,3 +254,38 @@ func TestMatchURLs(t *testing.T) {
 		}
 	}
 }
+
+func TestAltNamesFromFixtures(t *testing.T) {
+	for _, c := range []struct{ route, file, url, want string }{
+		{`novelfull\.com`, "novelfull_novel.html", "https://novelfull.com/lord-of-the-mysteries.html", "诡秘之主"},
+		{`readnovelfull\.com`, "readnovelfull_novel.html", "https://readnovelfull.com/lord-of-the-mysteries-v1.html", "诡秘之主"},
+	} {
+		e, _ := newEngine(t, map[string]string{c.route: c.file})
+		names, err := e.AltNames(context.Background(), c.url)
+		if err != nil {
+			t.Fatal(err)
+		}
+		found := false
+		for _, n := range names {
+			found = found || n == c.want
+		}
+		if !found {
+			t.Errorf("%s: alt names %q, want %q among them", c.file, names, c.want)
+		}
+	}
+}
+
+// 69shuba's HTML lists chapters newest first; data-num puts them in order.
+func TestSixtyNineShubaOrder(t *testing.T) {
+	e, _ := newEngine(t, map[string]string{`69shuba\.com/book/90442`: "69shuba_toc.html"})
+	n, err := e.Discover(context.Background(), "https://www.69shuba.com/book/90442.htm", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(n.Chapters) != 3 || n.Chapters[0].Title != "第1章 1：伦敦孤儿" || n.Chapters[2].Number != 3 {
+		t.Fatalf("chapters = %+v", n.Chapters)
+	}
+	if n.Language != "zh" || n.Status != "Ongoing" || n.Title != "霍格沃茨的学习面板" {
+		t.Errorf("language %q status %q title %q", n.Language, n.Status, n.Title)
+	}
+}

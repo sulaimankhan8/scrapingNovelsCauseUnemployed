@@ -169,7 +169,9 @@ public class MainActivity extends AppCompatActivity {
                 if (!HOST.equals(url.getHost())) return null;
                 String path = url.getPath() == null ? "/" : url.getPath();
                 if (path.startsWith("/library/") || path.startsWith("/mangalib/")) {
-                    return serveLibrary(path);
+                    // Keep the query: the reader's ?text=original switch needs it.
+                    String q = url.getEncodedQuery();
+                    return serveLibrary(q == null || q.isEmpty() ? path : path + "?" + q);
                 }
                 return serveAsset(path);
             }

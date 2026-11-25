@@ -143,6 +143,11 @@ func EPUB(store *library.Store, slug string, w io.Writer, opts Options) (*Result
 
 	for i, c := range chapters {
 		frag, err := store.ReadChapter(slug, c.Number)
+		if b.Foreign() {
+			if en, err2 := store.ReadTranslation(slug, c.Number); err2 == nil {
+				frag, err = en, nil // English edition; the original where no translation exists
+			}
+		}
 		if err != nil {
 			continue
 		}

@@ -19,9 +19,11 @@ import (
 	"novelarchiver/internal/browser"
 	"novelarchiver/internal/export"
 	"novelarchiver/internal/fetch"
+	"novelarchiver/internal/lang"
 	"novelarchiver/internal/library"
 	"novelarchiver/internal/sites"
 	"novelarchiver/internal/source"
+	"novelarchiver/internal/translate"
 )
 
 // SiteBrowser is a real-browser fetcher the user can also see and use.
@@ -57,6 +59,9 @@ type Service struct {
 	nextID   int
 	cancel   context.CancelFunc
 	lastDisc map[string]discovered
+	search   searchCache
+	// translator puts Chinese / Japanese / Korean novels into English.
+	translator *translate.Google
 }
 
 type discovered struct {
@@ -82,7 +87,8 @@ func New(root string) *Service {
 	httpF := fetch.NewHTTP(fetch.Options{})
 	a.store = store
 	a.engine = &source.Engine{Registry: reg, HTTP: httpF}
-	a.arch = &archiver.Archiver{Engine: a.engine, Store: store, Files: httpF}
+	a.translator = translate.NewGoogle()
+	a.arch = &archiver.Archiver{Engine: a.engine, Store: store, Files: httpF, Translator: a.translator}
 	a.loadSettings()
 	return a
 }
@@ -350,6 +356,17 @@ type DiscoverResult struct {
 	// shows even when the site refuses hot-linking (Cloudflare etc.).
 	CoverData  string `json:"coverData,omitempty"`
 	Downloaded int    `json:"downloaded"`
+	// English is the title, author and description in English for a
+	// Chinese / Japanese / Korean novel (nil for English novels, or when
+	// translation failed).
+	English *EnglishInfo `json:"english,omitempty"`
+}
+
+// EnglishInfo is a foreign novel's details, translated.
+type EnglishInfo struct {
+	Title       string `json:"title"`
+	Author      string `json:"author"`
+	Description string `json:"description"`
 }
 
 // DiscoverNovel accepts a novel page or chapter link and returns the
@@ -370,10 +387,25 @@ func (a *Service) DiscoverNovel(url string) (*DiscoverResult, error) {
 		}
 	}
 	res.CoverData = a.coverData(n)
+	if lang.NeedsTranslation(n.Language) && a.translator != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		if got, err := translate.Texts(ctx, a.translator, n.Language, nil, n.Title, n.Author, n.Description); err == nil {
+			res.English = &EnglishInfo{Title: got[0], Author: got[1], Description: got[2]}
+		}
+		cancel()
+	}
 	return res, nil
 }
 
 func (a *Service) discover(ctx context.Context, url string) (*source.Novel, error) {
+	return a.discoverWith(ctx, url, func(msg string) {
+		a.emit("status", map[string]any{"message": msg})
+	})
+}
+
+// discoverWith is discover with its own progress callback (nil: silent),
+// sharing discover's 10-minute cache.
+func (a *Service) discoverWith(ctx context.Context, url string, status source.StatusFunc) (*source.Novel, error) {
 	key := strings.TrimSpace(url)
 	a.mu.Lock()
 	if d, ok := a.lastDisc[key]; ok && time.Since(d.at) < 10*time.Minute {
@@ -381,9 +413,7 @@ func (a *Service) discover(ctx context.Context, url string) (*source.Novel, erro
 		return d.novel, nil
 	}
 	a.mu.Unlock()
-	n, err := a.engine.Discover(ctx, url, func(msg string) {
-		a.emit("status", map[string]any{"message": msg})
-	})
+	n, err := a.engine.Discover(ctx, url, status)
 	if err != nil {
 		return nil, err
 	}

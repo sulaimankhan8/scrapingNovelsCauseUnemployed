@@ -46,6 +46,14 @@ type Chapter struct {
 	// Removed marks a saved chapter the site no longer lists. Its file is
 	// kept; it is never deleted silently.
 	Removed bool `json:"removed,omitempty"`
+	// TitleOriginal is the chapter title in the novel's own language, when
+	// Title holds its English translation.
+	TitleOriginal string `json:"titleOriginal,omitempty"`
+	// Translated means an English copy of the chapter is saved next to the
+	// original (chapters/0001.en.html). TranslateError says why the last
+	// try failed; the next update tries again.
+	Translated     bool   `json:"translated,omitempty"`
+	TranslateError string `json:"translateError,omitempty"`
 }
 
 // Book is the contents of book.json.
@@ -68,7 +76,27 @@ type Book struct {
 	UpdatedAt       time.Time         `json:"updatedAt"`
 	// CheckedAt is when an update last finished for this book.
 	CheckedAt time.Time `json:"checkedAt,omitempty"`
+
+	// Language is "zh", "ja" or "ko" for a novel that is translated to
+	// English as it downloads; empty for English novels.
+	Language string `json:"language,omitempty"`
+	// OriginalTitle, OriginalAuthor and OriginalDescription keep the
+	// novel's details in its own language; Title etc. hold the English.
+	OriginalTitle       string `json:"originalTitle,omitempty"`
+	OriginalAuthor      string `json:"originalAuthor,omitempty"`
+	OriginalDescription string `json:"originalDescription,omitempty"`
+	// NoTranslate keeps a foreign novel in its own language only.
+	NoTranslate bool `json:"noTranslate,omitempty"`
+	// Names are the user's fixes for names the translation gets wrong or
+	// spells differently between chapters: original -> English.
+	Names map[string]string `json:"names,omitempty"`
 }
+
+// Foreign reports whether the book is in another language than English.
+func (b *Book) Foreign() bool { return b.Language != "" && b.Language != "en" }
+
+// Translating reports whether the book's chapters are translated.
+func (b *Book) Translating() bool { return b.Foreign() && !b.NoTranslate }
 
 // Counts summarises chapter states.
 func (b *Book) Counts() (ok, failed, locked, pending int) {
@@ -146,6 +174,29 @@ func (s *Store) dir(slug string) string { return filepath.Join(s.Root, slug) }
 // ChapterPath is where a chapter fragment lives.
 func (s *Store) ChapterPath(slug string, num int) string {
 	return filepath.Join(s.dir(slug), "chapters", fmt.Sprintf("%04d.html", num))
+}
+
+// TranslationPath is where a chapter's English translation lives.
+func (s *Store) TranslationPath(slug string, num int) string {
+	return filepath.Join(s.dir(slug), "chapters", fmt.Sprintf("%04d.en.html", num))
+}
+
+// WriteTranslation stores a chapter's English translation.
+func (s *Store) WriteTranslation(slug string, num int, html string) error {
+	p := s.TranslationPath(slug, num)
+	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(p, []byte(html), 0o644)
+}
+
+// ReadTranslation loads a chapter's English translation.
+func (s *Store) ReadTranslation(slug string, num int) (string, error) {
+	if err := validSlug(slug); err != nil {
+		return "", err
+	}
+	b, err := os.ReadFile(s.TranslationPath(slug, num))
+	return string(b), err
 }
 
 // ImageDir holds chapter images.

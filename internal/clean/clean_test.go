@@ -119,3 +119,13 @@ func TestDropsBrBetweenParagraphs(t *testing.T) {
 		t.Errorf("got %s", r.HTML)
 	}
 }
+
+func TestCJKQuotesAreNotSystemLines(t *testing.T) {
+	got := Chapter("<p>「継村さん。あなたには今月いっぱいで辞めてもらいます」</p><p>【罗恩删除了一条信息】</p><p>「Skill acquired: Appraisal」</p>", "", "").HTML
+	if strings.Count(got, `class="sys"`) != 2 {
+		t.Errorf("want the 【】 line and the English 「」 line boxed, not Japanese dialogue: %s", got)
+	}
+	if strings.Contains(got, `<p class="sys">「継村`) {
+		t.Errorf("Japanese dialogue boxed: %s", got)
+	}
+}

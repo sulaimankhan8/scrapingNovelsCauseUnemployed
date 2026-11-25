@@ -193,6 +193,7 @@ func (h *HTTP) once(ctx context.Context, rawURL, referer string) (*Page, error) 
 	if err != nil {
 		return nil, err
 	}
+	body = ToUTF8(body, resp.Header.Get("Content-Type"))
 	page := &Page{URL: resp.Request.URL.String(), Status: resp.StatusCode, Body: body, Header: resp.Header, FromHTTP: true}
 	if resp.StatusCode == 429 {
 		// Rate limited: honour Retry-After (capped) and let Get retry.

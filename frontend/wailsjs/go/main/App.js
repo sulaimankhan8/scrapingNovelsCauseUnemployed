@@ -30,6 +30,10 @@ export function CleanNovel(arg1) {
   return window['go']['main']['App']['CleanNovel'](arg1);
 }
 
+export function CountChapters(arg1) {
+  return window['go']['main']['App']['CountChapters'](arg1);
+}
+
 export function DeleteChapters(arg1, arg2, arg3) {
   return window['go']['main']['App']['DeleteChapters'](arg1, arg2, arg3);
 }
@@ -116,6 +120,10 @@ export function RetryNovel(arg1) {
 
 export function SaveSettings(arg1) {
   return window['go']['main']['App']['SaveSettings'](arg1);
+}
+
+export function SearchNovels(arg1, arg2) {
+  return window['go']['main']['App']['SearchNovels'](arg1, arg2);
 }
 
 export function SetReading(arg1, arg2) {

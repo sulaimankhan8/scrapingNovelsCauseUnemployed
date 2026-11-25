@@ -124,3 +124,38 @@ func TestEPUBRangeAndEmpty(t *testing.T) {
 		t.Errorf("FileName = %q", got)
 	}
 }
+
+// A translated novel exports in English, falling back to the original for a
+// chapter that has no translation yet.
+func TestEPUBUsesTranslation(t *testing.T) {
+	store, err := library.Open(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := &library.Book{Slug: "zh", Title: "Lord of Mysteries", OriginalTitle: "诡秘之主", Language: "zh", SiteName: "UU"}
+	store.WriteChapter("zh", 1, `<h1 class="ch-title">第一章 绯红</h1><p>痛！好痛！</p>`)
+	store.WriteTranslation("zh", 1, `<h1 class="ch-title">Chapter 1 Crimson</h1><p>It hurts!</p>`)
+	store.WriteChapter("zh", 2, `<h1 class="ch-title">第二章 情况</h1><p>还没翻译。</p>`)
+	b.Chapters = []library.Chapter{
+		{Number: 1, Title: "Chapter 1 Crimson", State: library.StateOK, Translated: true},
+		{Number: 2, Title: "第二章 情况", State: library.StateOK},
+	}
+	if err := store.Save(b); err != nil {
+		t.Fatal(err)
+	}
+	var buf bytes.Buffer
+	if _, err := EPUB(store, "zh", &buf, Options{}); err != nil {
+		t.Fatal(err)
+	}
+	zr, _ := zip.NewReader(bytes.NewReader(buf.Bytes()), int64(buf.Len()))
+	var all strings.Builder
+	for _, f := range zr.File {
+		rc, _ := f.Open()
+		data, _ := io.ReadAll(rc)
+		rc.Close()
+		all.Write(data)
+	}
+	if s := all.String(); !strings.Contains(s, "It hurts!") || strings.Contains(s, "痛！好痛！") || !strings.Contains(s, "还没翻译") {
+		t.Errorf("want chapter 1 in English and chapter 2 in the original")
+	}
+}

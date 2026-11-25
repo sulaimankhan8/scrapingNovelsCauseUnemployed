@@ -93,7 +93,12 @@ func fetchJS(urlJSON, cb string) string {
   const r = await fetch(` + urlJSON + `, {credentials: 'same-origin', redirect: 'follow'});
   const ct = (r.headers.get('content-type') || '').toLowerCase();
   if (ct === '' || /^text\/|json|xml|javascript/.test(ct)) {
-    cb(r.status, r.url, await r.text(), ct, false);
+    // r.text() always decodes UTF-8; GBK / Shift_JIS pages need their own charset.
+    const b = await r.arrayBuffer();
+    let cs = (ct.match(/charset=([\w.:-]+)/) || [])[1];
+    if (!cs) { const m = new TextDecoder('latin1').decode(b.slice(0, 4096)).match(/<meta[^>]+charset\s*=\s*["']?\s*([\w.:-]+)/i); if (m) cs = m[1]; }
+    let t; try { t = new TextDecoder(cs || 'utf-8').decode(b); } catch (e) { t = new TextDecoder('utf-8').decode(b); }
+    cb(r.status, r.url, t, ct, false);
   } else {
     const a = new Uint8Array(await r.arrayBuffer()); let s = '';
     for (let i = 0; i < a.length; i += 0x8000) s += String.fromCharCode.apply(null, a.subarray(i, i + 0x8000));

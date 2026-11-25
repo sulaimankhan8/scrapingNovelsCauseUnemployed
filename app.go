@@ -107,6 +107,15 @@ func (a *App) DeleteChapters(slug string, from, to int) (map[string]any, error) 
 func (a *App) CancelTask() error                { return a.svc.CancelTask() }
 func (a *App) OpenSiteBrowser(url string) error { return a.svc.OpenSiteBrowser(url) }
 
+// SearchNovels searches one stage's sites ("quick", "browser", "optin") by
+// title and returns every site's results so far, grouped.
+func (a *App) SearchNovels(query, stage string) (*service.SearchResult, error) {
+	return a.svc.SearchNovels(query, stage)
+}
+
+// CountChapters reads one search result's full chapter list.
+func (a *App) CountChapters(url string) (*service.ChapterCount, error) { return a.svc.CountChapters(url) }
+
 // ExportEPUB asks where to save, then writes the novel as an EPUB.
 // Returns nil (no error) if the user cancels the dialog.
 func (a *App) ExportEPUB(slug string) (*service.ExportResult, error) {

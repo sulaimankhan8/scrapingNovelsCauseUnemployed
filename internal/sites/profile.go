@@ -32,6 +32,13 @@ type Profile struct {
 	// (e.g. a mirror domain that is down or that the site's own servers
 	// refuse to serve).
 	CanonicalHost string `json:"canonicalHost,omitempty"`
+	// Language is what the site's novels are written in: "en" (or empty),
+	// "zh", "ja" or "ko". Novels in other languages than English are
+	// translated to English as they download.
+	Language string `json:"language,omitempty"`
+	// Query is added to every request to the site (AO3: "view_adult=true",
+	// so works rated Mature show their text instead of a warning page).
+	Query string `json:"query,omitempty"`
 
 	Input struct {
 		NovelURL         string `json:"novelUrl"`
@@ -42,6 +49,8 @@ type Profile struct {
 	Novel   map[string]any `json:"novel"`
 	TOC     map[string]any `json:"toc"`
 	Chapter map[string]any `json:"chapter"`
+	// Search, when set, says how to search the site by title (see README).
+	Search map[string]any `json:"search,omitempty"`
 
 	novelRe   *regexp.Regexp
 	chapterRe *regexp.Regexp
@@ -76,8 +85,8 @@ func Bool(section map[string]any, key string) bool {
 	return b
 }
 
-// NeedsBrowser reports whether the given stage ("novel", "toc", "chapter")
-// must be fetched through a real browser engine.
+// NeedsBrowser reports whether the given stage ("novel", "toc", "chapter",
+// "search") must be fetched through a real browser engine.
 func (p *Profile) NeedsBrowser(stage string) bool {
 	var sec map[string]any
 	switch stage {
@@ -87,6 +96,8 @@ func (p *Profile) NeedsBrowser(stage string) bool {
 		sec = p.TOC
 	case "chapter":
 		sec = p.Chapter
+	case "search":
+		sec = p.Search
 	}
 	if m := Str(sec, "fetchMode"); m != "" {
 		return m == "browser"
@@ -256,4 +267,21 @@ func Expand(tmpl string, vars map[string]string) string {
 		}
 		return m
 	})
+}
+
+// NovelKey names the novel a link points to, so two links to the same
+// novel compare equal even when they're written differently (WebNovel's
+// "/book/123" and "/book/title_123"). It is "site:id" (or "site:slug") for
+// a recognised novel link, else the link without scheme, "www." or a
+// trailing slash.
+func (r *Registry) NovelKey(link string) string {
+	if m, err := r.Match(link); err == nil && m.Profile != nil && m.Kind == KindNovel {
+		for _, k := range []string{"id", "slug"} {
+			if v := m.Captures[k]; v != "" {
+				return m.Profile.ID + ":" + v
+			}
+		}
+	}
+	u := strings.TrimPrefix(strings.TrimPrefix(link, "https://"), "http://")
+	return strings.ToLower(strings.TrimRight(strings.TrimPrefix(u, "www."), "/"))
 }

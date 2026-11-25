@@ -4,6 +4,7 @@
 //	go run ./cmd/na inspect <novel-or-chapter-url>
 //	go run ./cmd/na get <url> [-from 1] [-to 10] [-lib DIR]
 //	go run ./cmd/na list [-lib DIR]
+//	go run ./cmd/na test [-site ID] [-optin]   every site: discover, chapter 1, search
 package main
 
 import (
@@ -21,6 +22,7 @@ import (
 	"novelarchiver/internal/library"
 	"novelarchiver/internal/sites"
 	"novelarchiver/internal/source"
+	"novelarchiver/internal/translate"
 )
 
 func main() {
@@ -34,6 +36,8 @@ func main() {
 	to := fs.Int("to", 0, "last chapter")
 	workers := fs.Int("workers", 3, "parallel downloads")
 	noImages := fs.Bool("no-images", false, "skip chapter images")
+	only := fs.String("site", "", "test: only this site id")
+	optIn := fs.Bool("optin", false, "test: also run searches that usually ask for a human check")
 	args := os.Args[2:]
 	var url string
 	if len(args) > 0 && args[0] != "" && args[0][0] != '-' {
@@ -79,7 +83,7 @@ func main() {
 		need(url)
 		n, err := eng.Discover(ctx, url, status)
 		check(err)
-		a := &archiver.Archiver{Engine: eng, Store: store, Files: httpF}
+		a := &archiver.Archiver{Engine: eng, Store: store, Files: httpF, Translator: translate.NewGoogle()}
 		b, err := a.BookFromNovel(n)
 		check(err)
 		err = a.Run(ctx, b, n, archiver.Options{From: *from, To: *to, Concurrency: *workers, SkipImages: *noImages},
@@ -111,6 +115,10 @@ func main() {
 		page, err := f.Get(ctx, url, "")
 		check(err)
 		os.Stdout.Write(page.Body)
+	case "test":
+		if testSites(ctx, eng, *only, *optIn) > 0 {
+			os.Exit(1)
+		}
 	case "list":
 		books, err := store.List()
 		check(err)
@@ -130,7 +138,7 @@ func need(url string) {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: na inspect <url> | na dump <url> | na get <url> [-from N] [-to N] [-lib DIR] | na list")
+	fmt.Fprintln(os.Stderr, "usage: na inspect <url> | na dump <url> | na get <url> [-from N] [-to N] [-lib DIR] | na list | na test [-site ID] [-optin]")
 	os.Exit(2)
 }
 

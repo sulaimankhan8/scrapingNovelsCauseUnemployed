@@ -8,12 +8,14 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 
 	"novelarchiver/internal/fetch"
+	"novelarchiver/internal/lang"
 	"novelarchiver/internal/sites"
 )
 
@@ -28,13 +30,17 @@ type Engine struct {
 type StatusFunc func(msg string)
 
 func (e *Engine) fetcher(p *sites.Profile, stage string) (fetch.Fetcher, error) {
+	f := e.HTTP
 	if p != nil && p.NeedsBrowser(stage) {
 		if e.Browser == nil {
 			return nil, fmt.Errorf("%s: %w", p.Name, fetch.ErrNeedsBrowser)
 		}
-		return e.Browser, nil
+		f = e.Browser
 	}
-	return e.HTTP, nil
+	if p != nil && p.Query != "" {
+		f = queryFetcher{f: f, query: p.Query}
+	}
+	return f, nil
 }
 
 func (e *Engine) getDoc(ctx context.Context, f fetch.Fetcher, u, referer string) (*goquery.Document, *fetch.Page, error) {
@@ -69,6 +75,7 @@ func (e *Engine) Discover(ctx context.Context, input string, status StatusFunc) 
 	n.Vars["origin"] = m.Origin()
 	if p != nil {
 		n.SiteID, n.SiteName = p.ID, p.Name
+		n.Language = lang.Norm(p.Language)
 		if p.NeedsBrowser("chapter") && e.Browser == nil {
 			n.Warnings = append(n.Warnings, p.Name+" chapters only load in a real browser. In-app browser mode is still being built, so chapter downloads from this site will fail for now.")
 		}
@@ -88,6 +95,16 @@ func (e *Engine) Discover(ctx context.Context, input string, status StatusFunc) 
 		novelURL, chapterDoc, err = e.novelFromChapter(ctx, p, m)
 		if err != nil {
 			return nil, err
+		}
+		// Values the novel link carries (Wattpad's story id) that the
+		// chapter link doesn't.
+		if nm, err := e.Registry.Match(novelURL); err == nil && nm.Profile == p && nm.Kind == sites.KindNovel {
+			novelURL = nm.URL
+			for k, v := range nm.Captures {
+				if _, ok := n.Vars[k]; !ok {
+					n.Vars[k] = v
+				}
+			}
 		}
 	} else if m.Kind == sites.KindUnknown && p == nil {
 		// Unknown site: the link could be either kind. Treat it as a novel
@@ -129,6 +146,15 @@ func (e *Engine) Discover(ctx context.Context, input string, status StatusFunc) 
 
 	if n.Title == "" {
 		n.Title = titleFromURL(m.URL)
+	}
+	n.Status = englishStatus(n.Status)
+	// An unknown site: tell its language from the page.
+	if p == nil {
+		sample := n.Title + " " + n.Description
+		if novelDoc != nil {
+			sample += " " + clipRunes(textOf(novelDoc.Find("body")), 4000)
+		}
+		n.Language = lang.Norm(lang.Detect(sample))
 	}
 	// Mark which chapter the user pasted, so the UI can offer "from here".
 	if m.Kind == sites.KindChapter {
@@ -217,17 +243,23 @@ func (e *Engine) readMetadata(ctx context.Context, p *sites.Profile, n *Novel) (
 			return nil, fmt.Errorf("novel API returned invalid JSON: %w", err)
 		}
 		fields, _ := sec["fields"].(map[string]any)
-		get := func(k string) string { // "title|name" tries keys in order
-			keys, _ := fields[k].(string)
-			for _, key := range strings.Split(keys, "|") {
-				if v := jsonString(obj[strings.TrimSpace(key)]); v != "" {
-					return v
-				}
+		get := func(k string) string { // "title|name" tries paths in order; "user.name" reads nested fields
+			path, _ := fields[k].(string)
+			if path == "" {
+				return ""
 			}
-			return ""
+			return strings.TrimSpace(jsonString(jsonAt(obj, path)))
 		}
-		n.Vars["id"] = get("id")
+		if id := get("id"); id != "" {
+			n.Vars["id"] = id
+		}
 		n.Title, n.Author, n.Cover, n.Description = get("title"), get("author"), get("cover"), get("description")
+		if st := get("status"); st != "" {
+			n.Status = map[string]string{"true": "Completed", "false": "Ongoing"}[st]
+			if n.Status == "" {
+				n.Status = st
+			}
+		}
 		n.Cover = absoluteURL(n.URL, n.Cover)
 		return nil, nil
 	}
@@ -265,6 +297,8 @@ func (e *Engine) readMetadata(ctx context.Context, p *sites.Profile, n *Novel) (
 			n.Description = descriptionText(doc, sites.ParseSelector(expr), val)
 		case "status":
 			n.Status = val
+		case "altNames":
+			n.AltNames = splitNames(val)
 		case "firstChapter", "latestChapterUrl":
 			n.Vars[key] = resolve(doc.Url, val)
 		default:
@@ -296,6 +330,10 @@ func (e *Engine) readTOC(ctx context.Context, p *sites.Profile, n *Novel, novelD
 	lockSel := sites.Str(sec, "lockedMarker")
 	var refs []ChapterRef
 
+	// "sortAttr": order the list by this number on each item or an
+	// ancestor (69shuba lists newest first in its HTML, with data-num).
+	sortAttr := sites.Str(sec, "sortAttr")
+	var sortKeys []float64
 	collect := func(doc *goquery.Document) {
 		if items == nil {
 			return
@@ -311,6 +349,11 @@ func (e *Engine) readTOC(ctx context.Context, p *sites.Profile, n *Novel, novelD
 			}
 			locked := lockSel != "" && a.Find(lockSel).Length() > 0
 			refs = append(refs, ChapterRef{Title: strings.TrimSpace(title), URL: resolve(doc.Url, href), Locked: locked})
+			if sortAttr != "" {
+				v, _ := a.Closest("[" + sortAttr + "]").Attr(sortAttr)
+				k, _ := strconv.ParseFloat(strings.TrimSpace(v), 64)
+				sortKeys = append(sortKeys, k)
+			}
 		})
 	}
 
@@ -374,22 +417,30 @@ func (e *Engine) readTOC(ctx context.Context, p *sites.Profile, n *Novel, novelD
 		if err != nil {
 			return err
 		}
-		var arr []map[string]any
-		if err := json.Unmarshal(page.Body, &arr); err != nil {
+		var root any
+		if err := json.Unmarshal(page.Body, &root); err != nil {
 			return fmt.Errorf("chapter API returned invalid JSON: %w", err)
 		}
-		for i, c := range arr {
-			title := ""
-			for _, k := range strings.Split(sites.Str(sec, "titleField"), "|") {
-				if title = jsonString(c[k]); title != "" {
-					break
-				}
-			}
+		// "listPath": where the array is inside an object (Wattpad: "parts").
+		if lp := sites.Str(sec, "listPath"); lp != "" {
+			root = jsonAt(root, lp)
+		}
+		arr, _ := root.([]any)
+		if len(arr) == 0 {
+			return fmt.Errorf("the chapter API listed no chapters")
+		}
+		for i, item := range arr {
+			c, _ := item.(map[string]any)
+			title := strings.TrimSpace(jsonString(jsonAt(c, sites.Str(sec, "titleField"))))
 			idx := i
 			if v, ok := c["index"].(float64); ok {
 				idx = int(v)
 			}
-			refs = append(refs, ChapterRef{Title: title, Index: idx})
+			ref := ChapterRef{Title: title, Index: idx}
+			if uf := sites.Str(sec, "urlField"); uf != "" {
+				ref.URL = absoluteURL(n.URL, jsonString(jsonAt(c, uf)))
+			}
+			refs = append(refs, ref)
 		}
 
 	case "sequential":
@@ -405,6 +456,11 @@ func (e *Engine) readTOC(ctx context.Context, p *sites.Profile, n *Novel, novelD
 		for i := int(from); i <= to; i++ {
 			vars["n"] = strconv.Itoa(i)
 			refs = append(refs, ChapterRef{Title: fmt.Sprintf("Chapter %d", i), URL: sites.Expand(sites.Str(sec, "pattern"), vars)})
+		}
+
+	case "kakuyomu":
+		if refs, err = kakuyomuTOC(novelDoc, n); err != nil {
+			return err
 		}
 
 	case "next-link":
@@ -426,6 +482,18 @@ func (e *Engine) readTOC(ctx context.Context, p *sites.Profile, n *Novel, novelD
 		}
 	}
 
+	if sortAttr != "" && len(sortKeys) == len(refs) {
+		idx := make([]int, len(refs))
+		for i := range idx {
+			idx[i] = i
+		}
+		sort.SliceStable(idx, func(i, j int) bool { return sortKeys[idx[i]] < sortKeys[idx[j]] })
+		sorted := make([]ChapterRef, len(refs))
+		for i, k := range idx {
+			sorted[i] = refs[k]
+		}
+		refs = sorted
+	}
 	n.Chapters = numberRefs(refs)
 	return nil
 }
@@ -448,9 +516,23 @@ func (e *Engine) FetchChapter(ctx context.Context, n *Novel, ref ChapterRef) (*C
 	if sites.Str(sec, "strategy") == "api" {
 		vars := copyVars(n.Vars)
 		vars["index"] = strconv.Itoa(ref.Index)
+		// "idFromUrl": a regex whose group 1, taken from the chapter's link,
+		// becomes {chapterId} (Wattpad's part id).
+		if re := sites.Str(sec, "idFromUrl"); re != "" {
+			if m := regexp.MustCompile(re).FindStringSubmatch(ref.URL); len(m) > 1 {
+				vars["chapterId"] = m[1]
+			}
+		}
 		page, err := f.Get(ctx, sites.Expand(sites.Str(sec, "api"), vars), n.URL)
 		if err != nil {
 			return nil, err
+		}
+		// "format": "html" means the API answers with the chapter's HTML.
+		if sites.Str(sec, "format") == "html" {
+			if len(strings.TrimSpace(string(page.Body))) < 40 {
+				return nil, ErrNoContent
+			}
+			return &Chapter{Title: ref.Title, HTML: string(page.Body), BaseURL: ref.URL}, nil
 		}
 		var obj map[string]any
 		if err := json.Unmarshal(page.Body, &obj); err != nil {

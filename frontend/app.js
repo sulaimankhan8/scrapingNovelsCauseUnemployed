@@ -257,7 +257,7 @@
     status: 'any',
     sort: store.get('na-sort', 'read'),
     query: '',
-    intake: { phase: 'idle', url: '', data: null, err: '', scope: 'all', from: '', to: '', speed: '', images: null, descOpen: false, token: 0 },
+    intake: { phase: 'idle', url: '', data: null, err: '', scope: 'all', from: '', to: '', speed: '', images: null, descOpen: false, token: 0, search: null, fromSearch: false },
     novel: null,
     novelSlug: '',
     tocFilter: 'all',
@@ -539,11 +539,17 @@
     const looking = it.phase === 'looking';
     const hasText = it.url.trim().length > 0;
     const canPaste = !!(navigator.clipboard && navigator.clipboard.readText);
+    const s = it.search;
+    const searching = !!(s && s.phase === 'searching');
+    const showingResults = !!(s && !searching && it.url.trim() === s.query);
     let btn;
-    // Once a novel is found (or while looking), the field's button clears it;
-    // the card below holds the main action.
-    if (looking || (it.phase === 'found' && d)) btn = `<button type="button" class="btn btn--ghost" data-act="intake-clear" aria-label="${looking ? 'Stop looking' : 'Clear link'}" title="${looking ? 'Stop looking' : 'Clear link'}">${icon('x', 16)}</button>`;
-    else if (it.phase === 'error') btn = `<button type="submit" class="btn">Try again</button>`;
+    // Once a novel is found (or while looking or searching), the field's
+    // button clears it; the card below holds the main action.
+    if (looking || searching || (it.phase === 'found' && d) || (showingResults && it.phase === 'idle')) {
+      const lbl = looking ? 'Stop looking' : searching ? 'Stop searching' : s ? 'Clear search' : 'Clear link';
+      btn = `<button type="button" class="btn btn--ghost" data-act="intake-clear" aria-label="${lbl}" title="${lbl}">${icon('x', 16)}</button>`;
+    } else if (it.phase === 'error') btn = `<button type="submit" class="btn">Try again</button>`;
+    else if (hasText && !isLink(it.url)) btn = `<button type="submit" class="btn btn--primary">${icon('search', 16)} Search</button>`;
     else if (hasText || !canPaste) btn = `<button type="submit" class="btn btn--primary">Find<span class="wide"> novel</span> ${icon('arrow', 16)}</button>`;
     else btn = `<button type="button" class="btn" data-act="paste">Paste</button>`;
 
@@ -552,7 +558,7 @@
       panel = `<div class="card skeleton" data-key="sk-${it.token}" aria-live="polite">
         <div class="sk" style="width:88px;height:132px;flex:none;border-radius:6px"></div>
         <div style="flex:1;display:flex;flex-direction:column;gap:10px;padding-top:4px">
-          <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)">${spinner(16)} Reading ${esc(hostOf(normaliseUrl(it.url)) || 'the site')}…</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)">${spinner(16)} Reading ${esc(hostOf(it.lookupUrl || normaliseUrl(it.url)) || 'the site')}…</div>
           <div class="sk" style="height:20px;width:78%"></div><div class="sk" style="height:12px;width:40%"></div>
           <div class="sk sk--soft" style="height:12px;width:92%;margin-top:8px"></div><div class="sk sk--soft" style="height:12px;width:70%"></div>
         </div></div>`;
@@ -566,11 +572,12 @@
     morph(box, `
       <h1 class="page-h" id="addH">${MG() ? 'Add a novel or manga' : 'Add a novel'}</h1>
       <form class="linkbox${it.phase === 'error' ? ' is-error' : ''}" id="intakeForm" novalidate>
-        <label>${icon(it.phase === 'error' ? 'alert' : 'link', 18)}
-          <input type="url" id="novelUrl" placeholder="${MG() ? 'Paste a novel or manga link (series or any chapter)' : 'Paste a novel or chapter link'}" aria-label="${MG() ? 'Novel or manga link' : 'Novel or chapter link'}" autocomplete="off" spellcheck="false" value="${esc(it.url)}" ${looking ? 'readonly' : ''} ${it.phase === 'error' ? 'aria-invalid="true" aria-describedby="intakeErr"' : ''}>
+        <label>${icon(it.phase === 'error' ? 'alert' : hasText && !isLink(it.url) ? 'search' : 'link', 18)}
+          <input type="text" id="novelUrl" placeholder="${MG() ? 'Paste a novel or manga link, or search novels by title' : 'Paste a link, or search by title'}" aria-label="${MG() ? 'Novel or manga link, or a novel title to search for' : 'Novel link, or a title to search for'}" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="${hasText && !isLink(it.url) ? 'search' : 'go'}" value="${esc(it.url)}" ${looking || searching ? 'readonly' : ''} ${it.phase === 'error' ? 'aria-invalid="true" aria-describedby="intakeErr"' : ''}>
         </label>${btn}
       </form>
-      ${panel || (MG() ? `<p class="hint" data-key="hint">Works with 11 novel sites and 12 manga, manhwa and manhua sites, like Royal Road, NovelBin, MangaDex and WEBTOON. <a href="#/sites">See every supported site</a></p>` : `<p class="hint" data-key="hint">Works with NovelBin, NovelFull, Royal Road, WuxiaWorld, ScribbleHub and 6 more. Other sites open in reader mode. <a href="#/sites">See all</a></p>`)}`);
+      ${panel}${s ? searchPanel(s) : ''}
+      ${panel || s ? '' : (MG() ? `<p class="hint" data-key="hint">Type a title to search 8 novel sites at once (plus Chinese and Japanese sites, translated to English automatically), or paste a link from 17 novel sites and 12 manga, manhwa and manhua sites. <a href="#/sites">See every supported site</a></p>` : `<p class="hint" data-key="hint">Type a title to search 8 sites at once, plus Chinese and Japanese sites translated to English automatically. Or paste a link from Wattpad, AO3, Royal Road, 69shuba and 13 more. <a href="#/sites">See all</a></p>`)}`);
     // Attributes don't move a field's live value once it's been typed in.
     const input = $('#novelUrl');
     if (input && input.value !== it.url) input.value = it.url;
@@ -584,7 +591,9 @@
     if (u && !/^https?:\/\//i.test(u)) u = 'https://' + u;
     return u;
   }
-  async function lookup(raw) {
+  // fromSearch: the link is a search result. The field keeps the search
+  // words, and closing the card goes back to the results.
+  async function lookup(raw, fromSearch) {
     const url = normaliseUrl(raw);
     if (!url) return;
     if (MG() && await window.Manga.recognises(url)) {
@@ -594,7 +603,8 @@
     }
     const it = state.intake;
     const token = ++it.token;
-    Object.assign(it, { phase: 'looking', url: raw.trim(), data: null, err: '', scope: 'all', from: '', to: '', descOpen: false, speed: state.settings.speed, images: state.settings.keepImages });
+    if (!fromSearch) { it.search = null; it.searchToken = (it.searchToken || 0) + 1; }
+    Object.assign(it, { phase: 'looking', url: fromSearch ? it.url : raw.trim(), lookupUrl: url, fromSearch: !!fromSearch, data: null, err: '', scope: 'all', from: '', to: '', descOpen: false, speed: state.settings.speed, images: state.settings.keepImages });
     renderIntake();
     try {
       const d = await api('DiscoverNovel', url);
@@ -609,6 +619,12 @@
       if (first && window.innerWidth > 640) first.focus();
     } catch (e) {
       if (token !== it.token) return;
+      if (fromSearch) {
+        const er = explainLookupError(e.message, url);
+        closeFound();
+        toast(`${er.title} ${er.body}`, { tone: 'bad' });
+        return;
+      }
       it.phase = 'error';
       it.err = explainLookupError(e.message, url);
       renderIntake();
@@ -630,15 +646,31 @@
   window.__naBack = () => {
     if (menuState) { closeMenu(); return 'handled'; }
     if (overlayClose) { closeOverlay(); return 'handled'; }
-    if (route().name === 'library' && state.intake.phase !== 'idle') { cancelIntake(); return 'handled'; }
+    if (route().name === 'library' && (state.intake.phase !== 'idle' || state.intake.search)) { stepBackIntake(); return 'handled'; }
     if (route().name === 'read') { location.hash = `#/manga/${encodeURIComponent(route().slug)}`; return 'handled'; }
     if (route().name !== 'library') { location.hash = '#/'; return 'handled'; }
     return '';
   };
   function cancelIntake() {
     state.intake.token++;
-    Object.assign(state.intake, { phase: 'idle', url: '', data: null, err: '' });
+    state.intake.searchToken = (state.intake.searchToken || 0) + 1;
+    Object.assign(state.intake, { phase: 'idle', url: '', data: null, err: '', search: null, fromSearch: false });
     renderIntake();
+  }
+  // Close the novel card (or stop reading the site) but keep the search
+  // results it was opened from.
+  function closeFound() {
+    const it = state.intake;
+    if (!it.search) { cancelIntake(); return; }
+    it.token++;
+    Object.assign(it, { phase: 'idle', data: null, err: '', fromSearch: false, url: it.search.query });
+    renderIntake();
+  }
+  // Escape / Back: the card first, then the search, then the field.
+  function stepBackIntake() {
+    const it = state.intake;
+    if (it.phase !== 'idle' && it.search) closeFound();
+    else cancelIntake();
   }
   function foundCard(d, it) {
     const total = d.totalChapters || 0;
@@ -652,16 +684,22 @@
       return `<div class="note">${icon('info', 16)}<span>${esc(w)}</span></div>`;
     });
     const poster = d.coverData || d.cover;
-    let sub = `${esc(d.author || 'Unknown author')}`;
+    const en = d.english || null;
+    const foreign = d.language && d.language !== 'en';
+    const lname = foreign ? ((LANGS[d.language] || {}).name || 'other-language') : '';
+    if (foreign) notes.unshift(`<div class="note">${icon('info', 16)}<span>${esc(lname)} novel. Chapters are saved in ${esc(lname)} and translated to English with Google Translate as they download; you can switch between the two while reading.</span></div>`);
+    const showTitle = (en && en.title) || d.title, showAuthor = (en && en.author) || d.author, showDesc = (en && en.description) || d.description;
+    let sub = `${esc(showAuthor || 'Unknown author')}`;
     sub += crawl ? ' · chapter count unknown' : ` · ${plural(total, 'chapter')}`;
     const head = `<div class="found__head">
         <button type="button" class="icon-btn icon-btn--sm found__x" data-act="intake-cancel" aria-label="Close">${icon('x', 16)}</button>
         <div class="found__cover">${coverHTML(poster, d.title, d.author, false)}</div>
         <div class="found__meta">
           <span style="font-size:12px;color:var(--muted)">${esc(site)}${d.status ? ` · ${esc(d.status)}` : ''}</span>
-          <span class="found__title" id="foundT">${esc(niceTitle(d.title))}</span>
+          <span class="found__title" id="foundT">${esc(niceTitle(showTitle))}</span>
+          ${foreign && en && en.title && en.title !== d.title ? `<span class="found__orig" lang="${esc(d.language)}">${esc(d.title)}</span>` : ''}
           <span style="font-size:14px;color:var(--muted)">${sub}</span>
-          ${d.description ? `<p class="found__desc${it.descOpen ? ' is-open' : ''}">${esc(d.description)}</p>` : ''}
+          ${showDesc ? `<p class="found__desc${it.descOpen ? ' is-open' : ''}">${esc(showDesc)}</p>` : ''}
         </div></div>`;
 
     // Already in the library: open it or update it.
@@ -719,6 +757,207 @@
         <button type="button" class="btn btn--primary" data-act="intake-start" ${!crawl && count === 0 ? 'disabled' : ''}>${icon('download', 16)} ${label}</button>
       </div></div>`;
   }
+  // ---------------------------------------------------------------- search
+  // Text with a dot and no spaces ("novelfire.net/book/x") is a link;
+  // anything else is a title to search for.
+  function isLink(v) {
+    v = String(v || '').trim();
+    return /^https?:\/\//i.test(v) || (!/\s/.test(v) && /^[\w-]+(\.[\w-]+)+([/?#:]|$)/.test(v));
+  }
+  // Languages whose sites can be searched, with their names for chips.
+  const LANGS = {
+    zh: { native: '中文', name: 'Chinese' },
+    ja: { native: '日本語', name: 'Japanese' },
+    ko: { native: '한국어', name: 'Korean' },
+  };
+  const CJK_RE = /[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]/;
+  const langOn = (l) => (store.get('na-search-langs', []) || []).includes(l);
+  // Which foreign languages a search covers: the chips that are on, or all
+  // of them when the title itself is typed in Chinese / Japanese / Korean.
+  function searchLangs(r, query) {
+    const avail = (r && r.foreignLanguages) || [];
+    return CJK_RE.test(query || '') ? avail : avail.filter(langOn);
+  }
+  function foreignBusy(langs) { return langs.map((l) => (LANGS[l] ? LANGS[l].name : l) + ' sites'); }
+  // "A", "A and B", "A, B and C"
+  function listAnd(xs) {
+    xs = (xs || []).filter(Boolean);
+    return xs.length < 2 ? (xs[0] || '') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`;
+  }
+  // Search runs in stages: sites that answer plain HTTP first (shown as soon
+  // as they're in), then sites read through the site browser, merged into
+  // the same results. "optin" sites run only when asked.
+  async function runSearch(query) {
+    const it = state.intake;
+    query = query.replace(/\s+/g, ' ').trim();
+    it.token++;
+    const token = it.searchToken = (it.searchToken || 0) + 1;
+    const prev = it.search && it.search.query === query ? it.search : null;
+    Object.assign(it, { phase: 'idle', data: null, err: '', fromSearch: false, url: query });
+    it.search = { query, phase: 'searching', result: null, err: '', more: false, busy: [], counts: prev ? prev.counts : {} };
+    renderIntake();
+    try {
+      const r = await api('SearchNovels', query, 'quick');
+      if (token !== it.searchToken) return;
+      Object.assign(it.search, { result: r, phase: 'done', busy: r.pending || [] });
+      renderIntake();
+      if ((r.pending || []).length) await searchStage(token, 'browser', r.pending);
+      const langs = searchLangs(it.search.result, query);
+      if (langs.length) await searchStage(token, 'foreign:' + langs.join(','), foreignBusy(langs));
+    } catch (e) {
+      if (token !== it.searchToken) return;
+      it.search.phase = 'error';
+      it.search.err = e.message;
+      renderIntake();
+    }
+  }
+  async function searchStage(token, stage, names) {
+    const it = state.intake, s = it.search;
+    if (!s || token !== it.searchToken) return;
+    s.busy = names || [];
+    s.busyStage = stage;
+    renderIntake();
+    try {
+      const r = await api('SearchNovels', s.query, stage);
+      if (token !== it.searchToken) return;
+      s.result = r;
+    } catch (e) {
+      if (token !== it.searchToken) return;
+      toast(e.message, { tone: 'bad' });
+    }
+    s.busy = [];
+    renderIntake();
+  }
+  async function countChapters(url) {
+    const s = state.intake.search;
+    if (!s || !url) return;
+    const c = s.counts[url];
+    if (c && (c.state === 'loading' || c.state === 'done')) return;
+    s.counts[url] = { state: 'loading' };
+    renderIntake();
+    try {
+      const r = await api('CountChapters', url);
+      s.counts[url] = Object.assign({ state: 'done' }, r);
+    } catch (e) {
+      s.counts[url] = { state: 'error', err: e.message };
+      toast(explainLookupError(e.message, url).title, { tone: 'bad' });
+    }
+    if (state.intake.search === s) renderIntake();
+  }
+  // One site at a time: each count reads the site's whole chapter list.
+  async function countGroup(key) {
+    const s = state.intake.search;
+    const g = s && s.result && (s.result.groups || []).find((x) => x.key === key);
+    if (!g) return;
+    for (const h of g.hits) {
+      if (state.intake.search !== s) return;
+      await countChapters(h.url);
+    }
+  }
+  // What a row says about chapters: the exact count once counted, else what
+  // the site's search page showed.
+  function hitChapters(h, c) {
+    if (c && c.state === 'done') {
+      if (c.unknown) return { n: 0, text: 'Count unknown', how: 'Found one by one while downloading' };
+      const locked = (c.total || 0) - (c.free || 0);
+      return { n: c.free, text: plural(c.free, 'chapter'), how: locked > 0 ? `Counted · ${num(locked)} locked` : 'Counted', exact: true };
+    }
+    if (h.chapters) return { n: h.chapters, text: plural(h.chapters, 'chapter'), how: 'From the site’s listing' };
+    return { n: 0, text: 'Not listed', how: '' };
+  }
+  function searchPanel(s) {
+    if (s.phase === 'searching') {
+      return `<div class="sresults" data-key="sr" aria-live="polite" aria-busy="true">
+        <div class="sresults__head"><span class="sresults__status">${spinner(16)} Searching novel sites for “${esc(s.query)}”…</span></div>
+        ${[0, 1].map((i) => `<div class="card sgroup sgroup--sk" data-key="sk-${i}"><div class="sgroup__head"><div class="sk" style="width:56px;height:84px;border-radius:6px;flex:none"></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:10px;padding-top:4px"><div class="sk" style="height:18px;width:${i ? 52 : 68}%"></div><div class="sk sk--soft" style="height:12px;width:30%"></div></div></div>
+          <div class="sgroup__rows"><div class="sk sk--soft" style="height:44px;margin:0 16px 16px"></div></div></div>`).join('')}
+      </div>`;
+    }
+    if (s.phase === 'error') {
+      return `<div class="sresults" data-key="sr"><div class="err-box" role="alert"><b>Search didn’t work.</b><span>${esc(s.err)}</span></div></div>`;
+    }
+    const r = s.result || {};
+    const cjkQuery = CJK_RE.test(s.query);
+    // Hide rows from languages whose chip is off (unless the title was typed in that language).
+    const groups = (r.groups || []).map((g) => Object.assign({}, g, { hits: g.hits.filter((h) => !h.language || h.language === 'en' || cjkQuery || langOn(h.language)) })).filter((g) => g.hits.length);
+    const sites = r.sites || [];
+    const searched = sites.length;
+    const failed = sites.filter((x) => x.error);
+    const onSites = new Set();
+    groups.forEach((g) => g.hits.forEach((h) => onSites.add(h.siteId)));
+    const shown = s.more ? groups : groups.slice(0, 6);
+    const busy = s.busy || [];
+    const stillText = s.busyStage === 'optin'
+      ? `Searching ${esc(listAnd(busy))} through the site window. If it asks you to verify you’re human, tick the check there.`
+      : String(s.busyStage || '').startsWith('foreign')
+        ? `Finding the original title and searching ${esc(listAnd(busy))}. Their novels are translated to English automatically.`
+        : `Still waiting for ${esc(listAnd(busy))}. Their results will join these.`;
+    const still = busy.length ? `<div class="sresults__still" data-key="still">${spinner(14)} <span>${stillText}</span></div>` : '';
+    const avail = r.foreignLanguages || [];
+    const chips = avail.length ? `<div class="sresults__langs" data-key="langs" role="group" aria-label="Also search sites in other languages"><span class="muted">Also search</span>${avail.map((l) => `<button type="button" class="chip" data-act="search-lang" data-lang="${esc(l)}" aria-pressed="${cjkQuery || langOn(l)}" ${cjkQuery ? 'disabled' : ''} title="${esc((LANGS[l] || {}).name || l)} sites; their novels are translated to English automatically"><span lang="${esc(l)}">${esc((LANGS[l] || {}).native || l)}</span> ${esc((LANGS[l] || {}).name || l)}</button>`).join('')}</div>` : '';
+    const head = groups.length
+      ? `<div class="sresults__head"><h2 class="sresults__h">Results for “${esc(s.query)}”</h2><span class="muted">${plural(groups.length, 'novel')} on ${plural(onSites.size, 'site')}</span></div>${chips}${still}`
+      : busy.length
+        ? `<div class="sresults__head"><h2 class="sresults__h">Nothing yet for “${esc(s.query)}”</h2></div>${chips}${still}`
+        : `<div class="sresults__head"><h2 class="sresults__h">Nothing found for “${esc(s.query)}”</h2></div>
+         ${chips}<div class="note" data-key="empty">${icon('info', 16)}<span>None of the ${plural(searched - failed.length, 'site')} searched list a novel by that name. Check the spelling, or try fewer words, like just the first two.</span></div>`;
+    const foot = [];
+    if (failed.length) foot.push(`<div class="note note--amber">${icon('alert', 16)}<span>Couldn’t search ${failed.map((x) => `<b>${esc(x.name)}</b> (${esc(x.error)})`).join(', ')}.</span></div>`);
+    const bs = r.optInSites || [];
+    if (bs.length && !busy.length) {
+      foot.push(`<div class="sresults__more"><span>${esc(listAnd(bs))} ${bs.length === 1 ? 'isn’t' : 'aren’t'} searched by default because ${bs.length === 1 ? 'its search asks' : 'their search asks'} you to verify you’re human in the site window.</span>
+        <button type="button" class="btn btn--sm" data-act="search-optin">Search ${bs.length === 1 ? esc(bs[0]) : 'them'} too</button></div>`);
+    }
+    const searchedNote = searched ? `<p class="hint">Searched ${esc(listAnd(sites.map((x) => x.name)))}. Other sites don’t have a search the app can read yet; paste their links instead.</p>` : '';
+    return `<div class="sresults" data-key="sr" aria-live="polite">${head}
+      ${shown.map((g) => groupCard(g, s)).join('')}
+      ${groups.length > shown.length ? `<button type="button" class="btn sresults__all" data-act="search-more">Show ${plural(groups.length - shown.length, 'more result')}</button>` : ''}
+      ${foot.join('')}${searchedNote}</div>`;
+  }
+  function groupCard(g, s) {
+    const rows = g.hits.map((h) => ({ h, c: s.counts[h.url], ch: hitChapters(h, s.counts[h.url]) }));
+    const best = Math.max(0, ...rows.map((x) => x.ch.n));
+    // One site ahead gets a badge; sites behind the best get an amber count.
+    const atBest = rows.filter((x) => x.ch.n === best).length;
+    const markBest = rows.length > 1 && best > 0 && atBest === 1 && rows.some((x) => x.ch.n > 0);
+    const uncounted = rows.filter((x) => !(x.c && (x.c.state === 'done' || x.c.state === 'loading'))).length;
+    const sitesLine = rows.length > 1 ? `On ${plural(rows.length, 'site')}` : `On ${esc(rows[0].h.siteName)}`;
+    return `<article class="card sgroup" data-key="g-${esc(g.key)}" aria-labelledby="gt-${esc(g.key)}">
+      <div class="sgroup__head">
+        <div class="sgroup__cover">${coverHTML(g.cover, niceTitle(g.title), g.author, true)}</div>
+        <div class="sgroup__meta">
+          <h3 class="sgroup__title" id="gt-${esc(g.key)}">${esc(niceTitle(g.title))}</h3>
+          ${(() => { const o = g.hits.find((h) => h.titleOriginal); return o ? `<span class="sgroup__orig" lang="${esc(o.language)}">${esc(o.titleOriginal)}</span>` : ''; })()}
+          <span class="muted">${g.author ? esc(g.author) + ' · ' : ''}${sitesLine}</span>
+        </div>
+        ${rows.length > 1 && uncounted > 0 ? `<button type="button" class="btn btn--sm sgroup__countall" data-act="search-count-all" data-key="${esc(g.key)}" title="Read each site’s full chapter list to compare">Compare counts</button>` : ''}
+      </div>
+      <ul class="sgroup__rows">${rows.map((x) => hitRow(x, markBest && x.ch.n === best, best > 0 && x.ch.n > 0 && x.ch.n < best)).join('')}</ul>
+    </article>`;
+  }
+  function hitRow({ h, c, ch }, isBest, isBehind) {
+    const loading = c && c.state === 'loading';
+    const latest = (c && c.state === 'done' && c.latest) || h.latest || '';
+    const slug = (c && c.existingSlug) || h.existingSlug;
+    const count = loading
+      ? `<span class="srow__n">${spinner(14)} Counting…</span>`
+      : `<span class="srow__n${ch.n ? '' : ' is-none'}${isBehind ? ' is-behind' : ''}">${esc(ch.text)}</span>${ch.how ? `<small>${ch.exact ? icon('check', 12, 2.5) + ' ' : ''}${esc(ch.how)}</small>` : ''}`;
+    const countBtn = !loading && !(c && c.state === 'done')
+      ? `<button type="button" class="btn btn--sm btn--ghost" data-act="search-count" data-url="${esc(h.url)}" title="Read the site’s full chapter list">Count</button>` : '';
+    const main = slug
+      ? `<a class="btn btn--sm" href="#/novel/${encodeURIComponent(slug)}" data-act="intake-open">Open</a>`
+      : `<button type="button" class="btn btn--sm btn--primary" data-act="search-get" data-url="${esc(h.url)}" aria-label="Download from ${esc(h.siteName)}">${icon('download', 15)} Get</button>`;
+    return `<li class="srow${isBest ? ' is-best' : ''}" data-key="r-${esc(h.url)}">
+      <div class="srow__site"><b>${esc(h.siteName)}</b>${h.language && h.language !== 'en' ? `<span class="pill pill--rust" title="Saved in ${esc((LANGS[h.language] || {}).name || h.language)} and translated to English automatically"><span lang="${esc(h.language)}">${esc((LANGS[h.language] || {}).native || h.language)}</span> → EN</span>` : ''}${isBest ? '<span class="pill pill--green">Most chapters</span>' : ''}${slug ? '<span class="pill">In library</span>' : ''}</div>
+      <div class="srow__count">${count}</div>
+      <div class="srow__latest" title="${esc(latest)}">${latest ? 'Latest: ' + esc(latest) : ''}</div>
+      <div class="srow__acts">${countBtn}
+        <button type="button" class="btn btn--sm" data-act="search-preview" data-url="${esc(h.url)}" aria-label="Preview on ${esc(h.siteName)}" title="Open this page in the site window">Preview ${icon('external', 14)}</button>
+        ${main}</div>
+    </li>`;
+  }
+
   // The intake card is patched in place, so its controls are wired once here.
   document.addEventListener('input', (e) => {
     const el = e.target;
@@ -727,7 +966,9 @@
       const was = it.url.trim().length > 0;
       it.url = el.value;
       if (it.phase === 'error') { it.phase = 'idle'; renderIntake(); return; }
-      if (was !== (el.value.trim().length > 0) && it.phase === 'idle') renderIntake();
+      const nowLink = isLink(it.url), nowQuery = !!(it.search && it.url.trim() === it.search.query);
+      if ((was !== (el.value.trim().length > 0) || nowLink !== !!it.wasLink || nowQuery !== !!it.wasQuery) && it.phase === 'idle') renderIntake();
+      it.wasLink = nowLink; it.wasQuery = nowQuery;
     } else if ((el.id === 'rFrom' || el.id === 'rTo') && state.intake.data) {
       state.intake[el.id === 'rFrom' ? 'from' : 'to'] = el.value;
       const n = intakeCount(state.intake.data, state.intake);
@@ -747,7 +988,10 @@
   document.addEventListener('submit', (e) => {
     if (e.target.id !== 'intakeForm') return;
     e.preventDefault();
-    if (state.intake.url.trim()) lookup(state.intake.url);
+    const v = state.intake.url.trim();
+    if (!v) return;
+    if (isLink(v)) lookup(v);
+    else runSearch(v);
   });
   document.addEventListener('change', (e) => {
     const el = e.target;
@@ -771,7 +1015,7 @@
     try {
       const r = await api('StartScrape', opts);
       const title = niceTitle(d.title);
-      cancelIntake();
+      closeFound();
       if (r && r.status === 'queued') toast(`${title} is queued. It starts after the current download.`);
       else if (r && r.status === 'running') toast(`${title} is already downloading.`);
       loadActivity();
@@ -1704,10 +1948,27 @@
       case 'paste':
         try { const v = await navigator.clipboard.readText(); if (v) { state.intake.url = v.trim(); if (state.intake.phase === 'error') state.intake.phase = 'idle'; renderIntake(); const i = $('#novelUrl'); if (i) i.value = state.intake.url; focusUrl(); } else focusUrl(); } catch (er) { focusUrl(); toast(state.platform === 'android' ? 'Long-press the field and choose Paste.' : 'Press Ctrl+V to paste the link.'); }
         break;
-      case 'intake-clear': case 'intake-cancel': e.preventDefault(); cancelIntake(); break;
+      case 'intake-clear': e.preventDefault(); if (state.intake.phase !== 'idle' && state.intake.search) closeFound(); else cancelIntake(); break;
+      case 'intake-cancel': e.preventDefault(); closeFound(); break;
       case 'intake-start': startIntake(); break;
       case 'intake-open': setTimeout(cancelIntake, 0); break;
-      case 'intake-update': { const s = state.intake.data && state.intake.data.existingSlug; cancelIntake(); if (s) updateNovel(s); break; }
+      case 'intake-update': { const s = state.intake.data && state.intake.data.existingSlug; closeFound(); if (s) updateNovel(s); break; }
+      case 'search-get': lookup(t.dataset.url, true); break;
+      case 'search-preview': openSiteWindow(t.dataset.url); break;
+      case 'search-count': countChapters(t.dataset.url); break;
+      case 'search-count-all': countGroup(t.dataset.key); break;
+      case 'search-more': if (state.intake.search) { state.intake.search.more = true; renderIntake(); } break;
+      case 'search-lang': {
+        const l = t.dataset.lang, on = new Set(store.get('na-search-langs', []) || []);
+        if (on.has(l)) on.delete(l); else on.add(l);
+        store.set('na-search-langs', [...on]);
+        const sr = state.intake.search;
+        const searchedLang = sr && sr.result && (sr.result.sites || []).some((x) => x.language === l || (sr.result.groups || []).some((g) => g.hits.some((h) => h.language === l)));
+        if (sr && sr.result && on.has(l) && !searchedLang && !(sr.busy || []).length) searchStage(state.intake.searchToken, 'foreign:' + l, foreignBusy([l]));
+        else renderIntake();
+        break;
+      }
+      case 'search-optin': { const s = state.intake.search; if (s && s.result) searchStage(state.intake.searchToken, 'optin', s.result.optInSites); break; }
       case 'site-window': openSiteWindow(t.dataset.url || (state.intake.data && state.intake.data.url) || ''); break;
       case 'stop': api('CancelTask').catch((er) => toast(er.message, { tone: 'bad' })); break;
       case 'stop-all': api('CancelAll').then(loadActivity).catch((er) => toast(er.message, { tone: 'bad' })); break;
@@ -1780,7 +2041,7 @@
     if (e.key === 'Escape') {
       if (menuState) { closeMenu(); return; }
       if (overlayClose) { closeOverlay(); return; }
-      if (state.intake.phase !== 'idle' && route().name === 'library') { cancelIntake(); return; }
+      if ((state.intake.phase !== 'idle' || state.intake.search) && route().name === 'library') { stepBackIntake(); return; }
       return;
     }
     if (typing || e.ctrlKey || e.metaKey || e.altKey || overlayClose) return;
@@ -1826,7 +2087,7 @@
     if (c) c.challenge = name;
     logLine(`Needs you: ${name}`);
     scheduleJobs();
-    notify(`${name} needs you`, `Tick the check in the site window to keep downloading${c && c.title ? ' ' + c.title : ''}.`);
+    notify(`${name} needs you`, c ? `Tick the check in the site window to keep downloading${c.title ? ' ' + c.title : ''}.` : 'Tick the check in the site window to continue.');
     toast(`${name} needs you to continue`, { tone: 'warn', action: { label: 'Open site window', fn: () => openSiteWindow(site) }, timeout: 12000 });
   });
   function siteUrl(h) { h = String(h || '').trim(); if (!h) return ''; return /^https?:\/\//i.test(h) ? h : 'https://' + h; }

@@ -217,6 +217,22 @@ func isSystemLine(t string) bool {
 	}
 	for _, oc := range sysOpenClose {
 		if strings.HasPrefix(t, oc[0]) && strings.HasSuffix(t, oc[1]) {
+			// 「」 and 『』 are ordinary quotation marks in Japanese and
+			// Chinese text; only translated (Latin-script) lines use them
+			// for system messages.
+			if (oc[0] == "「" || oc[0] == "『") && hasCJK(t) {
+				return false
+			}
+			return true
+		}
+	}
+	return false
+}
+
+// hasCJK reports Chinese characters, kana or Hangul in s.
+func hasCJK(s string) bool {
+	for _, r := range s {
+		if unicode.In(r, unicode.Han, unicode.Hiragana, unicode.Katakana, unicode.Hangul) {
 			return true
 		}
 	}

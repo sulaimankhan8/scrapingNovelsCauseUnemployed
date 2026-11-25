@@ -204,7 +204,21 @@ The desktop window is divided into four main sections:
 
 ## 5. Archiving Novels: Step-by-Step
 
-### Step 1: Input URL
+### Step 1: Input URL or Search by Title
+
+Paste a novel or chapter link, **or type the novel's title** and press Search. A title is searched on NovelFull, ReadNovelFull, NovelPing, FreeWebNovel, NovelFire, Wattpad, Archive of Our Own and WebNovel at the same time. Each novel shows once, with a row per site:
+
+- **Chapter count** from the site's search page. **Count** reads the site's full chapter list (paid and locked chapters are counted separately), and **Compare counts** does that for every site in the card, so you can pick the site with the most chapters.
+- **Preview** opens the page in the site window. **Get** opens the usual download card; closing it brings you back to the results.
+- Royal Road and ScribbleHub are searched only when you tap **Search them too**, because their search asks you to tick a "verify you are human" check in the site window.
+
+#### Chinese and Japanese novels
+
+Turn on **中文 Chinese** or **日本語 Japanese** under the search results (or type the title in Chinese or Japanese) to also search UUKanshu and Shousetsuka ni Narou. Their copies appear in the same card as the English sites, tagged **中文 → EN** / **日本語 → EN**, so you can compare chapter counts; the original is often far ahead of the English translations. You can also paste links from 69shuba, UUKanshu, Syosetu and Kakuyomu.
+
+These novels are saved as written and translated to English with Google Translate as each chapter downloads (free, no account). The title, description and chapter list are translated too. In the reader, **EN / 原文** switches between the English and the original; your choice is remembered. EPUB export is in English. If Google is busy, chapters are saved in the original and translated on the next update.
+
+### Step 1b: Paste a Link
 Copy the web novel URL from your browser (e.g., `https://novelbin.xyz/novel/endless-evolution-last-star` or any chapter link) and paste it into the **Archival Intake** box.
 
 > [!TIP]

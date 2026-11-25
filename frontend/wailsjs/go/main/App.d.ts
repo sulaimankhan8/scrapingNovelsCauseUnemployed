@@ -16,6 +16,8 @@ export function ChooseBackup():Promise<service.BackupInfo>;
 
 export function CleanNovel(arg1:string):Promise<Record<string, any>>;
 
+export function CountChapters(arg1:string):Promise<service.ChapterCount>;
+
 export function DeleteChapters(arg1:string,arg2:number,arg3:number):Promise<Record<string, any>>;
 
 export function DeleteImages(arg1:string):Promise<Record<string, any>>;
@@ -59,6 +61,8 @@ export function RetryMissing(arg1:string):Promise<Record<string, any>>;
 export function RetryNovel(arg1:string):Promise<Record<string, any>>;
 
 export function SaveSettings(arg1:service.Settings):Promise<service.Settings>;
+
+export function SearchNovels(arg1:string,arg2:string):Promise<service.SearchResult>;
 
 export function SetReading(arg1:string,arg2:number):Promise<void>;
 

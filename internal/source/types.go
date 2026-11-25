@@ -16,6 +16,13 @@ type Novel struct {
 	Status      string       `json:"status,omitempty"`
 	Chapters    []ChapterRef `json:"chapters"`
 
+	// Language is "en", "zh", "ja" or "ko" (from the site profile, or
+	// detected for an unknown site).
+	Language string `json:"language"`
+	// AltNames are other titles the site lists, often including the
+	// original-language title ("诡秘之主" for Lord of the Mysteries).
+	AltNames []string `json:"altNames,omitempty"`
+
 	// TOCMode is "list" when Chapters is the full table of contents, or
 	// "crawl" when chapters are discovered by following "next" links from
 	// FirstChapterURL during download.

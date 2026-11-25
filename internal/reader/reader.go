@@ -65,7 +65,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.NotFound(w, r)
 			return
 		}
-		h.chapter(w, b, n)
+		h.chapter(w, b, n, r.URL.Query().Get("text") == "original")
 	}
 }
 
@@ -87,7 +87,9 @@ func (h *Handler) toc(w http.ResponseWriter, b *library.Book) {
 	})
 }
 
-func (h *Handler) chapter(w http.ResponseWriter, b *library.Book, n int) {
+// chapter renders one chapter. For a translated novel it shows the
+// English copy unless original is set (or there is no English copy yet).
+func (h *Handler) chapter(w http.ResponseWriter, b *library.Book, n int, original bool) {
 	idx := -1
 	for i, c := range b.Chapters {
 		if c.Number == n {
@@ -102,6 +104,25 @@ func (h *Handler) chapter(w http.ResponseWriter, b *library.Book, n int) {
 	c := b.Chapters[idx]
 	body, err := h.Store.ReadChapter(b.Slug, n)
 	missing := err != nil
+	foreign := b.Foreign()
+	showEN, untranslated := false, false
+	if foreign && !missing {
+		if en, err := h.Store.ReadTranslation(b.Slug, n); err == nil {
+			if !original {
+				body, showEN = en, true
+			}
+		} else {
+			untranslated = true
+		}
+	}
+	htmlLang := "en"
+	if foreign && !showEN {
+		htmlLang = b.Language
+	}
+	query := ""
+	if foreign && original {
+		query = "?text=original"
+	}
 	if !missing {
 		_ = h.Store.SetReading(b.Slug, n) // the library shows "Continue · Ch. n"
 	}
@@ -115,7 +136,22 @@ func (h *Handler) chapter(w http.ResponseWriter, b *library.Book, n int) {
 	render(w, chapterTmpl, map[string]any{
 		"Book": b, "Ch": c, "Body": template.HTML(body), "Missing": missing,
 		"Prev": prev, "Next": next, "Total": len(b.Chapters),
+		"Foreign": foreign, "ShowEN": showEN, "Untranslated": untranslated && !original,
+		"Lang": htmlLang, "Query": template.URL(query), "OrigLabel": origLabel(b.Language),
 	})
+}
+
+// origLabel is "original text" in the novel's own language, for the switch.
+func origLabel(code string) string {
+	switch code {
+	case "zh":
+		return "原文"
+	case "ja":
+		return "原文"
+	case "ko":
+		return "원문"
+	}
+	return "Original"
 }
 
 func render(w http.ResponseWriter, t *template.Template, data any) {
@@ -151,16 +187,23 @@ main{max-width:var(--measure);margin:0 auto;padding:24px 16px 96px}
 `
 
 var chapterTmpl = template.Must(template.New("ch").Parse(`<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="{{.Lang}}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{{.Ch.Title}} · {{.Book.Title}}</title>
 <script>
 (function(){try{var s=JSON.parse(localStorage.getItem('na-reader')||'{}'),app=localStorage.getItem('na-theme')||'',r=document.documentElement;
 if(s.theme)r.dataset.theme=s.theme;else if(app&&app!=='system')r.dataset.theme=app;
 if(s.font==='sans')r.dataset.font='sans';if(s.align==='justify')r.dataset.align='justify';
 if(s.size)r.style.setProperty('--size',s.size+'px');if(s.lh)r.style.setProperty('--lh',s.lh);if(s.width)r.style.setProperty('--measure',s.width+'rem');}catch(e){}})();
+{{if .Foreign}}// Remembered EN / original choice for translated novels.
+(function(){try{var want=localStorage.getItem('na-text')==='original', has=location.search.indexOf('text=original')>=0;
+if(want&&!has)location.replace('?text=original');}catch(e){}})();{{end}}
 </script>
 <style>` + baseCSS + `
 article p{margin:0 0 1em}
+.lang{display:inline-flex;gap:2px;padding:2px;border:1px solid var(--line);border-radius:9px}
+.bar .lang a{border:0;min-height:30px;padding:5px 9px;border-radius:7px;font-size:13px}
+.bar .lang a[aria-current=true]{background:var(--ink);color:var(--bg);font-weight:600}
+.note{padding:10px 12px;border-radius:10px;background:var(--sys-bg);color:var(--sys-ink);font:14px/1.45 system-ui,sans-serif;margin:0 0 1.2em}
 article h1.ch-title{font-size:1.5em;line-height:1.25;margin:.4em 0 1.2em}
 article img{max-width:100%;height:auto;display:block;margin:1em auto}
 article hr{border:0;border-top:1px solid var(--line);margin:2em auto;width:40%}
@@ -197,20 +240,22 @@ box-shadow:0 12px 24px -16px rgba(0,0,0,.35)}
 <div class="bar">
  <a href="/#/novel/{{.Book.Slug}}" aria-label="Novel page and chapters">☰ Contents</a>
  <span class="title">{{.Book.Title}} — {{.Ch.Number}}/{{.Total}}</span>
+ {{if .Foreign}}<span class="lang" role="group" aria-label="Text language"><a href="?" data-text="" aria-current="{{if .ShowEN}}true{{else}}false{{end}}" lang="en">EN</a><a href="?text=original" data-text="original" aria-current="{{if .ShowEN}}false{{else}}true{{end}}" lang="{{.Book.Language}}">{{.OrigLabel}}</a></span>{{end}}
  <button id="theme" type="button" aria-label="Reading settings" aria-expanded="false" aria-controls="aa">Aa</button>
 </div>
 <div class="aa" id="aa" role="dialog" aria-label="Reading settings" hidden><div class="aa-in" id="aaIn"></div></div>
 <main><article>
 {{if .Missing}}<h1 class="ch-title">{{.Ch.Title}}</h1>
 <p class="missing">This chapter isn't downloaded{{if .Ch.Error}} ({{.Ch.Error}}){{end}}. Press <b>Update</b> on the <a href="/#/novel/{{.Book.Slug}}">novel page</a> to fetch it.</p>
-{{else}}{{.Body}}{{end}}
+{{else}}{{if .Untranslated}}<p class="note" lang="en">This chapter isn't translated yet, so it's shown as it was written. It's translated on the next update.</p>{{end}}{{.Body}}{{end}}
 </article>
 <nav class="nav">
- {{if .Prev}}<a href="{{.Prev}}" rel="prev">← Previous</a>{{else}}<span>← Previous</span>{{end}}
- {{if .Next}}<a href="{{.Next}}" rel="next">Next →</a>{{else}}<span>Next →</span>{{end}}
+ {{if .Prev}}<a href="{{.Prev}}{{.Query}}" rel="prev">← Previous</a>{{else}}<span>← Previous</span>{{end}}
+ {{if .Next}}<a href="{{.Next}}{{.Query}}" rel="next">Next →</a>{{else}}<span>Next →</span>{{end}}
 </nav></main>
 <script>
 (function(){
+ document.querySelectorAll('.lang a').forEach(function(a){a.addEventListener('click',function(){try{if(a.dataset.text)localStorage.setItem('na-text',a.dataset.text);else localStorage.removeItem('na-text')}catch(e){}})});
  var KEY='na-reader', s={};
  try{s=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
  var root=document.documentElement;

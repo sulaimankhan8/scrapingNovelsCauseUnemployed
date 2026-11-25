@@ -129,6 +129,9 @@ func main() {
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		p := r.URL.Path
 		if strings.HasPrefix(p, "/library/") || strings.HasPrefix(p, "/mangalib/") {
+			if r.URL.RawQuery != "" {
+				p += "?" + r.URL.RawQuery // the reader's ?text=original switch
+			}
 			res := core.Serve(p)
 			w.Header().Set("Content-Type", res.MimeType)
 			w.WriteHeader(int(res.Status))

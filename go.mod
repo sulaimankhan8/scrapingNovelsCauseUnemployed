@@ -8,6 +8,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/wailsapp/wails/v2 v2.17.1
 	golang.org/x/net v0.63.0
+	golang.org/x/text v0.44.0
 )
 
 require (
@@ -43,7 +44,6 @@ require (
 	golang.org/x/mod v0.43.0 // indirect
 	golang.org/x/sync v0.25.0 // indirect
 	golang.org/x/sys v0.50.0 // indirect
-	golang.org/x/text v0.44.0 // indirect
 	golang.org/x/tools v0.53.0 // indirect
 )
 

@@ -208,6 +208,10 @@ func (c *Core) Call(method string, argsJSON string) (string, error) {
 		err = c.svc.CancelTask()
 	case "OpenSiteBrowser":
 		err = c.svc.OpenSiteBrowser(str(0))
+	case "SearchNovels":
+		out, err = c.svc.SearchNovels(str(0), str(1))
+	case "CountChapters":
+		out, err = c.svc.CountChapters(str(0))
 	case "GetActivity":
 		out = c.svc.GetActivity()
 	case "GetSettings":
