@@ -24,6 +24,14 @@ import (
 // original chapter is kept; the next update translates it.
 var ErrBusy = errors.New("Google Translate is limiting requests right now; the chapter is saved in its own language, and Translate now works again in a few minutes")
 
+// ErrBlocked means Google has blocked this network's translation requests
+// for a while (its "unusual traffic" page). Retrying soon only prolongs
+// it, so the app stops asking for half an hour.
+var ErrBlocked = errors.New("Google Translate is limiting requests from this network for a while (it saw too many). That usually lifts within a few hours; the chapter is saved in its own language, and Translate now will work then")
+
+// statusBlocked is post's status for an answer from the unusual-traffic page.
+const statusBlocked = -1
+
 // quotes fixes Google's TeX-style quotes: Japanese 『』 come back as two
 // backticks and two apostrophes.
 var quotes = strings.NewReplacer("``", "“", "''", "”")
@@ -66,7 +74,10 @@ func newClient() *http.Client {
 	tr.TLSNextProto = map[string]func(string, *tls.Conn) http.RoundTripper{}
 	// Offer only HTTP/1.1 in the TLS handshake too, or Google picks h2.
 	tr.TLSClientConfig = &tls.Config{NextProtos: []string{"http/1.1"}}
-	return &http.Client{Timeout: 30 * time.Second, Transport: tr}
+	return &http.Client{Timeout: 30 * time.Second, Transport: tr,
+		// A redirect is Google sending us to its unusual-traffic page:
+		// read it as an answer instead of following it.
+		CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
 }
 
 var defaultClient = newClient()
@@ -180,9 +191,12 @@ func (g *Google) call(ctx context.Context, text, from, to string) (string, error
 		if err == nil {
 			return out, nil
 		}
-		// Google says "slow down" with 429, or by sending the request to
-		// its "unusual traffic" page, which answers a POST with 405.
-		limited := status == http.StatusTooManyRequests || status == http.StatusMethodNotAllowed
+		if status == statusBlocked {
+			g.pause(30 * time.Minute)
+			return "", ErrBlocked
+		}
+		// Google says "slow down" with 429.
+		limited := status == http.StatusTooManyRequests
 		retry := limited || status >= 500 || status == 0
 		if !retry || attempt >= len(backoff) || ctx.Err() != nil {
 			if limited {
@@ -255,8 +269,9 @@ func (g *Google) post(ctx context.Context, text, from, to string) (string, int, 
 	if err != nil {
 		return "", resp.StatusCode, err
 	}
-	if strings.Contains(resp.Request.URL.Path, "/sorry") {
-		return "", http.StatusTooManyRequests, fmt.Errorf("Google Translate answered with its unusual-traffic page")
+	if strings.Contains(resp.Request.URL.Path, "/sorry") || strings.Contains(resp.Header.Get("Location"), "/sorry") ||
+		resp.StatusCode == http.StatusMethodNotAllowed {
+		return "", statusBlocked, ErrBlocked
 	}
 	if resp.StatusCode != http.StatusOK {
 		return "", resp.StatusCode, fmt.Errorf("Google Translate answered HTTP %d", resp.StatusCode)
