@@ -74,7 +74,7 @@ func New(libraryDir string, events Events, driver BrowserDriver) (*Core, error) 
 		})
 		svc.SetBrowser(site)
 	}
-	c := &Core{svc: svc, reader: &reader.Handler{Store: svc.Store(), Translate: svc.TranslateChapter}}
+	c := &Core{svc: svc, reader: &reader.Handler{Store: svc.Store(), Translate: svc.TranslateChapter, Paused: svc.TranslatePause}}
 
 	mopts := manga.ServiceOptions{
 		NoBrowser: site == nil,

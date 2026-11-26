@@ -715,7 +715,7 @@
     const en = d.english || null;
     const foreign = d.language && d.language !== 'en';
     const lname = foreign ? ((LANGS[d.language] || {}).name || 'other-language') : '';
-    if (foreign) notes.unshift(`<div class="note">${icon('info', 16)}<span>${esc(lname)} novel. Chapters are saved in ${esc(lname)} and translated to English with Google Translate as they download; you can switch between the two while reading.</span></div>`);
+    if (foreign) notes.unshift(`<div class="note">${icon('info', 16)}<span>${esc(lname)} novel. Chapters are saved in ${esc(lname)} and translated to English with Google Translate: the first few as they download, the rest in the background, a few a minute. You can switch between the two while reading.</span></div>`);
     const showTitle = (en && en.title) || d.title, showAuthor = (en && en.author) || d.author, showDesc = (en && en.description) || d.description;
     let sub = `${esc(showAuthor || 'Unknown author')}`;
     sub += crawl ? ' · chapter count unknown' : ` · ${plural(total, 'chapter')}`;
@@ -1476,9 +1476,12 @@
     try {
       const r = await api('TranslateNovel', slug);
       const n = novelBySlug(slug);
-      if (r && r.status === 'queued') toast(`${n ? niceTitle(n.title) : 'Translation'} is queued. It starts after the current download.`);
-      else if (r && r.status === 'running') toast(`${n ? niceTitle(n.title) : 'It'} is already busy.`);
-      loadActivity();
+      const t = (r && r.translation) || {};
+      const name = n ? niceTitle(n.title) : 'This novel';
+      if (t.state === 'paused') toast(`${name} is next. Google Translate asked for a break; it starts by itself around ${clock(t.resume)}.`);
+      else if (t.state === 'daily') toast(`${name} is next. Today’s ${num(t.daily)} chapters are done; it carries on tomorrow.`);
+      else toast(`${name} is translating now, about ${num(t.perMin || 3)} chapters a minute.`);
+      loadNovel(slug, true);
     } catch (e) { toast(e.message, { tone: 'bad' }); }
   }
   async function retryMissing(slug) {
@@ -1617,9 +1620,15 @@
     const missing = (d.failedCount || 0) + (d.pendingCount || 0);
     const notes = [];
     if (d.failedCount) notes.push(`<div class="note note--red" style="align-items:center;flex-wrap:wrap">${icon('alert', 18)}<span style="flex:1 1 260px"><strong>${plural(d.failedCount, 'chapter')} didn’t download.</strong>${d.lockedCount ? ` ${plural(d.lockedCount, 'paid chapter')} ${d.lockedCount === 1 ? 'was' : 'were'} skipped; ${d.lockedCount === 1 ? 'it stays' : 'they stay'} locked on the site.` : ''}</span><button type="button" class="btn btn--danger btn--sm" data-act="retry" data-slug="${esc(d.slug)}">Retry ${num(d.failedCount)}</button></div>`);
-    if (d.untranslatedCount || d.titleUntranslated) {
-      const busyHere = state.activity.current && state.activity.current.slug === d.slug;
-      notes.push(`<div class="note" style="align-items:center;flex-wrap:wrap">${icon('globe', 16)}<span style="flex:1 1 220px">${d.untranslatedCount ? `${plural(d.untranslatedCount, 'saved chapter')} ${d.untranslatedCount === 1 ? 'isn’t' : 'aren’t'} in English yet.` : 'The title and description aren’t in English yet.'}</span>${busyHere ? '' : `<button type="button" class="btn btn--sm" data-act="translate" data-slug="${esc(d.slug)}">Translate now</button>`}</div>`);
+    if (d.translation && (d.untranslatedCount || d.titleUntranslated)) {
+      const t = d.translation;
+      const what = d.untranslatedCount ? `${plural(d.untranslatedCount, 'saved chapter')} ${d.untranslatedCount === 1 ? 'isn’t' : 'aren’t'} in English yet.` : 'The title and chapter names aren’t in English yet.';
+      const how = t.state === 'paused' ? `Google Translate asked for a break; translating carries on by itself around ${clock(t.resume)}.`
+        : t.state === 'daily' ? `Today’s ${num(t.daily)} chapters are done; translating carries on tomorrow, so Google doesn’t block the app.`
+        : t.state === 'busy' ? 'They’re translated after this download, a few a minute.'
+        : `They’re translated in the background, about ${num(t.perMin || 3)} a minute, so Google doesn’t block the app. A chapter you open is translated first.`;
+      const btn = t.state === 'queued' ? `<button type="button" class="btn btn--sm" data-act="translate" data-slug="${esc(d.slug)}">Translate this one first</button>` : '';
+      notes.push(`<div class="note" style="align-items:center;flex-wrap:wrap">${icon('globe', 16)}<span style="flex:1 1 220px">${what} ${how}</span>${btn}</div>`);
     }
     if (d.goneCount && !d.failedCount) notes.push(`<div class="note">${icon('info', 16)}<span>${esc(d.site)} skips ${d.goneCount === 1 ? 'one chapter number' : `${num(d.goneCount)} chapter numbers`}; ${d.goneCount === 1 ? 'that chapter isn’t' : 'those chapters aren’t'} on the site, so there’s nothing to download.</span></div>`);
     if (d.lockedCount && !d.failedCount) notes.push(`<div class="note">${icon('lock', 16)}<span>${plural(d.lockedCount, 'paid chapter')} ${d.lockedCount === 1 ? 'is' : 'are'} locked on ${esc(d.site)} and ${d.lockedCount === 1 ? 'wasn’t' : 'weren’t'} downloaded.</span></div>`);
@@ -2133,6 +2142,8 @@
   });
 
   // ================================================================ BACKEND EVENTS
+  // "3:40 PM" for a unix-ms time.
+  function clock(ms) { return ms ? new Date(ms).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : 'soon'; }
   function logLine(m) { const ts = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }); state.log.push(`${ts}  ${m}`); if (state.log.length > 400) state.log.splice(0, 100); }
   on('queue', (a) => {
     const prevSlug = state.activity.current && state.activity.current.slug;
@@ -2199,6 +2210,13 @@
     loadLibrary();
   });
   on('backup', (d) => { if (backupListener) backupListener(d); });
+  // The background translator finished a chapter: refresh the open novel
+  // page now and then (not on every chapter).
+  let trTimer = 0;
+  on('translated', (d) => {
+    if (trTimer || route().name !== 'novel' || state.novelSlug !== d.slug) return;
+    trTimer = setTimeout(() => { trTimer = 0; if (route().name === 'novel' && state.novelSlug === d.slug) loadNovel(d.slug, true); }, 4000);
+  });
 
   // ================================================================ BRIDGE
   // manga.js reuses the shell's helpers instead of copying them.

@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"novelarchiver/internal/lang"
 	"novelarchiver/internal/library"
 	"novelarchiver/internal/translate"
 )
@@ -61,80 +60,90 @@ func (t translated) apply(c *library.Chapter) {
 	}
 }
 
+// InlineTranslate is how many chapters a download translates as it saves
+// them, so the start of a new novel can be read in English right away. The
+// rest are left to the background translator, a few a minute, because
+// translating a whole novel in one go gets Google to block the network.
+const InlineTranslate = 5
+
 // needsTranslation: saved, and no English copy yet (or the original was
-// rewritten by an update after the copy was made).
+// rewritten by an update after the copy was made). It goes by the files,
+// so a book saved by another job without the Translated mark still counts
+// as translated.
 func (a *Archiver) needsTranslation(b *library.Book, c library.Chapter) bool {
 	if c.State != library.StateOK {
 		return false
 	}
 	en, err := os.Stat(a.Store.TranslationPath(b.Slug, c.Number))
-	if err != nil || !c.Translated {
+	if err != nil {
 		return true
 	}
 	orig, err := os.Stat(a.Store.ChapterPath(b.Slug, c.Number))
 	return err == nil && orig.ModTime().After(en.ModTime())
 }
 
-// translatePending translates every saved chapter that has no English copy
-// yet: ones whose translation failed earlier, and ones an update rewrote.
-// It stops (without failing the job) while Google is refusing requests.
-func (a *Archiver) translatePending(ctx context.Context, b *library.Book, emit Emit) error {
+// Pending lists saved chapters (by number) that have no English copy yet.
+func (a *Archiver) Pending(b *library.Book) []int {
 	if !a.shouldTranslate(b) {
 		return nil
 	}
-	var todo []int
-	for i, c := range b.Chapters {
+	var out []int
+	for _, c := range b.Chapters {
 		if a.needsTranslation(b, c) {
-			todo = append(todo, i)
+			out = append(out, c.Number)
 		}
 	}
-	// waits counts breaks taken; idle, breaks in a row that weren't
-	// followed by a single success (a longer block: stop and leave the
-	// rest for Translate now).
-	waits, idle, okCount, bad := 0, 0, 0, 0
-	for n, i := range todo {
-		if ctx.Err() != nil {
-			return ctx.Err()
-		}
-		c := &b.Chapters[i]
-		t := a.translateOne(ctx, b, c.Number)
-		if !t.ok && strings.Contains(t.err, "limiting requests") && waits < 6 && idle < 2 {
-			// Google asked for a short break: take it (up to six times),
-			// then carry on, rather than leaving the rest untranslated.
-			if d := pausedFor(a.Translator); d > 0 && d <= 5*time.Minute {
-				waits++
-				idle++
-				_ = a.Store.Save(b)
-				emit("status", map[string]any{"message": fmt.Sprintf("Google Translate asked to slow down. Translating again in about %d min; everything is saved.", int(d.Minutes()+0.99))})
-				select {
-				case <-time.After(d + 2*time.Second):
-				case <-ctx.Done():
-					return ctx.Err()
-				}
-				t = a.translateOne(ctx, b, c.Number)
-			}
-		}
-		t.apply(c)
-		if !t.ok && strings.Contains(t.err, "limiting requests") {
-			emit("status", map[string]any{"message": "Google Translate is busy; the remaining chapters are saved in " + lang.Name(b.Language) + ". Press Translate now on the novel page later."})
-			break
-		}
-		if t.ok {
-			okCount++
-			idle = 0
-		} else {
-			bad++
-		}
-		if (n+1)%10 == 0 {
-			_ = a.Store.Save(b)
-		}
-		emit("progress", Progress{
-			Stage: "translating", Current: n + 1, Total: len(todo), Scraped: okCount, Failed: bad,
-			Percentage: (n + 1) * 100 / len(todo), ChapterNum: c.Number, ChapterTitle: c.Title,
-			Status: map[bool]string{true: "ok", false: "err"}[t.ok], Slug: b.Slug, Title: b.Title,
-		})
+	return out
+}
+
+// MetaLeft counts what's still in the original language among the book's
+// title (1) and its chapter titles.
+func (a *Archiver) MetaLeft(b *library.Book) int {
+	if !a.shouldTranslate(b) {
+		return 0
 	}
-	return nil
+	n := 0
+	if b.OriginalTitle != "" && b.Title == b.OriginalTitle {
+		n++
+	}
+	for _, c := range b.Chapters {
+		if c.TitleOriginal == "" && c.Title != "" && hasCJK(c.Title) {
+			n++
+		}
+	}
+	return n
+}
+
+// NeedsTranslation reports whether saved chapter num has no English copy.
+func (a *Archiver) NeedsTranslation(b *library.Book, num int) bool {
+	if !a.shouldTranslate(b) {
+		return false
+	}
+	for _, c := range b.Chapters {
+		if c.Number == num {
+			return a.needsTranslation(b, c)
+		}
+	}
+	return false
+}
+
+// TranslateMeta translates the title, author, description and up to
+// titleBatch chapter titles, and saves the book.
+func (a *Archiver) TranslateMeta(ctx context.Context, b *library.Book) error {
+	if !a.shouldTranslate(b) {
+		return nil
+	}
+	a.translateBook(ctx, b, Options{})
+	return a.Store.Save(b)
+}
+
+func hasCJK(s string) bool {
+	for _, r := range s {
+		if r >= 0x3040 && r <= 0x9fff || r >= 0xac00 && r <= 0xd7af || r >= 0xf900 && r <= 0xfaff {
+			return true
+		}
+	}
+	return false
 }
 
 // translateBook puts the title, author and description into English
@@ -175,7 +184,7 @@ func (a *Archiver) translateChapterTitles(ctx context.Context, b *library.Book, 
 		if (from > 0 && c.Number < from) || (to > 0 && c.Number > to) {
 			continue
 		}
-		if c.TitleOriginal == "" && c.Title != "" {
+		if c.TitleOriginal == "" && c.Title != "" && hasCJK(c.Title) {
 			idx = append(idx, i)
 			titles = append(titles, c.Title)
 		}
@@ -218,21 +227,6 @@ func (a *Archiver) TranslateChapter(ctx context.Context, b *library.Book, num in
 		return nil
 	}
 	return fmt.Errorf("no chapter %d", num)
-}
-
-// TranslateAll translates the title, the chapter titles and every saved
-// chapter that has no English copy yet, without downloading anything.
-func (a *Archiver) TranslateAll(ctx context.Context, b *library.Book, emit Emit) error {
-	if !a.shouldTranslate(b) {
-		return fmt.Errorf("this novel isn't set to be translated")
-	}
-	a.translateBook(ctx, b, Options{})
-	_ = a.Store.Save(b)
-	err := a.translatePending(ctx, b, emit)
-	if serr := a.Store.Save(b); err == nil {
-		err = serr
-	}
-	return err
 }
 
 // Untranslated counts saved chapters with no English copy yet.

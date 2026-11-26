@@ -196,9 +196,6 @@ func (a *Archiver) Run(ctx context.Context, b *library.Book, novel *source.Novel
 	if err == nil && opts.Revise != 0 {
 		err = a.revise(ctx, b, novel, opts, emit)
 	}
-	if err == nil {
-		err = a.translatePending(ctx, b, emit)
-	}
 	if saveErr := a.Store.Save(b); err == nil {
 		err = saveErr
 	}
@@ -274,6 +271,7 @@ func (a *Archiver) downloadList(ctx context.Context, b *library.Book, novel *sou
 		blocked  atomic.Value
 		start    = time.Now()
 		queue    = make(chan int)
+		inline   int64 // chapters translated as they download (see InlineTranslate)
 		wg       sync.WaitGroup
 		jobCtx   context.Context
 		stopJobs context.CancelFunc
@@ -300,7 +298,7 @@ func (a *Archiver) downloadList(ctx context.Context, b *library.Book, novel *sou
 					return
 				}
 				var tr *translated
-				if state == library.StateOK && a.shouldTranslate(b) {
+				if state == library.StateOK && a.shouldTranslate(b) && atomic.AddInt64(&inline, 1) <= InlineTranslate {
 					t := a.translateOne(jobCtx, b, ref.Number)
 					tr = &t
 				}
@@ -419,7 +417,7 @@ func (a *Archiver) crawl(ctx context.Context, b *library.Book, novel *source.Nov
 			return err
 		}
 		b.Chapters = append(b.Chapters, library.Chapter{Number: num, Title: ch.Title, URL: next, State: library.StateOK, Words: words})
-		if a.shouldTranslate(b) {
+		if a.shouldTranslate(b) && count < InlineTranslate {
 			a.translateOne(ctx, b, num).apply(&b.Chapters[len(b.Chapters)-1])
 		}
 		if b.Vars == nil {

@@ -22,12 +22,12 @@ import (
 
 // ErrBusy means Google is refusing requests for now (rate limit). The
 // original chapter is kept; the next update translates it.
-var ErrBusy = errors.New("Google Translate is limiting requests right now; the chapter is saved in its own language, and Translate now works again in a few minutes")
+var ErrBusy = errors.New("Google Translate asked the app to slow down; the chapter is saved in its own language and is translated by itself once Google allows it again")
 
 // ErrBlocked means Google has blocked this network's translation requests
 // for a while (its "unusual traffic" page). Retrying soon only prolongs
 // it, so the app stops asking for half an hour.
-var ErrBlocked = errors.New("Google Translate is limiting requests from this network for a while (it saw too many). That usually lifts within a few hours; the chapter is saved in its own language, and Translate now will work then")
+var ErrBlocked = errors.New("Google Translate is limiting requests from this network for a while (it saw too many). That usually lifts within a few hours; the chapter is saved in its own language and is translated by itself after that")
 
 // statusBlocked is post's status for an answer from the unusual-traffic page.
 const statusBlocked = -1
@@ -57,7 +57,18 @@ type Google struct {
 	mu          sync.Mutex
 	next        time.Time
 	pausedUntil time.Time
+	// strikes counts refusals close together: each one makes the next
+	// pause longer. An hour without one resets it.
+	strikes    int
+	lastStrike time.Time
 }
+
+// Pauses after Google refuses, growing with each refusal in a row: a
+// "slow down" (429) and a network block (the unusual-traffic page).
+var (
+	busyPauses    = []time.Duration{3 * time.Minute, 10 * time.Minute, 30 * time.Minute, time.Hour}
+	blockedPauses = []time.Duration{30 * time.Minute, time.Hour, 2 * time.Hour, 4 * time.Hour}
+)
 
 // NewGoogle returns a translator with sensible defaults.
 func NewGoogle() *Google {
@@ -189,10 +200,11 @@ func (g *Google) call(ctx context.Context, text, from, to string) (string, error
 		}
 		out, status, err := g.post(ctx, text, from, to)
 		if err == nil {
+			g.ok()
 			return out, nil
 		}
 		if status == statusBlocked {
-			g.pause(30 * time.Minute)
+			g.strike(blockedPauses)
 			return "", ErrBlocked
 		}
 		// Google says "slow down" with 429.
@@ -200,7 +212,7 @@ func (g *Google) call(ctx context.Context, text, from, to string) (string, error
 		retry := limited || status >= 500 || status == 0
 		if !retry || attempt >= len(backoff) || ctx.Err() != nil {
 			if limited {
-				g.pause(3 * time.Minute)
+				g.strike(busyPauses)
 				return "", ErrBusy
 			}
 			return "", err
@@ -237,9 +249,29 @@ func (g *Google) wait(ctx context.Context) error {
 	}
 }
 
-func (g *Google) pause(d time.Duration) {
+// strike pauses after a refusal, longer for each one in a row.
+func (g *Google) strike(pauses []time.Duration) {
 	g.mu.Lock()
-	g.pausedUntil = time.Now().Add(d)
+	defer g.mu.Unlock()
+	now := time.Now()
+	if now.Sub(g.lastStrike) > time.Hour {
+		g.strikes = 0
+	}
+	i := g.strikes
+	if i >= len(pauses) {
+		i = len(pauses) - 1
+	}
+	g.strikes++
+	g.lastStrike = now
+	g.pausedUntil = now.Add(pauses[i])
+}
+
+// ok forgets old refusals once Google has been answering for an hour.
+func (g *Google) ok() {
+	g.mu.Lock()
+	if g.strikes > 0 && time.Since(g.lastStrike) > time.Hour {
+		g.strikes = 0
+	}
 	g.mu.Unlock()
 }
 

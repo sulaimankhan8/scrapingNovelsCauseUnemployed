@@ -1,9 +1,11 @@
 package reader
 
 import (
+	"context"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"novelarchiver/internal/library"
 )
@@ -72,5 +74,37 @@ func TestDeleteChapterRange(t *testing.T) {
 	}
 	if _, err := store.DeleteChapters("test-novel", 5, 2); err == nil {
 		t.Errorf("reversed range accepted")
+	}
+}
+
+func TestUntranslatedChapterTranslatesWhenOpened(t *testing.T) {
+	store := setup(t)
+	b, _ := store.Load("test-novel")
+	b.Language = "zh"
+	if err := store.Save(b); err != nil {
+		t.Fatal(err)
+	}
+	calls := 0
+	var paused time.Duration
+	h := &Handler{Store: store, Paused: func() time.Duration { return paused },
+		Translate: func(_ context.Context, slug string, n int) error {
+			calls++
+			return store.WriteTranslation(slug, n, "<p>English</p>")
+		}}
+
+	_, body := get(h, "/library/test-novel/1")
+	if !strings.Contains(body, "Translating this chapter") || !strings.Contains(body, "?translate=auto") || calls != 0 {
+		t.Fatalf("first look should show the original and reload to translate (calls %d): %.300s", calls, body)
+	}
+	_, body = get(h, "/library/test-novel/1?translate=auto")
+	if calls != 1 || !strings.Contains(body, "English") || strings.Contains(body, "location.replace('?translate=auto')") {
+		t.Fatalf("the reload should translate once and not ask again (calls %d)", calls)
+	}
+
+	// While Google asks for a break: no reload, a note saying when.
+	paused = 12 * time.Minute
+	_, body = get(h, "/library/test-novel/2")
+	if strings.Contains(body, "location.replace('?translate=auto')") || !strings.Contains(body, "about 12 min") || calls != 1 {
+		t.Fatalf("paused: should wait, not translate (calls %d)", calls)
 	}
 }

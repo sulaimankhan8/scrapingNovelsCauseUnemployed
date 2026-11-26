@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"novelarchiver/internal/library"
 )
@@ -24,7 +25,10 @@ import (
 type Handler struct {
 	Store *library.Store
 	// Translate puts one saved chapter into English now (nil: not offered).
+	// An untranslated chapter is translated as soon as it's opened.
 	Translate func(ctx context.Context, slug string, n int) error
+	// Paused is how long Google has asked the app to wait (nil: never).
+	Paused func() time.Duration
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +73,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		trErr := ""
-		if r.URL.Query().Get("translate") == "now" && h.Translate != nil && b.Foreign() {
+		ask := r.URL.Query().Get("translate")
+		if (ask == "now" || ask == "auto") && h.Translate != nil && b.Foreign() {
 			if err := h.Translate(r.Context(), b.Slug, n); err != nil {
 				trErr = err.Error()
 			}
@@ -77,7 +82,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				b = nb
 			}
 		}
-		h.chapter(w, b, n, r.URL.Query().Get("text") == "original", trErr, h.Translate != nil)
+		h.chapter(w, b, n, r.URL.Query().Get("text") == "original", trErr, h.Translate != nil, ask == "")
 	}
 }
 
@@ -101,7 +106,7 @@ func (h *Handler) toc(w http.ResponseWriter, b *library.Book) {
 
 // chapter renders one chapter. For a translated novel it shows the
 // English copy unless original is set (or there is no English copy yet).
-func (h *Handler) chapter(w http.ResponseWriter, b *library.Book, n int, original bool, trErr string, canTranslate bool) {
+func (h *Handler) chapter(w http.ResponseWriter, b *library.Book, n int, original bool, trErr string, canTranslate, firstLook bool) {
 	idx := -1
 	for i, c := range b.Chapters {
 		if c.Number == n {
@@ -127,6 +132,17 @@ func (h *Handler) chapter(w http.ResponseWriter, b *library.Book, n int, origina
 			untranslated = true
 		}
 	}
+	// Opening an untranslated chapter translates it (the page reloads
+	// with the English) unless Google has asked for a break.
+	var paused time.Duration
+	if h.Paused != nil {
+		paused = h.Paused()
+	}
+	auto := untranslated && !original && canTranslate && firstLook && trErr == "" && paused == 0
+	pausedMin := 0
+	if paused > 0 && trErr == "" {
+		pausedMin = int(paused.Minutes() + 0.99)
+	}
 	htmlLang := "en"
 	if foreign && !showEN {
 		htmlLang = b.Language
@@ -150,7 +166,7 @@ func (h *Handler) chapter(w http.ResponseWriter, b *library.Book, n int, origina
 		"Prev": prev, "Next": next, "Total": len(b.Chapters),
 		"Foreign": foreign, "ShowEN": showEN, "Untranslated": untranslated && !original,
 		"Lang": htmlLang, "Query": template.URL(query), "OrigLabel": origLabel(b.Language),
-		"CanTranslate": canTranslate, "TranslateErr": trErr,
+		"CanTranslate": canTranslate && paused == 0, "TranslateErr": trErr, "Auto": auto, "PausedMin": pausedMin,
 	})
 }
 
@@ -209,7 +225,9 @@ if(s.font==='sans')r.dataset.font='sans';if(s.align==='justify')r.dataset.align=
 if(s.size)r.style.setProperty('--size',s.size+'px');if(s.lh)r.style.setProperty('--lh',s.lh);if(s.width)r.style.setProperty('--measure',s.width+'rem');}catch(e){}})();
 {{if .Foreign}}// Remembered EN / original choice for translated novels.
 (function(){try{var want=localStorage.getItem('na-text')==='original', has=location.search.indexOf('text=original')>=0;
-if(want&&!has)location.replace('?text=original');}catch(e){}})();{{end}}
+if(want&&!has)location.replace('?text=original');
+{{if .Auto}}else if(!want)location.replace('?translate=auto');{{end}}
+if(/[?&]translate=/.test(location.search))history.replaceState(null,'',location.pathname);}catch(e){}})();{{end}}
 </script>
 <style>` + baseCSS + `
 article p{margin:0 0 1em}
@@ -262,7 +280,7 @@ box-shadow:0 12px 24px -16px rgba(0,0,0,.35)}
 <main><article>
 {{if .Missing}}<h1 class="ch-title">{{.Ch.Title}}</h1>
 <p class="missing">This chapter isn't downloaded{{if .Ch.Error}} ({{.Ch.Error}}){{end}}. Press <b>Update</b> on the <a href="/#/novel/{{.Book.Slug}}">novel page</a> to fetch it.</p>
-{{else}}{{if .Untranslated}}<p class="note" lang="en">{{if .TranslateErr}}Couldn't translate it: {{.TranslateErr}}{{else}}This chapter isn't translated yet, so it's shown as it was written.{{end}}{{if .CanTranslate}} <a class="tr-now" href="?translate=now" onclick="this.textContent='Translating…';this.setAttribute('aria-disabled','true')">Translate now</a>{{end}}</p>{{end}}{{.Body}}{{end}}
+{{else}}{{if .Untranslated}}<p class="note" lang="en">{{if .Auto}}Translating this chapter…{{else if .TranslateErr}}Couldn't translate it: {{.TranslateErr}}{{else if .PausedMin}}Google Translate asked the app to take a break, so this chapter is shown as it was written. It's translated by itself in about {{.PausedMin}} min.{{else}}This chapter isn't translated yet, so it's shown as it was written.{{end}}{{if and .CanTranslate (not .Auto)}} <a class="tr-now" href="?translate=now" onclick="this.textContent='Translating…';this.setAttribute('aria-disabled','true')">Translate now</a>{{end}}</p>{{end}}{{.Body}}{{end}}
 </article>
 <nav class="nav">
  {{if .Prev}}<a href="{{.Prev}}{{.Query}}" rel="prev">← Previous</a>{{else}}<span>← Previous</span>{{end}}

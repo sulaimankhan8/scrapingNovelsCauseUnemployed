@@ -25,7 +25,7 @@ func main() {
 	// The offline reader is served in-process at /library/... — no ports.
 	var libHandler http.Handler = http.NotFoundHandler()
 	if st := app.svc.Store(); st != nil {
-		libHandler = &reader.Handler{Store: st, Translate: app.svc.TranslateChapter}
+		libHandler = &reader.Handler{Store: st, Translate: app.svc.TranslateChapter, Paused: app.svc.TranslatePause}
 	}
 	var mangaHandler http.Handler = http.NotFoundHandler()
 	if st := app.manga.store(); st != nil {
