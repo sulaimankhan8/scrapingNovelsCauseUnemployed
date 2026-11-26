@@ -640,11 +640,14 @@ main.view { padding: 36px 0 96px; }
   .novel-hero h1 { font-size: 26px; line-height: 1.1; }
   .novel-hero .by { font-size: 14px; }
   .facts { gap: 18px; }
-  .actions .btn--primary { width: 100%; height: 52px; }
-  .actions .btn--lg:not(.btn--primary) { flex: 1; height: 44px; padding: 0 10px; }
+  /* Phone actions: Continue across, then a two-by-two grid, so nothing
+     (least of all ⋯) ends up alone on a row. Same pattern as the manga page. */
+  .actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .actions .btn--primary { grid-column: 1 / -1; width: 100%; height: 52px; }
+  .actions .btn--lg:not(.btn--primary) { width: 100%; height: 44px; padding: 0 10px; }
   .actions .wide { display: none; }
-  .actions .aa-btn { flex: none !important; width: 48px; padding: 0 !important; }
-  .actions .icon-btn--line { width: 48px !important; height: 44px !important; }
+  .actions .aa-btn .wide { display: inline; }
+  .actions .icon-btn--line { width: 100% !important; height: 44px !important; }
   .toc li { padding: 0 12px; gap: 10px; }
   .toasts { left: 12px; right: 12px; bottom: 12px; max-width: none; }
   .toast { width: 100%; max-width: none; }

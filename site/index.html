@@ -44,9 +44,10 @@ p{margin:0}
 .nav .wrap{display:flex;align-items:center;gap:20px;height:60px}
 .brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font:600 20px/1 var(--serif);letter-spacing:-.01em;margin-right:auto}
 .brand svg{width:30px;height:30px;flex:none}
-.nav a.l{color:var(--ink-2);text-decoration:none;font-size:15px}
+.nav a.l{color:var(--ink-2);text-decoration:none;font-size:15px;white-space:nowrap}
 .nav a.l:hover{color:var(--ink)}
 .nav .btn{min-height:38px;padding:0 14px;font-size:14px}
+@media (max-width:900px){.nav a.l[href="#authors"]{display:none}}
 @media (max-width:760px){.nav a.l{display:none}}
 
 /* buttons */

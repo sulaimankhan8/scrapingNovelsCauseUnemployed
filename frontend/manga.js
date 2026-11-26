@@ -502,10 +502,10 @@
       </div>
       <div id="mgRBody"></div>
       <div class="mg-rbar mg-rbar--bot">
-        <button type="button" class="btn btn--sm mg-rbtn" data-rch="${v.prevKey}" ${v.prevKey ? '' : 'disabled'}>${NA.icon('back', 14)} Previous</button>
+        <button type="button" class="btn btn--sm mg-rbtn" data-rch="${v.prevKey}" ${v.prevKey ? '' : 'disabled'} aria-label="Previous chapter">${NA.icon('back', 14)} <span class="mg-rlbl">Previous</span></button>
         <input type="range" id="mgRSlider" min="1" max="${Math.max(1, v.pages.length)}" value="${R.page + 1}" aria-label="Page">
         <span class="mg-rcount" id="mgRCount"></span>
-        <button type="button" class="btn btn--sm mg-rbtn" data-rch="${v.nextKey}" ${v.nextKey ? '' : 'disabled'}>Next ${NA.icon('arrow', 14)}</button>
+        <button type="button" class="btn btn--sm mg-rbtn" data-rch="${v.nextKey}" ${v.nextKey ? '' : 'disabled'} aria-label="Next chapter"><span class="mg-rlbl">Next</span> ${NA.icon('arrow', 14)}</button>
       </div></div>`;
     const root = $('#mgR');
     const body = $('#mgRBody');

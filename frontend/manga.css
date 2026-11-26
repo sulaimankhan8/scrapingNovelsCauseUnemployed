@@ -301,6 +301,18 @@ body.reading #main { padding: 0; }
   .mg-ch { padding: 0 10px 0 12px; gap: 8px; }
   .mg-ch__s .btn--sm { height: 36px; }
   .mg-selbar { top: 8px; }
+
+  /* Reader bottom bar: Previous and Next become arrow buttons so the bar
+     fits a 360px screen and the page slider keeps the room. */
+  .mg-rbar--bot { padding: 10px 12px; }
+  .mg-rbar--bot .mg-rbtn { width: 44px; height: 40px; padding: 0; justify-content: center; flex: none; }
+  .mg-rlbl { display: none; }
+  .mg-rcount { min-width: 0; }
+
+  /* The chapter you're reading: its "Reading · page 3" tag drops under the
+     title instead of being cut off. */
+  .mg-ch.is-here .mg-ch__t { white-space: normal; padding: 10px 0; }
+  .mg-ch.is-here .mg-ch__t .mg-tag { display: block; margin: 2px 0 0; }
 }
 
 /* Phones: the download pill is a spinner and a number, and the wordmark
