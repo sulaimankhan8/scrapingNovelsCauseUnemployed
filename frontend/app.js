@@ -316,15 +316,35 @@
     el.className = 'toast';
     el.setAttribute('role', opts.tone === 'bad' ? 'alert' : 'status');
     const dot = { ok: '#8FC79B', warn: '#E8B04A', bad: '#F07A6A' }[opts.tone];
-    el.innerHTML = `${dot ? `<span class="dot" style="background:${dot}"></span>` : ''}<span class="msg">${esc(msg)}</span>${opts.action ? `<button type="button" class="act${opts.plain ? ' act--plain' : ''}">${esc(opts.action.label)}</button>` : ''}<button type="button" class="x" aria-label="Dismiss">${icon('x', 14)}</button>`;
+    // One button (opts.action) or several (opts.actions). An action with keep: true
+    // leaves the toast up, so a reader can tap Open and then Share.
+    const acts = opts.actions || (opts.action ? [opts.action] : []);
+    if (acts.length > 1) el.classList.add('toast--multi');
+    const buttons = acts.map((a, i) => `<button type="button" class="act${opts.plain ? ' act--plain' : ''}" data-i="${i}">${esc(a.label)}</button>`).join('');
+    el.innerHTML = `${dot ? `<span class="dot" style="background:${dot}"></span>` : ''}<span class="msg">${esc(msg)}</span>${acts.length > 1 ? `<span class="acts">${buttons}</span>` : buttons}<button type="button" class="x" aria-label="Dismiss">${icon('x', 14)}</button>`;
     const close = () => { el.style.transition = 'opacity .15s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 160); };
-    if (opts.action) $('.act', el).addEventListener('click', () => { close(); opts.action.fn(); });
+    el.querySelectorAll('.act').forEach((b) => b.addEventListener('click', () => { const a = acts[+b.dataset.i]; if (!a.keep) close(); a.fn(); }));
     $('.x', el).addEventListener('click', close);
     box.appendChild(el);
     while (box.children.length > 3) box.firstElementChild.remove();
-    const t = opts.timeout === 0 ? 0 : (opts.timeout || (opts.action ? 8000 : 4500));
+    const t = opts.timeout === 0 ? 0 : (opts.timeout || (acts.length ? 8000 : 4500));
     if (t) setTimeout(close, t);
     return close;
+  }
+
+  // On Android an exported EPUB or CBZ comes back with a content link (r.uri):
+  // offer to open it in the reader's own e-book or comic app, or share it
+  // (Send to Kindle, Drive, chat…). The toast stays up so both can be used.
+  function savedFileToast(msg, r) {
+    const fail = (e) => toast(e.message, { tone: 'bad', timeout: 7000 });
+    return toast(msg, {
+      tone: 'ok',
+      timeout: 15000,
+      actions: [
+        { label: 'Open', keep: true, fn: () => api('OpenFile', r.uri, r.mime).catch(fail) },
+        { label: 'Share', keep: true, fn: () => api('ShareFile', r.uri, r.mime, r.fileName || '').catch(fail) },
+      ],
+    });
   }
 
   // ---------------------------------------------------------------- notify & chime
@@ -1547,8 +1567,8 @@
       const r = await api('ExportEPUB', slug);
       close();
       if (!r) return; // dialog cancelled
-      const where = state.platform === 'android' ? `${r.path || 'Downloads'}` : '';
-      toast(`Saved ${r.fileName} · ${r.sizeMb}${where ? ' · ' + where : ''}`, state.platform === 'android' ? { tone: 'ok' } : { tone: 'ok', action: { label: 'Show in folder', fn: () => api('ShowFileInFolder', r.path).catch(() => {}) } });
+      if (r.uri) savedFileToast(`Saved ${r.fileName} · ${r.sizeMb}${r.path ? ' · ' + r.path : ''}`, r);
+      else toast(`Saved ${r.fileName} · ${r.sizeMb}`, { tone: 'ok', action: { label: 'Show in folder', fn: () => api('ShowFileInFolder', r.path).catch(() => {}) } });
     } catch (e) { close(); toast(`Couldn’t save the EPUB: ${e.message}`, { tone: 'bad' }); }
     finally { exporting = false; }
   }
@@ -2221,7 +2241,7 @@
   // ================================================================ BRIDGE
   // manga.js reuses the shell's helpers instead of copying them.
   window.NA = {
-    api, on, esc, num, plural, mb, ago, icon, spinner, toast, notify, chime, morph, sleep,
+    api, on, esc, num, plural, mb, ago, icon, spinner, toast, savedFileToast, notify, chime, morph, sleep,
     openOverlay, closeOverlay, confirmDialog, openMenu, closeMenu, coverHTML, toneOf, niceTitle,
     store, state, route, render, renderShelf, openSiteWindow, openExternal, goAdd, MARK, LOGO,
     isOverlayOpen: () => !!overlayClose,

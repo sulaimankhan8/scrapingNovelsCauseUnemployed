@@ -581,6 +581,15 @@ main.view { padding: 36px 0 96px; }
 .toast .act { height: 34px; padding: 0 12px; border: 0; border-radius: 6px; background: #F7F3EC; color: #1D1B18; font-size: 13px; font-weight: 600; white-space: nowrap; }
 .toast .act--plain { background: transparent; color: #F7F3EC; text-decoration: underline; }
 .toast .x { width: 32px; height: 32px; border: 0; border-radius: 6px; background: transparent; color: #CFC8BC; display: grid; place-items: center; }
+.toast .acts { display: flex; gap: 8px; flex: none; }
+/* With two buttons on a narrow screen, the buttons get their own row under the message. */
+@media (max-width: 520px) {
+  .toast--multi { flex-wrap: wrap; row-gap: 8px; }
+  .toast--multi .msg { flex: 1 1 0; }
+  .toast--multi .x { order: 1; }
+  .toast--multi .acts { order: 2; flex: 1 1 100%; }
+  .toast--multi .acts .act { flex: 1; height: 40px; }
+}
 
 /* ---------- responsive ---------- */
 @media (max-width: 860px) {

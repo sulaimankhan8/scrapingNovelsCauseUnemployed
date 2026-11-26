@@ -67,6 +67,33 @@ public class MainActivity extends AppCompatActivity {
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> { });
     private boolean askedNotify;
 
+    // Android 7–9 have no shared Downloads collection an app can write to without
+    // a storage permission, so exports there ask the user where to save instead.
+    private CompletableFuture<Uri> pendingSave;
+    private final ActivityResultLauncher<String> saveEpub =
+            registerForActivityResult(new ActivityResultContracts.CreateDocument("application/epub+zip"), this::onSaveChosen);
+    private final ActivityResultLauncher<String> saveCbz =
+            registerForActivityResult(new ActivityResultContracts.CreateDocument("application/vnd.comicbook+zip"), this::onSaveChosen);
+
+    private void onSaveChosen(Uri uri) {
+        if (pendingSave != null) {
+            pendingSave.complete(uri);
+            pendingSave = null;
+        }
+    }
+
+    /** NovelBridge asks where to save an exported EPUB or CBZ; completes with null if cancelled. */
+    void pickSaveLocation(String fileName, String mime, CompletableFuture<Uri> result) {
+        if (pendingSave != null) pendingSave.complete(null);
+        pendingSave = result;
+        try {
+            ("application/epub+zip".equals(mime) ? saveEpub : saveCbz).launch(fileName);
+        } catch (Exception e) {
+            pendingSave = null;
+            result.complete(null);
+        }
+    }
+
     /** NovelBridge asks for a backup file to restore. */
     void pickBackup(CompletableFuture<Uri> result) {
         if (pendingPick != null) pendingPick.complete(null);

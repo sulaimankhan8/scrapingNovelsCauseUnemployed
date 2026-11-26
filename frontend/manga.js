@@ -139,7 +139,7 @@
   async function exportCBZ(slug) {
     try {
       const r = await call('ExportCBZ', slug);
-      if (r && onPhone()) NA.toast(`Saved ${NA.plural(r.chapters, 'chapter')} as CBZ in ${r.path || 'Downloads'}`, { tone: 'ok', timeout: 6000 });
+      if (r && r.uri) NA.savedFileToast(`Saved ${NA.plural(r.chapters, 'chapter')} as CBZ${r.path ? ' in ' + r.path : ''}`, r);
       else if (r) NA.toast(`Saved ${NA.plural(r.chapters, 'chapter')} (${sizeOf(r.bytes)}) as CBZ`, { tone: 'ok', action: { label: 'Show file', fn: () => NA.api('ShowFileInFolder', r.path).catch(() => {}) } });
     } catch (e) { NA.toast(e.message, { tone: 'bad' }); }
   }

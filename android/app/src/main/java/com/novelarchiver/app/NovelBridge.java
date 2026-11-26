@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ActivityNotFoundException;
+import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -32,6 +34,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -178,6 +181,14 @@ public class NovelBridge implements Events {
                     payload = exportEPUB(new org.json.JSONArray(argsJson).getString(0));
                 } else if ("Manga.ExportCBZ".equals(method)) {
                     payload = exportCBZ(new org.json.JSONArray(argsJson).getString(0));
+                } else if ("OpenFile".equals(method)) {
+                    org.json.JSONArray a = new org.json.JSONArray(argsJson);
+                    openFile(a.getString(0), a.getString(1));
+                    payload = "";
+                } else if ("ShareFile".equals(method)) {
+                    org.json.JSONArray a = new org.json.JSONArray(argsJson);
+                    shareFile(a.getString(0), a.getString(1), a.optString(2, ""));
+                    payload = "";
                 } else if ("BackupLibrary".equals(method)) {
                     payload = backupLibrary();
                 } else if ("ChooseBackup".equals(method)) {
@@ -209,24 +220,115 @@ public class NovelBridge implements Events {
         activity.runOnUiThread(() -> webView.evaluateJavascript(js, null));
     }
 
-    /** Go writes the EPUB to the cache; it is then copied into Downloads. */
+    static final String EPUB = "application/epub+zip";
+    static final String CBZ = "application/vnd.comicbook+zip";
+
+    /** Go writes the EPUB to the cache; it is then saved where the reader can get at it. */
     private String exportEPUB(String slug) throws Exception {
         File tmpDir = new File(activity.getCacheDir(), "export");
         tmpDir.mkdirs();
         JSONObject res = new JSONObject(core.exportEPUB(slug, tmpDir.getAbsolutePath()));
-        File tmp = new File(res.getString("path"));
-        res.put("path", toDownloads(tmp, res.getString("fileName"), "application/epub+zip"));
-        return res.toString();
+        return saveExport(res, EPUB);
     }
 
-    /** Go writes a manga series as one CBZ to the cache; it is then copied into Downloads. */
+    /** Go writes a manga series as one CBZ to the cache; it is then saved where the reader can get at it. */
     private String exportCBZ(String slug) throws Exception {
         File tmpDir = new File(activity.getCacheDir(), "export");
         tmpDir.mkdirs();
         JSONObject res = new JSONObject(core.exportCBZ(slug, tmpDir.getAbsolutePath()));
+        return saveExport(res, CBZ);
+    }
+
+    /**
+     * Moves an exported file out of the cache. Android 10+: into the phone's
+     * Downloads folder. Android 7–9: wherever the reader picks in the system's
+     * Save dialog. Adds "uri" and "mime" so the page can offer Open and Share.
+     * Returns "" (cancelled) if the reader closes the Save dialog.
+     */
+    private String saveExport(JSONObject res, String mime) throws Exception {
         File tmp = new File(res.getString("path"));
-        res.put("path", toDownloads(tmp, res.getString("fileName"), "application/vnd.comicbook+zip"));
+        String name = res.getString("fileName");
+        Uri uri;
+        if (Build.VERSION.SDK_INT >= 29) {
+            uri = insertIntoDownloads(tmp, name, mime);
+            res.put("path", "Downloads");
+        } else {
+            CompletableFuture<Uri> picked = new CompletableFuture<>();
+            activity.runOnUiThread(() -> activity.pickSaveLocation(name, mime, picked));
+            uri = picked.get();
+            if (uri == null) {
+                tmp.delete();
+                return "";
+            }
+            try (InputStream in = new FileInputStream(tmp);
+                 OutputStream out = activity.getContentResolver().openOutputStream(uri, "w")) {
+                if (out == null) throw new Exception("couldn't write to that folder");
+                copy(in, out);
+            }
+            res.put("path", "");
+        }
+        tmp.delete();
+        res.put("uri", uri.toString());
+        res.put("mime", mime);
         return res.toString();
+    }
+
+    /** Opens a saved export in whichever app the reader picks (their e-book or comic reader). */
+    private void openFile(String uriStr, String mime) throws Exception {
+        Uri uri = Uri.parse(uriStr);
+        boolean epub = EPUB.equals(mime);
+        // Comic readers register CBZ under several types; try the common ones.
+        String[] types = epub ? new String[]{EPUB} : new String[]{CBZ, "application/x-cbz", "application/zip"};
+        onUi(() -> {
+            for (String t : types) {
+                Intent view = new Intent(Intent.ACTION_VIEW)
+                        .setDataAndType(uri, t)
+                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                try {
+                    activity.startActivity(view);
+                    return;
+                } catch (ActivityNotFoundException ignored) {
+                }
+            }
+            throw new Exception(epub
+                    ? "No app on this phone opens EPUB books. Install an e-book reader, or use Share to send it to one."
+                    : "No app on this phone opens CBZ comics. Install a comic reader, or use Share to send it to one.");
+        });
+    }
+
+    /** Hands a saved export to the system share sheet (Kindle, Drive, email, chat apps…). */
+    private void shareFile(String uriStr, String mime, String name) throws Exception {
+        Uri uri = Uri.parse(uriStr);
+        Intent send = new Intent(Intent.ACTION_SEND)
+                .setType(mime)
+                .putExtra(Intent.EXTRA_STREAM, uri)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        send.setClipData(ClipData.newRawUri(name, uri)); // carries the read grant through the chooser
+        Intent chooser = Intent.createChooser(send, name.isEmpty() ? "Share" : "Share " + name);
+        onUi(() -> activity.startActivity(chooser));
+    }
+
+    private interface UiAction {
+        void run() throws Exception;
+    }
+
+    /** Runs on the UI thread and waits, passing any error back to the caller. */
+    private void onUi(UiAction action) throws Exception {
+        CompletableFuture<Void> done = new CompletableFuture<>();
+        activity.runOnUiThread(() -> {
+            try {
+                action.run();
+                done.complete(null);
+            } catch (Exception e) {
+                done.completeExceptionally(e);
+            }
+        });
+        try {
+            done.get();
+        } catch (ExecutionException e) {
+            Throwable c = e.getCause();
+            throw c instanceof Exception ? (Exception) c : new Exception(c);
+        }
     }
 
     /** The whole library as one zip in Downloads. */
@@ -290,23 +392,30 @@ public class NovelBridge implements Events {
         }
     }
 
+    /** Android 10+: copies a file into the phone's shared Downloads folder and returns its content URI. */
+    private Uri insertIntoDownloads(File tmp, String name, String mime) throws Exception {
+        ContentValues v = new ContentValues();
+        v.put(MediaStore.Downloads.DISPLAY_NAME, name);
+        v.put(MediaStore.Downloads.MIME_TYPE, mime);
+        v.put(MediaStore.Downloads.IS_PENDING, 1);
+        ContentResolver cr = activity.getContentResolver();
+        Uri uri = cr.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
+        if (uri == null) throw new Exception("couldn't create the file in Downloads");
+        try (InputStream in = new FileInputStream(tmp); OutputStream out = cr.openOutputStream(uri)) {
+            if (out == null) throw new Exception("couldn't write the file in Downloads");
+            copy(in, out);
+        }
+        v.clear();
+        v.put(MediaStore.Downloads.IS_PENDING, 0);
+        cr.update(uri, v, null, null);
+        return uri;
+    }
+
     /** Copies a finished file into the phone's Downloads folder; returns where it went. */
     private String toDownloads(File tmp, String name, String mime) throws Exception {
         String shown;
         if (Build.VERSION.SDK_INT >= 29) {
-            ContentValues v = new ContentValues();
-            v.put(MediaStore.Downloads.DISPLAY_NAME, name);
-            v.put(MediaStore.Downloads.MIME_TYPE, mime);
-            v.put(MediaStore.Downloads.IS_PENDING, 1);
-            ContentResolver cr = activity.getContentResolver();
-            Uri uri = cr.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
-            if (uri == null) throw new Exception("couldn't create the file in Downloads");
-            try (InputStream in = new FileInputStream(tmp); OutputStream out = cr.openOutputStream(uri)) {
-                copy(in, out);
-            }
-            v.clear();
-            v.put(MediaStore.Downloads.IS_PENDING, 0);
-            cr.update(uri, v, null, null);
+            insertIntoDownloads(tmp, name, mime);
             shown = "Downloads";
         } else {
             // Android 9 and older: app-specific Downloads folder (no permission needed).
