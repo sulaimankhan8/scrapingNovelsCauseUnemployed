@@ -47,6 +47,8 @@ type Profile struct {
 	Vars     map[string]string `json:"vars"`   // extra values read from the series page
 	Chapters ChapterRules      `json:"chapters"`
 	Pages    PageRules         `json:"pages"`
+	// Search finds series by title (nil: the site can't be searched).
+	Search *SearchRules `json:"search,omitempty"`
 
 	seriesRe  *regexp.Regexp
 	chapterRe *regexp.Regexp

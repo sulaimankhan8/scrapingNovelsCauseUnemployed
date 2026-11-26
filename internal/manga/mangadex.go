@@ -69,19 +69,8 @@ func (e *Engine) mangadexDiscover(ctx context.Context, p *Profile, m *Match, sta
 	a := md.Data.Attributes
 	s := &Series{SiteID: p.ID, SiteName: p.Name, URL: "https://mangadex.org/title/" + id,
 		Vars: map[string]string{"id": id, "seriesUrl": "https://mangadex.org/title/" + id}}
-	s.Type = map[string]string{"ko": "Manhwa", "zh": "Manhua", "zh-hk": "Manhua"}[a.Language]
-	if s.Type == "" {
-		s.Type = "Manga"
-	}
-	s.Title = pickLang(a.Title)
-	if a.Title["en"] == "" {
-		for _, alt := range a.AltTitles {
-			if alt["en"] != "" {
-				s.Title = alt["en"]
-				break
-			}
-		}
-	}
+	s.Type = mdType(a.Language)
+	s.Title = mdTitle(a.Title, a.AltTitles)
 	s.Description = clip(pickLang(a.Description), 4000)
 	s.Status = a.Status
 	var authors []string
@@ -208,4 +197,102 @@ func pickLang(m map[string]string) string {
 		return v
 	}
 	return ""
+}
+
+// mangadexSearch asks the MangaDex API for series by title. Only series
+// with English chapters hosted on MangaDex are listed, since those are the
+// only ones that can be downloaded.
+func (e *Engine) mangadexSearch(ctx context.Context, p *Profile, query string) ([]SearchHit, error) {
+	q := url.Values{}
+	q.Set("title", query)
+	q.Set("limit", strconv.Itoa(maxSearchHits))
+	q.Add("includes[]", "cover_art")
+	q.Add("includes[]", "author")
+	for _, r := range []string{"safe", "suggestive", "erotica"} {
+		q.Add("contentRating[]", r)
+	}
+	q.Add("availableTranslatedLanguage[]", "en")
+	q.Set("hasAvailableChapters", "true")
+	q.Set("order[relevance]", "desc")
+	pg, err := e.get(ctx, p, Request{URL: mdAPI + "/manga?" + q.Encode()})
+	if err != nil {
+		return nil, err
+	}
+	return parseMangadexSearch(p, pg.Body)
+}
+
+func parseMangadexSearch(p *Profile, body []byte) ([]SearchHit, error) {
+	var res struct {
+		Result string `json:"result"`
+		Data   []struct {
+			ID         string `json:"id"`
+			Attributes struct {
+				Title       map[string]string   `json:"title"`
+				AltTitles   []map[string]string `json:"altTitles"`
+				Language    string              `json:"originalLanguage"`
+				LastChapter string              `json:"lastChapter"`
+				Status      string              `json:"status"`
+			} `json:"attributes"`
+			Relationships []mdRel `json:"relationships"`
+		} `json:"data"`
+	}
+	if err := json.Unmarshal(body, &res); err != nil {
+		return nil, fmt.Errorf("MangaDex search returned invalid JSON: %w", err)
+	}
+	if res.Result != "ok" {
+		return nil, fmt.Errorf("MangaDex search failed (%s)", res.Result)
+	}
+	var hits []SearchHit
+	for _, d := range res.Data {
+		a := d.Attributes
+		h := SearchHit{SiteID: p.ID, SiteName: p.Name, URL: "https://mangadex.org/title/" + d.ID,
+			Title: mdTitle(a.Title, a.AltTitles), Type: mdType(a.Language)}
+		var authors []string
+		for _, r := range d.Relationships {
+			switch r.Type {
+			case "author":
+				if n, _ := r.Attributes["name"].(string); n != "" {
+					authors = append(authors, n)
+				}
+			case "cover_art":
+				if f, _ := r.Attributes["fileName"].(string); f != "" {
+					h.Cover = "https://uploads.mangadex.org/covers/" + d.ID + "/" + f + ".256.jpg"
+				}
+			}
+		}
+		h.Author = strings.Join(authors, ", ")
+		// lastChapter is the series' final chapter, set once it has
+		// ended; the chapters hosted in English may be fewer, so it's
+		// shown as the latest, not as a count.
+		if a.LastChapter != "" {
+			h.Latest = "Chapter " + a.LastChapter
+		}
+		if h.Title != "" {
+			hits = append(hits, h)
+		}
+	}
+	return hits, nil
+}
+
+// mdTitle is the English title when MangaDex has one, else the romanised one.
+func mdTitle(title map[string]string, alts []map[string]string) string {
+	if t := title["en"]; t != "" {
+		return t
+	}
+	for _, alt := range alts {
+		if alt["en"] != "" {
+			return alt["en"]
+		}
+	}
+	return pickLang(title)
+}
+
+func mdType(lang string) string {
+	switch lang {
+	case "ko":
+		return "Manhwa"
+	case "zh", "zh-hk":
+		return "Manhua"
+	}
+	return "Manga"
 }

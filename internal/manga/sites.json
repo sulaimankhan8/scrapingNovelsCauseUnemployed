@@ -9,6 +9,7 @@
       "domains": ["mangadex.org"],
       "status": "tested",
       "api": "mangadex",
+      "search": { "verified": "Verified 2026-11-26 over plain HTTP (api.mangadex.org/manga?title=, series with English chapters on MangaDex only): Chainsaw Man first of 6." },
       "example": "https://mangadex.org/title/801513ba-a712-498c-8f57-cae55b38cc92/berserk",
       "headers": { "User-Agent": "InkShelfs/3.0 (personal offline reader)" },
       "seriesUrl": "^https?://(www\\.)?mangadex\\.org/title/(?<id>[0-9a-f-]{36})",
@@ -31,7 +32,17 @@
         "description": "p.text-sm.text--secondary, meta[property='og:description']@content"
       },
       "chapters": { "items": "#chapters a[href^='/chapters/']", "order": "newest-first" },
-      "pages": { "images": "img.js-page@data-src|src" }
+      "pages": { "images": "img.js-page@data-src|src" },
+      "search": {
+        "url": "https://mangapill.com/search?q={query}",
+        "items": "div.grid > div",
+        "link": "a[href^='/manga/']@href",
+        "title": "a.mb-2 div",
+        "cover": "img@data-src|src",
+        "type": "div.flex-wrap > div.text-xs",
+        "skip": "(?i)^novel$",
+        "verified": "Verified 2026-11-26 over plain HTTP: Chainsaw Man = /manga/723/chainsaw-man first; its novel entries are dropped."
+      }
     },
     {
       "id": "weebcentral",
@@ -59,6 +70,16 @@
       "pages": {
         "url": "{chapterUrl}/images?is_prev=False&current_page=1&reading_style=long_strip",
         "images": "img[alt^='Page']@src"
+      },
+      "search": {
+        "url": "https://weebcentral.com/search/data?text={query}&sort=Best+Match&order=Descending&official=Any&anime=Any&adult=Any&display_mode=Full+Display",
+        "items": "article.bg-base-300",
+        "link": "a[href*='/series/']@href",
+        "title": "a.line-clamp-1",
+        "cover": "img@src",
+        "author": "a[href*='author=']",
+        "type": "div.opacity-70 ~ Type:[[:space:]]*([[:alpha:]]+)",
+        "verified": "Verified 2026-11-26 over plain HTTP (htmx endpoint, 3 results a page): Chainsaw Man first."
       }
     },
     {
@@ -100,7 +121,18 @@
         "description": ".description-summary .summary__content, .description-summary"
       },
       "chapters": { "url": "{seriesUrl}/ajax/chapters/", "method": "POST", "items": "li.wp-manga-chapter > a", "order": "newest-first" },
-      "pages": { "images": ".reading-content img@data-src|src" }
+      "pages": { "images": ".reading-content img@data-src|src" },
+      "search": {
+        "url": "https://www.mangaread.org/?s={query}&post_type=wp-manga",
+        "items": ".c-tabs-item__content",
+        "link": ".post-title a@href",
+        "title": ".post-title a",
+        "cover": "img@data-src|src",
+        "author": ".mg_author .summary-content",
+        "latest": ".latest-chap .chapter a",
+        "chapters": ".latest-chap .chapter a ~ (?i)chapter[[:space:]]*([0-9.]+)",
+        "verified": "Verified 2026-11-26 over plain HTTP: Chainsaw Man first, latest Chapter 232."
+      }
     },
     {
       "id": "toonily",
@@ -120,7 +152,15 @@
         "description": ".summary__content, .description-summary"
       },
       "chapters": { "items": "li.wp-manga-chapter > a", "order": "newest-first" },
-      "pages": { "images": ".reading-content img@data-src|src" }
+      "pages": { "images": ".reading-content img@data-src|src" },
+      "search": {
+        "url": "https://toonily.com/search/{slug}",
+        "items": ".page-item-detail",
+        "link": ".post-title a@href",
+        "title": ".post-title a",
+        "cover": "img@data-src|src",
+        "verified": "Verified 2026-11-26 over plain HTTP (/?s= redirects to /search/<slug>): Solo Leveling in the first 3."
+      }
     },
     {
       "id": "manhuaplus",
