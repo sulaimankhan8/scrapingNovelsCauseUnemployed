@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>InkShelfs: read web novels and manga offline, without the ads</title>
-<meta name="description" content="Save web novels, manga, manhwa and manhua to your Windows PC or Android phone and read them offline, with no ads. Free and open source.">
+<title>InkShelfs: web novel &amp; manga downloader for offline reading</title>
+<meta name="description" content="Download web novels, manga, manhwa and manhua to your Windows PC or Android phone and read them offline, with no ads. Free and open source.">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
 <link rel="canonical" href="https://inkshelfs.vercel.app/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="InkShelfs">
 <meta property="og:url" content="https://inkshelfs.vercel.app/">
-<meta property="og:title" content="InkShelfs: read web novels and manga offline, without the ads">
+<meta property="og:title" content="InkShelfs: web novel &amp; manga downloader for offline reading">
 <meta property="og:description" content="Save the web novels and manga you follow to your PC or Android phone. Read on the train, with no ads or pop-ups. Free and open source.">
 <meta property="og:image" content="https://inkshelfs.vercel.app/img/og.png">
 <meta property="og:image:width" content="1200">
@@ -20,7 +21,10 @@
 <meta name="theme-color" content="#121417" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<!-- fonts load without blocking the first paint; the system fallbacks show until they arrive -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <script type="application/ld+json">
@@ -29,7 +33,17 @@
   "@type": "SoftwareApplication",
   "name": "InkShelfs",
   "alternateName": "NovelArchiver",
-  "description": "Save web novels, manga, manhwa and manhua to your Windows PC or Android phone and read them offline, with no ads.",
+  "description": "Download web novels, manga, manhwa and manhua to your Windows PC or Android phone and read them offline, with no ads.",
+  "featureList": [
+    "Download web novels from Royal Road, WuxiaWorld, ScribbleHub, NovelBin, Wattpad, AO3 and more",
+    "Download manga, manhwa and manhua from MangaDex, WEBTOON, Asura Scans and more",
+    "Search novels by title across every supported site",
+    "Chinese and Japanese web novels translated to English",
+    "Offline reader with light, sepia and dark themes",
+    "Export novels as EPUB and manga as CBZ",
+    "Background downloads and new-chapter updates"
+  ],
+  "screenshot": "https://inkshelfs.vercel.app/img/desk-inkshelf-library.webp",
   "url": "https://inkshelfs.vercel.app/",
   "image": "https://inkshelfs.vercel.app/img/og.png",
   "applicationCategory": "BookApplication",
@@ -193,7 +207,7 @@ section{padding:88px 0;border-top:1px solid var(--line)}
 .nw{white-space:nowrap}
 code{font:.88em ui-monospace,Consolas,monospace;background:var(--sunk);border-radius:5px;padding:1px 5px;overflow-wrap:anywhere}
 .check{margin-top:20px;padding:18px 20px;border-radius:14px;border:1px dashed var(--line);font-size:.95rem;color:var(--ink-2)}
-pre.cmd{margin:10px 0 0;padding:10px 12px;border-radius:8px;background:var(--sunk);font:.85rem/1.5 ui-monospace,Consolas,monospace;overflow-x:auto}
+pre.cmd{margin:10px 0 0;padding:10px 12px;border-radius:8px;background:var(--sunk);font:.85rem/1.5 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
 
 /* sites + new */
 .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px}
@@ -216,9 +230,14 @@ pre.cmd{margin:10px 0 0;padding:10px 12px;border-radius:8px;background:var(--sun
 .accent-em{font-style:italic;color:var(--accent)}
 .note{margin-top:16px;font-size:.95rem}
 h2.minor{margin-top:40px;font-size:1.6rem}
-.sites-wrap h3{font:600 .82rem/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 0 0}
-.renamed{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;padding:5px 12px 5px 6px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:13.5px;color:var(--ink-2)}
-.renamed b{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:1px 8px;font-size:11.5px;letter-spacing:.04em}
+.sites-wrap h3{font:600 .82rem/1.4 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 0 0}
+.sites-wrap h3 .muted{text-transform:none;letter-spacing:0;font-weight:400}
+/* hero: a one-line keyword kicker inside the h1, and the 3.2 note as a quiet link under the buttons */
+.kicker{display:block;margin-bottom:16px;font:600 13px/1.3 var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.meta .whatsnew{color:var(--ink-2);text-decoration:none}
+.meta .whatsnew b{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-right:6px}
+@media (hover:hover){.meta .whatsnew:hover{color:var(--ink);text-decoration:underline}}
 
 /* support pop-ups (shown after a download starts; never block it) */
 dialog.thanks{width:min(30rem,calc(100% - 32px));border:0;border-radius:20px;padding:0;background:var(--card);color:var(--ink);box-shadow:0 30px 80px -30px rgba(0,0,0,.6)}
@@ -297,14 +316,13 @@ footer a{display:inline-block;padding:12px 0}
 <div class="hero" id="download">
   <div class="wrap">
     <div>
-      <span class="renamed"><b>NEW</b>Search by title, plus Chinese and Japanese novels</span>
-      <h1>The next chapter, <em>on the train</em>.</h1>
+      <h1><span class="kicker">Web novel &amp; manga downloader<span class="sr">:</span></span> The next chapter, <em>on the train</em>.</h1>
       <p class="lede">InkShelfs saves the web novels, manga, manhwa and manhua you follow to your PC or phone, so you can read on the commute, at lunch, or wherever the signal drops. No ads in the middle of a chapter, no pop-ups, no waiting for pages to load.</p>
       <div class="cta">
         <a class="btn primary dl" data-os="Windows" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/InkShelfs.exe"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5 10 4.5v7H3zm0 13 7 1v-7H3zM11 4.4 21 3v8.5H11zm0 15.2L21 21v-8.5H11z"/></svg>Windows <small>.exe</small></a>
         <a class="btn dl" data-os="Android" href="https://github.com/sulaimankhan8/novelarchiver/releases/latest/download/InkShelfs-android-test.apk"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.6 9.5 19.4 6.4a.4.4 0 1 0-.7-.4l-1.8 3.2A10.8 10.8 0 0 0 12 8.2c-1.8 0-3.5.4-4.9 1L5.3 6a.4.4 0 1 0-.7.4l1.8 3.1A9.5 9.5 0 0 0 1.5 17h21a9.5 9.5 0 0 0-4.9-7.5zM7 14.4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>Android <small>.apk</small></a>
       </div>
-      <p class="meta"><span class="v"><i aria-hidden="true"></i>Version 3.2</span><span>Free and open source</span><span>Novels and manga on Windows and Android</span><a href="#install">First install? Read this</a></p>
+      <p class="meta"><span class="v"><i aria-hidden="true"></i>Version 3.2</span><span>Free and open source</span><a class="whatsnew" href="#new"><b>New</b> Search by title, Chinese and Japanese novels</a><a href="#install">First install? Read this</a></p>
     </div>
     <div class="stage">
       <div class="win">
@@ -452,7 +470,7 @@ footer a{display:inline-block;padding:12px 0}
       <p class="muted note">Every site was tested with a real download. The app’s Sites page lists them all with a “Try an example” link. Other novel sites open in a general reader mode, and when a site changes its layout, its rules can be fixed without a new release.</p>
     </div>
     <div>
-      <h2>What’s new in 3.2</h2>
+      <h2 id="new">What’s new in 3.2</h2>
       <ul class="new">
         <li><b>Search by title</b><span>Type a novel’s name instead of a link. Every site is searched at once, and each novel shows once with a row per site.</span></li>
         <li><b>Compare chapter counts</b><span>See which site has the most chapters before you download; Count reads a site’s full list, paid chapters counted apart.</span></li>
