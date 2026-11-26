@@ -4,13 +4,45 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>InkShelfs: read web novels and manga offline, without the ads</title>
-<meta name="description" content="Save the web novels, manga, manhwa and manhua you follow to your Windows PC or Android phone and read them offline, with no ads or pop-ups. Free and open source. Formerly NovelArchiver.">
+<meta name="description" content="Save web novels, manga, manhwa and manhua to your Windows PC or Android phone and read them offline, with no ads. Free and open source.">
+<link rel="canonical" href="https://inkshelfs.vercel.app/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="InkShelfs">
+<meta property="og:url" content="https://inkshelfs.vercel.app/">
+<meta property="og:title" content="InkShelfs: read web novels and manga offline, without the ads">
+<meta property="og:description" content="Save the web novels and manga you follow to your PC or Android phone. Read on the train, with no ads or pop-ups. Free and open source.">
+<meta property="og:image" content="https://inkshelfs.vercel.app/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="InkShelfs on a Windows PC and an Android phone: a library of novels and manga, and a chapter open in the reader.">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#f6f2ea" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#121417" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%231D1B18'/%3E%3Cpath d='M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z' fill='%23F7F3EC'/%3E%3Cpath d='M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z' fill='%23E9DFCE'/%3E%3Cpath d='M37 20h9v10h-9zM37 33h9v12h-9z' fill='%231D1B18'/%3E%3Ccircle cx='48' cy='48' r='7' fill='%23A8431F'/%3E%3C/svg%3E">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "InkShelfs",
+  "alternateName": "NovelArchiver",
+  "description": "Save web novels, manga, manhwa and manhua to your Windows PC or Android phone and read them offline, with no ads.",
+  "url": "https://inkshelfs.vercel.app/",
+  "image": "https://inkshelfs.vercel.app/img/og.png",
+  "applicationCategory": "BookApplication",
+  "operatingSystem": "Windows 10, Windows 11, Android 7.0+",
+  "softwareVersion": "3.2",
+  "downloadUrl": "https://github.com/sulaimankhan8/novelarchiver/releases/latest",
+  "license": "https://github.com/sulaimankhan8/novelarchiver",
+  "isAccessibleForFree": true,
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}
+}
+</script>
+<link rel="alternate icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%231D1B18'/%3E%3Cpath d='M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z' fill='%23F7F3EC'/%3E%3Cpath d='M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z' fill='%23E9DFCE'/%3E%3Cpath d='M37 20h9v10h-9zM37 33h9v12h-9z' fill='%231D1B18'/%3E%3Ccircle cx='48' cy='48' r='7' fill='%23A8431F'/%3E%3C/svg%3E">
+<script>if(/Android/i.test(navigator.userAgent))document.documentElement.classList.add('android')</script>
 <style>
 :root{
   --paper:#f6f2ea;--card:#fffdf8;--sunk:#ede6d9;--ink:#1d1b18;--ink-2:#3d3830;--muted:#6b645a;--line:#e2d9c9;
@@ -44,19 +76,34 @@ p{margin:0}
 .nav .wrap{display:flex;align-items:center;gap:20px;height:60px}
 .brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font:600 20px/1 var(--serif);letter-spacing:-.01em;margin-right:auto}
 .brand svg{width:30px;height:30px;flex:none}
+.nav .links{display:flex;gap:20px}
 .nav a.l{color:var(--ink-2);text-decoration:none;font-size:15px;white-space:nowrap}
 .nav a.l:hover{color:var(--ink)}
-.nav .btn{min-height:38px;padding:0 14px;font-size:14px}
+.nav .btn{min-height:44px;padding:0 16px;font-size:14px}
+.menu{display:none;position:relative}
+.menu summary{list-style:none;width:44px;height:44px;display:grid;place-items:center;border-radius:12px;cursor:pointer;color:var(--ink)}
+.menu summary::-webkit-details-marker{display:none}
+.menu summary svg{width:22px;height:22px}
+.menu[open] summary{background:var(--sunk)}
+.menu-panel{position:absolute;right:0;top:calc(100% + 8px);min-width:14rem;padding:6px;border-radius:14px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:grid}
+.menu-panel a{display:flex;align-items:center;min-height:46px;padding:0 14px;border-radius:9px;color:var(--ink);text-decoration:none;font-size:16px}
+.menu-panel a:active{background:var(--sunk)}
 @media (max-width:900px){.nav a.l[href="#authors"]{display:none}}
-@media (max-width:760px){.nav a.l{display:none}}
+@media (max-width:760px){.nav .links{display:none}.menu{display:block}.nav .wrap{gap:8px}}
 
 /* buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 22px;border-radius:12px;text-decoration:none;font-weight:600;font-size:16px;border:1px solid var(--line);color:var(--ink);background:var(--card);transition:background-color .15s,border-color .15s,transform .15s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 22px;border-radius:12px;text-decoration:none;font-weight:600;font-size:16px;border:1px solid color-mix(in srgb,var(--ink) 30%,var(--paper));color:var(--ink);background:var(--card);transition:background-color .15s,border-color .15s,transform .15s}
 .btn:active{transform:scale(.97)}
 .btn.primary{background:var(--ink);border-color:var(--ink);color:var(--paper)}
 .btn small{font-weight:400;opacity:.75;font-size:13px}
 .btn svg{width:18px;height:18px;flex:none}
 @media (hover:hover){.btn:hover{border-color:var(--muted)}.btn.primary:hover{background:var(--ink-2)}}
+/* On Android, lead with the .apk: swap which download is primary and put it first.
+   html.android is set by a one-line script in <head>, so there is no flash. */
+.android .cta .dl[data-os="Android"]{order:-1;background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.android .cta .dl[data-os="Windows"]{background:var(--card);border-color:color-mix(in srgb,var(--ink) 30%,var(--paper));color:var(--ink)}
+.android .install .card[data-os="Android"]{order:-1}
+@media (max-width:520px){.cta .btn{flex:1 1 100%}}
 
 /* hero */
 .hero{padding:64px 0 40px;overflow:hidden}
@@ -80,7 +127,7 @@ p{margin:0}
 .phone img{border-radius:26px}
 .stage .phone{position:absolute;right:-10px;bottom:0}
 @media (max-width:900px){.hero .wrap{grid-template-columns:1fr;gap:36px}.hero{padding-top:40px}.stage .phone{right:6px}}
-@media (max-width:520px){.stage{padding-bottom:28px}.stage .phone{width:42%;border-radius:24px;padding:6px}.stage .phone img{border-radius:19px}.win .bar{height:24px}.win .bar .ctl span{width:30px}}
+@media (max-width:520px){.hero{padding-top:28px}.lede{margin:18px 0 22px}.stage{padding-bottom:28px}.stage .phone{width:42%;border-radius:24px;padding:6px}.stage .phone img{border-radius:19px}.win .bar{height:24px}.win .bar .ctl span{width:30px}}
 
 /* sections */
 section{padding:88px 0;border-top:1px solid var(--line)}
@@ -99,6 +146,7 @@ section{padding:88px 0;border-top:1px solid var(--line)}
 .tour{display:grid;gap:96px}
 .row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;align-items:center}
 .row.flip .txt{order:2}
+.row .txt{max-width:40rem}
 .row .txt p{color:var(--ink-2);margin-top:12px;font-size:1.05rem}
 .row ul{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:8px}
 .row li{display:flex;gap:10px;font-size:.98rem;color:var(--ink-2)}
@@ -119,18 +167,18 @@ section{padding:88px 0;border-top:1px solid var(--line)}
 .authors .head p{color:color-mix(in srgb,var(--paper) 82%,transparent)}
 .authors h2 em{font-style:italic;color:#f0a27e}
 @media (prefers-color-scheme:dark){.authors{background:#1d1a17;color:var(--ink)}.authors .head p{color:var(--ink-2)}}
-.give{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1px;background:color-mix(in srgb,currentColor 18%,transparent);border-radius:14px;overflow:hidden}
+.give{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(15rem,100%),1fr));gap:1px;background:color-mix(in srgb,currentColor 18%,transparent);border-radius:14px;overflow:hidden}
 .give div{background:var(--ink);padding:22px}
 @media (prefers-color-scheme:dark){.give div{background:#1d1a17}}
 .give b{display:block;font:500 1.15rem/1.3 var(--serif);margin-bottom:6px}
 .give p{font-size:.95rem;opacity:.8}
-.never{margin-top:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:24px}
+.never{margin-top:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(16rem,100%),1fr));gap:24px}
 .never h3{font-size:1.1rem;margin-bottom:6px}
 .never p{font-size:.95rem;opacity:.8}
 .never h3::before{content:"✕ ";color:#f0a27e;font-family:var(--sans);font-size:.9em}
 
 /* install */
-.install{display:grid;grid-template-columns:repeat(auto-fit,minmax(19rem,1fr));gap:20px}
+.install{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(19rem,100%),1fr));gap:20px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
 .card h3{display:flex;align-items:center;gap:10px;margin-bottom:4px}
 .card h3 svg{width:22px;height:22px;flex:none}
@@ -142,6 +190,7 @@ section{padding:88px 0;border-top:1px solid var(--line)}
 .ui{display:inline-block;padding:0 8px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;background:var(--paper);font-weight:600;font-size:.9em;white-space:nowrap}
 .ui.blue{background:#0067c0;border-color:#0067c0;color:#fff}
 .say{font-style:italic}
+.nw{white-space:nowrap}
 code{font:.88em ui-monospace,Consolas,monospace;background:var(--sunk);border-radius:5px;padding:1px 5px;overflow-wrap:anywhere}
 .check{margin-top:20px;padding:18px 20px;border-radius:14px;border:1px dashed var(--line);font-size:.95rem;color:var(--ink-2)}
 pre.cmd{margin:10px 0 0;padding:10px 12px;border-radius:8px;background:var(--sunk);font:.85rem/1.5 ui-monospace,Consolas,monospace;overflow-x:auto}
@@ -161,7 +210,12 @@ pre.cmd{margin:10px 0 0;padding:10px 12px;border-radius:8px;background:var(--sun
 .kinds span{font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
 .shots{display:grid;gap:18px}
 .shots .win + .win{margin-left:12%}
+/* On phones the series window becomes a phone showing the Android app; the desktop reader is too small to read there. */
+@media (max-width:760px){.shots .swap{width:min(70%,280px);justify-self:center;border-radius:34px;padding:9px;background:#141518;border-color:rgba(0,0,0,.4)}.shots .swap .bar{display:none}.shots .swap img{border-radius:26px}.shots .win + .win{display:none}}
 .sites h3{font-size:1.05rem;margin-top:26px}
+.accent-em{font-style:italic;color:var(--accent)}
+.note{margin-top:16px;font-size:.95rem}
+h2.minor{margin-top:40px;font-size:1.6rem}
 .sites-wrap h3{font:600 .82rem/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 0 0}
 .renamed{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;padding:5px 12px 5px 6px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:13.5px;color:var(--ink-2)}
 .renamed b{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:1px 8px;font-size:11.5px;letter-spacing:.04em}
@@ -170,7 +224,7 @@ pre.cmd{margin:10px 0 0;padding:10px 12px;border-radius:8px;background:var(--sun
 dialog.thanks{width:min(30rem,calc(100% - 32px));border:0;border-radius:20px;padding:0;background:var(--card);color:var(--ink);box-shadow:0 30px 80px -30px rgba(0,0,0,.6)}
 dialog.thanks::backdrop{background:rgba(18,20,23,.55)}
 @media (prefers-reduced-motion:no-preference){dialog.thanks[open]{animation:pop .28s cubic-bezier(.23,1,.32,1)}@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}}}
-.thanks .in{padding:26px 26px 22px;display:grid;gap:14px}
+.thanks .in{padding:26px 26px 0;display:grid;gap:14px}
 .thanks .step{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .thanks h2{font-size:1.65rem;line-height:1.15}
 .thanks p{color:var(--ink-2);font-size:.98rem}
@@ -180,7 +234,10 @@ dialog.thanks::backdrop{background:rgba(18,20,23,.55)}
 .thanks li{display:grid;grid-template-columns:22px 1fr;gap:8px;font-size:.96rem;color:var(--ink-2)}
 .thanks li b{color:var(--ink);font-weight:600}
 .thanks li svg{width:18px;height:18px;margin-top:3px;color:var(--accent)}
-.thanks .foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:4px}
+/* the buttons stay pinned to the bottom of the dialog, so a short phone never hides Next/Done */
+.thanks .foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;bottom:0;padding:12px 0 22px;margin-top:-4px;background:var(--card)}
+.thanks .foot .btn{margin-left:auto}
+@media (max-height:720px),(max-width:420px){.thanks .in{padding:20px 20px 0;gap:10px}.thanks h2{font-size:1.4rem}.thanks .foot{padding-bottom:16px}}
 .thanks .foot label{margin-right:auto;display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted);cursor:pointer}
 .thanks .foot input{accent-color:var(--accent);width:16px;height:16px}
 .thanks .btn{min-height:44px;padding:0 18px;font-size:15px}
@@ -192,19 +249,20 @@ dialog.thanks::backdrop{background:rgba(18,20,23,.55)}
 
 /* faq */
 .faq{max-width:48rem}
-.faq details{border-bottom:1px solid var(--line);padding:18px 0}
-.faq summary{cursor:pointer;font:500 1.15rem/1.35 var(--serif);list-style:none;display:flex;justify-content:space-between;gap:16px}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{cursor:pointer;font:500 1.15rem/1.35 var(--serif);list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0}
 .faq summary::-webkit-details-marker{display:none}
 .faq summary::after{content:"+";font-family:var(--sans);color:var(--muted);font-size:1.3rem;line-height:1}
 .faq details[open] summary::after{content:"–"}
-.faq details p{margin-top:10px;color:var(--ink-2)}
+.faq details p{margin:-6px 0 18px;color:var(--ink-2)}
 
 /* final cta + footer */
 .final{text-align:center}
 .final h2{max-width:20ch;margin:0 auto}
 .final .cta{justify-content:center;margin-top:28px}
 footer{border-top:1px solid var(--line);padding:32px 0 48px;color:var(--muted);font-size:.9rem}
-footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;align-items:center}
+footer a{display:inline-block;padding:12px 0}
 </style>
 </head>
 <body>
@@ -212,12 +270,25 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="InkShelfs home"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#1D1B18"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><path d="M37 20h9v10h-9zM37 33h9v12h-9z" fill="#1D1B18"/><path d="M18 21h10M18 27h10M18 33h7" stroke="#B5AC9E" stroke-width="2.4" stroke-linecap="round"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs</a>
-    <a class="l" href="#tour">How it works</a>
-    <a class="l" href="#manga">Manga</a>
-    <a class="l" href="#sites">Sites</a>
-    <a class="l" href="#authors">Supporting creators</a>
-    <a class="l" href="#install">Installing</a>
-    <a class="l" href="#faq">FAQ</a>
+    <nav class="links" aria-label="Sections">
+      <a class="l" href="#tour">How it works</a>
+      <a class="l" href="#manga">Manga</a>
+      <a class="l" href="#sites">Sites</a>
+      <a class="l" href="#authors">Supporting creators</a>
+      <a class="l" href="#install">Installing</a>
+      <a class="l" href="#faq">FAQ</a>
+    </nav>
+    <details class="menu">
+      <summary aria-label="Sections"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></summary>
+      <nav class="menu-panel" aria-label="Sections">
+        <a href="#tour">How it works</a>
+        <a href="#manga">Manga</a>
+        <a href="#sites">Sites</a>
+        <a href="#authors">Supporting creators</a>
+        <a href="#install">Installing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+    </details>
     <a class="btn primary" href="#download">Download</a>
   </div>
 </header>
@@ -236,9 +307,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
       <p class="meta"><span class="v"><i aria-hidden="true"></i>Version 3.2</span><span>Free and open source</span><span>Novels and manga on Windows and Android</span><a href="#install">First install? Read this</a></p>
     </div>
     <div class="stage">
-      <div class="win" aria-hidden="true">
-        <div class="bar"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div>
-        <img src="img/desk-inkshelf-library.webp" width="1600" height="1000" alt="InkShelfs on Windows: one library with novels and manga, and All, Novels and Manga tabs.">
+      <div class="win">
+        <div class="bar" aria-hidden="true"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div>
+        <img src="img/desk-inkshelf-library.webp" width="1600" height="1000" fetchpriority="high" alt="InkShelfs on Windows: one library with novels and manga, and All, Novels and Manga tabs.">
       </div>
       <div class="phone"><img src="img/phone-reader.webp" width="1170" height="2532" alt="Reading a chapter on an Android phone."></div>
     </div>
@@ -292,7 +363,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
         <p>On Windows you get the same library and reader in a desktop window, with room for the full chapter list, 100 chapters a page. Export any novel as an EPUB for Kindle, Play Books, Apple Books or KOReader, and back up the whole library to one file.</p>
         <ul><li>EPUB for novels, CBZ for manga</li><li>One site window: a “verify you’re human” check passed once counts for both</li></ul>
       </div>
-      <div class="win" aria-hidden="true"><div class="bar"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div><img src="img/desk-novel.webp" width="2560" height="1600" loading="lazy" alt="A novel's page on Windows with its chapter list."></div>
+      <div class="win"><div class="bar" aria-hidden="true"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div><img src="img/desk-novel.webp" width="2560" height="1600" loading="lazy" alt="A novel's page on Windows with its chapter list."></div>
     </div>
   </div>
 </section>
@@ -301,15 +372,15 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
   <div class="wrap tour">
     <div class="row">
       <div class="txt">
-        <h2>Manga, manhwa and manhua, <em style="font-style:italic;color:var(--accent)">offline</em>.</h2>
+        <h2>Manga, manhwa and manhua, <em class="accent-em">offline</em>.</h2>
         <p>Paste a series or chapter link from MangaDex, WEBTOON, Asura Scans or nine other sites. Pick all chapters, the first few, a range, or from the one you pasted. Every page is checked to be a real image before it’s saved, so a site’s error page never ends up in your copy.</p>
         <div class="kinds"><span>Manga</span><span>Manhwa</span><span>Manhua</span><span>Webtoons</span></div>
         <ul><li>A long strip for webtoons; pages right-to-left or left-to-right; two pages side by side</li><li>Pages keep their real size before they load, so the strip never jumps under your thumb</li><li>At the end of a chapter the next one opens, or downloads with one click</li><li>Select chapters to download or to free up space; save a series as one CBZ for Komga, Kavita or Mihon</li></ul>
         <p class="muted" style="font-size:.95rem">On Android too: swipe to turn pages, double-tap to zoom, and downloads keep going with the screen off.</p>
       </div>
       <div class="shots">
-        <div class="win" aria-hidden="true"><div class="bar"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div><img src="img/desk-manga-series.webp" width="1600" height="1000" loading="lazy" alt="A manga series page in InkShelfs with its chapter list and download buttons."></div>
-        <div class="win" aria-hidden="true"><div class="bar"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div><img src="img/desk-manga-reader.webp" width="1600" height="1000" loading="lazy" alt="The manga reader showing two pages side by side, right to left."></div>
+        <div class="win swap"><div class="bar" aria-hidden="true"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div><picture><source media="(max-width:760px)" srcset="img/phone-manga-series.webp" width="1170" height="2532"><img src="img/desk-manga-series.webp" width="1600" height="1000" loading="lazy" alt="A manhwa series page in InkShelfs with its cover, download buttons and chapter list."></picture></div>
+        <div class="win"><div class="bar" aria-hidden="true"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#2a2d33"/><path d="M14 14h15a3 3 0 0 1 3 3v33H17a3 3 0 0 1-3-3z" fill="#F7F3EC"/><path d="M32 17a3 3 0 0 1 3-3h15v33a3 3 0 0 1-3 3H32z" fill="#E9DFCE"/><circle cx="48" cy="48" r="7" fill="#A8431F"/></svg>InkShelfs<span class="ctl"><span>–</span><span>▢</span><span>✕</span></span></div><img src="img/desk-manga-reader.webp" width="1600" height="1000" loading="lazy" alt="The manga reader showing two pages side by side, right to left."></div>
       </div>
     </div>
   </div>
@@ -336,16 +407,16 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
   <div class="wrap">
     <div class="head"><h2>Installing: about the warnings</h2><p>InkShelfs is free and isn’t sold through the Microsoft Store or Google Play, so it isn’t signed with a paid publisher certificate. The first time you open it, Windows or Android will warn about an unknown app. That’s expected; here’s exactly what to tap.</p></div>
     <div class="install">
-      <div class="card">
+      <div class="card" data-os="Windows">
         <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5 10 4.5v7H3zm0 13 7 1v-7H3zM11 4.4 21 3v8.5H11zm0 15.2L21 21v-8.5H11z"/></svg>Windows 10 and 11</h3>
         <p class="why">Microsoft Defender SmartScreen blocks apps it hasn’t seen many people run yet.</p>
         <ol class="steps">
-          <li><span>Your browser may say <span class="say">“InkShelfs.exe isn’t commonly downloaded”</span>. In Edge choose <span class="ui">⋯</span>, <span class="ui">Keep</span>, then <span class="ui">Keep anyway</span>.<small>In Chrome, choose <span class="ui">Keep</span> on the download.</small></span></li>
+          <li><span>Your browser may say <span class="say">“InkShelfs.exe isn’t commonly downloaded”</span>. In Edge choose <span class="nw"><span class="ui">⋯</span>,</span> <span class="nw"><span class="ui">Keep</span>,</span> then <span class="nw"><span class="ui">Keep anyway</span>.</span><small>In Chrome, choose <span class="ui">Keep</span> on the download.</small></span></li>
           <li><span>Open <code>InkShelfs.exe</code>. A blue box says <span class="say">“Windows protected your PC”</span>. Click <span class="ui">More info</span>, the small link under the text.</span></li>
           <li><span>The publisher shows as <span class="say">“Unknown publisher”</span>. Click <span class="ui blue">Run anyway</span>.<small>Windows asks once for each new version.</small></span></li>
         </ol>
       </div>
-      <div class="card">
+      <div class="card" data-os="Android">
         <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.6 9.5 19.4 6.4a.4.4 0 1 0-.7-.4l-1.8 3.2A10.8 10.8 0 0 0 12 8.2c-1.8 0-3.5.4-4.9 1L5.3 6a.4.4 0 1 0-.7.4l1.8 3.1A9.5 9.5 0 0 0 1.5 17h21a9.5 9.5 0 0 0-4.9-7.5zM7 14.4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>Android 7 and newer</h3>
         <p class="why">Android protects you from apps that don’t come from Google Play, so it asks you to allow this one.</p>
         <ol class="steps">
@@ -378,7 +449,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
       <ul class="sites">
         <li>MangaDex</li><li>Mangapill</li><li>Weeb Central</li><li>MangaKatana</li><li>MangaRead</li><li>Toonily</li><li>ManhuaPlus</li><li>Flame Comics</li><li>WEBTOON <span class="muted">(free episodes)</span></li><li>MangaGeko</li><li>MangaNato / MangaKakalot</li><li>Asura Scans</li>
       </ul>
-      <p class="muted" style="margin-top:16px;font-size:.95rem">Every site was tested with a real download. The app’s Sites page lists them all with a “Try an example” link. Other novel sites open in a general reader mode, and when a site changes its layout, its rules can be fixed without a new release.</p>
+      <p class="muted note">Every site was tested with a real download. The app’s Sites page lists them all with a “Try an example” link. Other novel sites open in a general reader mode, and when a site changes its layout, its rules can be fixed without a new release.</p>
     </div>
     <div>
       <h2>What’s new in 3.2</h2>
@@ -389,13 +460,13 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
         <li><b>Search in Chinese and Japanese</b><span>Turn on 中文 or 日本語 and an English title finds the original too, often far ahead of the translations.</span></li>
         <li><b>Wattpad and AO3</b><span>Stories and works from both, with search.</span></li>
       </ul>
-      <h2 style="margin-top:40px;font-size:1.6rem">3.1</h2>
+      <h2 class="minor">3.1</h2>
       <ul class="new">
         <li><b>Android manga</b><span>Manga, manhwa and manhua on your phone: the same 12 sites, background downloads, Only on Wi-Fi, and CBZ saved to Downloads.</span></li>
         <li><b>Touch reader</b><span>Swipe to turn pages in the reading direction; double-tap to zoom in and pan, again to fit.</span></li>
         <li><b>Phone layout</b><span>A compact library header, a tidier series page, and how much space manga uses in Settings.</span></li>
       </ul>
-      <p style="margin-top:16px;font-size:.95rem"><a href="https://github.com/sulaimankhan8/novelarchiver/releases/latest">Full release notes</a></p>
+      <p class="note"><a href="https://github.com/sulaimankhan8/novelarchiver/releases/latest">Full release notes</a></p>
     </div>
   </div>
 </section>
@@ -468,6 +539,15 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-betw
 </dialog>
 
 <script>
+// The phone menu closes once a section is picked, on a tap outside, or on Esc.
+(function () {
+  var menu = document.querySelector('.menu');
+  if (!menu) return;
+  menu.addEventListener('click', function (e) { if (e.target.closest('a')) menu.open = false; });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.open) { menu.open = false; menu.querySelector('summary').focus(); } });
+  document.addEventListener('click', function (e) { if (menu.open && !menu.contains(e.target)) menu.open = false; });
+})();
+
 // After a download link is clicked, the download goes ahead as normal; two
 // short notes then ask readers to support creators and the sites they read
 // on. Both close with Esc, the × or a click outside, and can be turned off.
